@@ -627,7 +627,7 @@ Update this file as you progress. Commit after each major milestone.
   - [ ] Create `PaymentAdapterConfiguration.java`
   - [ ] Create Spring bean definitions
 - [ ] **Payment Infrastructure Tests**
-  - [ ] Create `JpaPaymentRepositoryTest.java`
+  - [x] Create `PaymentJpaRepositoryIntegrationTest.java` (7 tests passing)
   - [ ] Create `PaymentControllerTest.java`
   - [ ] Create `PaymentControllerIntegrationTest.java`
   - [ ] Create `StripePaymentProviderTest.java`
@@ -1066,7 +1066,7 @@ Update this file as you progress. Commit after each major milestone.
 
 ### 8.2 Integration Tests
 - [ ] **Repository Tests**
-  - [ ] Create `JpaPaymentRepositoryTest.java`
+  - [x] Create `PaymentJpaRepositoryIntegrationTest.java` (7 tests passing)
   - [ ] Create `JpaTransactionRepositoryTest.java`
   - [ ] Create `JpaRefundRepositoryTest.java`
   - [ ] Create `JpaMerchantRepositoryTest.java`

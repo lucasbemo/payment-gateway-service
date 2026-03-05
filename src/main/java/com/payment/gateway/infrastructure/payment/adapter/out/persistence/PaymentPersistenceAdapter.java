@@ -1,5 +1,6 @@
 package com.payment.gateway.infrastructure.payment.adapter.out.persistence;
 
+import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.port.PaymentRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +10,11 @@ import java.util.Optional;
 
 /**
  * Persistence adapter for Payment repository.
- * Implements the domain's PaymentRepositoryPort interface.
+ * Implements both the domain's PaymentRepositoryPort and application's PaymentQueryPort interfaces.
  */
 @Component
 @RequiredArgsConstructor
-public class PaymentPersistenceAdapter implements PaymentRepositoryPort {
+public class PaymentPersistenceAdapter implements PaymentRepositoryPort, PaymentQueryPort {
 
     private final PaymentJpaRepository paymentJpaRepository;
     private final PaymentMapper paymentMapper;
