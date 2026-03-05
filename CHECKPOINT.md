@@ -141,7 +141,7 @@ Update this file as you progress. Commit after each major milestone.
 
 ### 2.1 Common Domain Components
 - [x] Create base domain classes
-  - [ ] Create `BaseEntity.java` in domain (if needed)
+  - [x] Create `BaseEntity.java` in domain (if needed)
   - [x] Create domain exception base classes
 
 ### 2.2 Payment Domain (Bounded Context)
@@ -367,18 +367,18 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Test discrepancy management
     - [x] Test settlement report handling
   - [x] Create `ReconciliationDomainServiceTest.java`
-  - [ ] Create `EventStatus.java` (Enum)
-    - [ ] Define statuses: PENDING, PUBLISHED, FAILED
-- [ ] **Outbox Repository**
-  - [ ] Create `OutboxEventRepository.java` interface
-    - [ ] Define findByStatus method
-    - [ ] Define markAsPublished method
-    - [ ] Define markAsFailed method
-- [ ] **Outbox Domain Services**
-  - [ ] Create `OutboxEventDomainService.java`
-    - [ ] Implement event creation logic
-    - [ ] Implement event publishing logic
-    - [ ] Implement retry logic
+  - [x] Create `EventStatus.java` (Enum)
+    - [x] Define statuses: PENDING, PUBLISHED, FAILED
+- [x] **Outbox Repository**
+  - [x] Create `OutboxEventRepository.java` interface
+    - [x] Define findByStatus method
+    - [x] Define markAsPublished method
+    - [x] Define markAsFailed method
+- [x] **Outbox Domain Services**
+  - [x] Create `OutboxEventDomainService.java`
+    - [x] Implement event creation logic
+    - [x] Implement event publishing logic
+    - [x] Implement retry logic
 - [x] **Outbox Domain Tests**
   - [x] Create `OutboxEventTest.java`
   - [x] Create `OutboxEventDomainServiceTest.java`
