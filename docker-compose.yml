@@ -1,0 +1,184 @@
+services:
+  # Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: payment-gateway-service-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: payment_gateway
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - payment-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: payment-gateway-service-pgadmin
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - payment-network
+
+  # Message Broker
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: payment-gateway-service-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - payment-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: payment-gateway-service-kafka
+    ports:
+      - "9093:9093"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29093,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - payment-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: payment-gateway-service-kafka-ui
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29093
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - payment-network
+
+  # Redis for Idempotency
+  redis:
+    image: redis:7-alpine
+    container_name: payment-gateway-service-redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - payment-network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: payment-gateway-service-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - payment-network
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: payment-gateway-service-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - payment-network
+
+  # Zipkin for Tracing
+  zipkin:
+    image: openzipkin/zipkin:3.0
+    container_name: payment-gateway-service-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - payment-network
+
+  # MinIO for Report Storage (S3-compatible)
+  minio:
+    image: minio/minio:latest
+    container_name: payment-gateway-service-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - payment-network
+
+  # Application
+  payment-gateway:
+    build: .
+    container_name: payment-gateway-service-app
+    ports:
+      - "8000:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_gateway
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - payment-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  kafka_data:
+  redis_data:
+  grafana_data:
+  minio_data:
+
+networks:
+  payment-network:
+    driver: bridge
