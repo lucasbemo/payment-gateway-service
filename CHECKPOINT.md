@@ -396,138 +396,138 @@ Update this file as you progress. Commit after each major milestone.
 ## ⚙️ PHASE 3: APPLICATION LAYER IMPLEMENTATION
 
 ### 3.1 Payment Use Cases
-- [ ] **Input Ports (Use Case Interfaces)**
-  - [ ] Create `ProcessPaymentUseCase.java`
-    - [ ] Define processPayment command interface
-  - [ ] Create `GetPaymentUseCase.java`
-    - [ ] Define getPaymentById query interface
-    - [ ] Define getPaymentsByMerchant query interface
-  - [ ] Create `CancelPaymentUseCase.java`
-    - [ ] Define cancelPayment command interface
-  - [ ] Create `CapturePaymentUseCase.java`
-    - [ ] Define capturePayment command interface
-- [ ] **Output Ports (Adapter Interfaces)**
-  - [ ] Create `PaymentRepositoryPort.java`
-  - [ ] Create `TransactionRepositoryPort.java`
-  - [ ] Create `MerchantRepositoryPort.java`
-  - [ ] Create `CustomerRepositoryPort.java`
-  - [ ] Create `PaymentEventPublisherPort.java`
-  - [ ] Create `ExternalPaymentProviderPort.java`
-  - [ ] Create `TokenizationServicePort.java`
-- [ ] **Use Case Implementations**
-  - [ ] Create `ProcessPaymentService.java`
-    - [ ] Implement processPayment method
-    - [ ] Implement idempotency handling
-    - [ ] Implement transaction creation
-    - [ ] Implement outbox event creation
-  - [ ] Create `GetPaymentService.java`
-    - [ ] Implement getPaymentById method
-    - [ ] Implement getPaymentsByMerchant method
-  - [ ] Create `CancelPaymentService.java`
-    - [ ] Implement cancelPayment method
-    - [ ] Implement status validation
-  - [ ] Create `CapturePaymentService.java`
-    - [ ] Implement capturePayment method
-- [ ] **Payment Use Case Tests**
-  - [ ] Create `ProcessPaymentServiceTest.java`
-    - [ ] Test successful payment processing
-    - [ ] Test idempotent payment (duplicate request)
-    - [ ] Test payment with insufficient funds
-    - [ ] Test payment with invalid data
-  - [ ] Create `GetPaymentServiceTest.java`
-  - [ ] Create `CancelPaymentServiceTest.java`
+- [x] **Input Ports (Use Case Interfaces)**
+  - [x] Create `ProcessPaymentUseCase.java`
+    - [x] Define processPayment command interface
+  - [x] Create `GetPaymentUseCase.java`
+    - [x] Define getPaymentById query interface
+    - [x] Define getPaymentsByMerchant query interface
+  - [x] Create `CancelPaymentUseCase.java`
+    - [x] Define cancelPayment command interface
+  - [x] Create `CapturePaymentUseCase.java`
+    - [x] Define capturePayment command interface
+- [x] **Output Ports (Adapter Interfaces)**
+  - [x] Create `PaymentRepositoryPort.java`
+  - [x] Create `TransactionRepositoryPort.java`
+  - [x] Create `MerchantRepositoryPort.java`
+  - [x] Create `CustomerRepositoryPort.java`
+  - [x] Create `PaymentEventPublisherPort.java`
+  - [x] Create `ExternalPaymentProviderPort.java`
+  - [x] Create `TokenizationServicePort.java`
+- [x] **Use Case Implementations**
+  - [x] Create `ProcessPaymentService.java`
+    - [x] Implement processPayment method
+    - [x] Implement idempotency handling
+    - [x] Implement transaction creation
+    - [x] Implement outbox event creation
+  - [x] Create `GetPaymentService.java`
+    - [x] Implement getPaymentById method
+    - [x] Implement getPaymentsByMerchant method
+  - [x] Create `CancelPaymentService.java`
+    - [x] Implement cancelPayment method
+    - [x] Implement status validation
+  - [x] Create `CapturePaymentService.java`
+    - [x] Implement capturePayment method
+- [x] **Payment Use Case Tests**
+  - [x] Create `ProcessPaymentServiceTest.java`
+    - [x] Test successful payment processing
+    - [x] Test idempotent payment (duplicate request)
+    - [x] Test payment with insufficient funds
+    - [x] Test payment with invalid data
+  - [x] Create `GetPaymentServiceTest.java`
+  - [x] Create `CancelPaymentServiceTest.java`
 
 ### 3.2 Refund Use Cases
-- [ ] **Input Ports**
-  - [ ] Create `ProcessRefundUseCase.java`
-  - [ ] Create `GetRefundUseCase.java`
-  - [ ] Create `CancelRefundUseCase.java`
-- [ ] **Output Ports**
-  - [ ] Create `RefundRepositoryPort.java`
-  - [ ] Create `PaymentRepositoryPort.java` (reference to payment port)
-  - [ ] Create `TransactionRepositoryPort.java` (reference)
-  - [ ] Create `RefundEventPublisherPort.java`
-- [ ] **Use Case Implementations**
-  - [ ] Create `ProcessRefundService.java`
-    - [ ] Implement full refund logic
-    - [ ] Implement partial refund logic
-    - [ ] Implement refund validation
-  - [ ] Create `GetRefundService.java`
-  - [ ] Create `CancelRefundService.java`
-- [ ] **Refund Use Case Tests**
-  - [ ] Create `ProcessRefundServiceTest.java`
-  - [ ] Create `GetRefundServiceTest.java`
+- [x] **Input Ports**
+  - [x] Create `ProcessRefundUseCase.java`
+  - [x] Create `GetRefundUseCase.java`
+  - [x] Create `CancelRefundUseCase.java`
+- [x] **Output Ports**
+  - [x] Create `RefundRepositoryPort.java`
+  - [x] Create `PaymentRepositoryPort.java` (reference to payment port)
+  - [x] Create `TransactionRepositoryPort.java` (reference)
+  - [x] Create `RefundEventPublisherPort.java`
+- [x] **Use Case Implementations**
+  - [x] Create `ProcessRefundService.java`
+    - [x] Implement full refund logic
+    - [x] Implement partial refund logic
+    - [x] Implement refund validation
+  - [x] Create `GetRefundService.java`
+  - [x] Create `CancelRefundService.java`
+- [x] **Refund Use Case Tests**
+  - [x] Create `ProcessRefundServiceTest.java`
+  - [x] Create `GetRefundServiceTest.java`
 
 ### 3.3 Transaction Use Cases
-- [ ] **Input Ports**
-  - [ ] Create `GetTransactionUseCase.java`
-  - [ ] Create `VoidTransactionUseCase.java`
-  - [ ] Create `CaptureTransactionUseCase.java`
-- [ ] **Output Ports**
-  - [ ] Create `TransactionRepositoryPort.java`
-  - [ ] Create `PaymentRepositoryPort.java`
-  - [ ] Create `ExternalPaymentProviderPort.java`
-- [ ] **Use Case Implementations**
-  - [ ] Create `GetTransactionService.java`
-  - [ ] Create `VoidTransactionService.java`
-  - [ ] Create `CaptureTransactionService.java`
+- [x] **Input Ports**
+  - [x] Create `GetTransactionUseCase.java`
+  - [x] Create `VoidTransactionUseCase.java`
+  - [x] Create `CaptureTransactionUseCase.java`
+- [x] **Output Ports**
+  - [x] Create `TransactionRepositoryPort.java`
+  - [x] Create `PaymentRepositoryPort.java`
+  - [x] Create `ExternalPaymentProviderPort.java`
+- [x] **Use Case Implementations**
+  - [x] Create `GetTransactionService.java`
+  - [x] Create `VoidTransactionService.java`
+  - [x] Create `CaptureTransactionService.java`
 - [ ] **Transaction Use Case Tests**
-  - [ ] Create `GetTransactionServiceTest.java`
-  - [ ] Create `VoidTransactionServiceTest.java`
+  - [x] Create `GetTransactionServiceTest.java`
+  - [x] Create `VoidTransactionServiceTest.java`
 
 ### 3.4 Merchant Use Cases
-- [ ] **Input Ports**
-  - [ ] Create `RegisterMerchantUseCase.java`
-  - [ ] Create `GetMerchantUseCase.java`
-  - [ ] Create `UpdateMerchantUseCase.java`
-  - [ ] Create `SuspendMerchantUseCase.java`
-- [ ] **Output Ports**
-  - [ ] Create `MerchantRepositoryPort.java`
-- [ ] **Use Case Implementations**
-  - [ ] Create `RegisterMerchantService.java`
-  - [ ] Create `GetMerchantService.java`
-  - [ ] Create `UpdateMerchantService.java`
-  - [ ] Create `SuspendMerchantService.java`
+- [x] **Input Ports**
+  - [x] Create `RegisterMerchantUseCase.java`
+  - [x] Create `GetMerchantUseCase.java`
+  - [x] Create `UpdateMerchantUseCase.java`
+  - [x] Create `SuspendMerchantUseCase.java`
+- [x] **Output Ports**
+  - [x] Create `MerchantRepositoryPort.java`
+- [x] **Use Case Implementations**
+  - [x] Create `RegisterMerchantService.java`
+  - [x] Create `GetMerchantService.java`
+  - [x] Create `UpdateMerchantService.java`
+  - [x] Create `SuspendMerchantService.java`
 - [ ] **Merchant Use Case Tests**
-  - [ ] Create `RegisterMerchantServiceTest.java`
-  - [ ] Create `GetMerchantServiceTest.java`
+  - [x] Create `RegisterMerchantServiceTest.java`
+  - [x] Create `GetMerchantServiceTest.java`
 
 ### 3.5 Customer Use Cases
-- [ ] **Input Ports**
-  - [ ] Create `RegisterCustomerUseCase.java`
-  - [ ] Create `GetCustomerUseCase.java`
-  - [ ] Create `AddPaymentMethodUseCase.java`
-  - [ ] Create `RemovePaymentMethodUseCase.java`
-- [ ] **Output Ports**
-  - [ ] Create `CustomerRepositoryPort.java`
-  - [ ] Create `TokenizationServicePort.java`
-- [ ] **Use Case Implementations**
-  - [ ] Create `RegisterCustomerService.java`
-  - [ ] Create `GetCustomerService.java`
-  - [ ] Create `AddPaymentMethodService.java`
-  - [ ] Create `RemovePaymentMethodService.java`
+- [x] **Input Ports**
+  - [x] Create `RegisterCustomerUseCase.java`
+  - [x] Create `GetCustomerUseCase.java`
+  - [x] Create `AddPaymentMethodUseCase.java`
+  - [x] Create `RemovePaymentMethodUseCase.java`
+- [x] **Output Ports**
+  - [x] Create `CustomerRepositoryPort.java`
+  - [x] Create `TokenizationServicePort.java`
+- [x] **Use Case Implementations**
+  - [x] Create `RegisterCustomerService.java`
+  - [x] Create `GetCustomerService.java`
+  - [x] Create `AddPaymentMethodService.java`
+  - [x] Create `RemovePaymentMethodService.java`
 - [ ] **Customer Use Case Tests**
-  - [ ] Create `RegisterCustomerServiceTest.java`
-  - [ ] Create `AddPaymentMethodServiceTest.java`
+  - [x] Create `RegisterCustomerServiceTest.java`
+  - [x] Create `AddPaymentMethodServiceTest.java`
 
 ### 3.6 Reconciliation Use Cases
-- [ ] **Input Ports**
-  - [ ] Create `ReconcileTransactionsUseCase.java`
-  - [ ] Create `GenerateSettlementReportUseCase.java`
-- [ ] **Output Ports**
-  - [ ] Create `TransactionRepositoryPort.java`
-  - [ ] Create `PaymentRepositoryPort.java`
-  - [ ] Create `ReportGeneratorPort.java`
-- [ ] **Use Case Implementations**
-  - [ ] Create `ReconcileTransactionsService.java`
-  - [ ] Create `GenerateSettlementReportService.java`
+- [x] **Input Ports**
+  - [x] Create `ReconcileTransactionsUseCase.java`
+  - [x] Create `GenerateSettlementReportUseCase.java`
+- [x] **Output Ports**
+  - [x] Create `TransactionRepositoryPort.java`
+  - [x] Create `PaymentRepositoryPort.java`
+  - [x] Create `ReportGeneratorPort.java`
+- [x] **Use Case Implementations**
+  - [x] Create `ReconcileTransactionsService.java`
+  - [x] Create `GenerateSettlementReportService.java`
 
 **Phase 3 Completion Criteria:**
-- [ ] All use case interfaces are defined
-- [ ] All output port interfaces are defined
-- [ ] All use case implementations are complete
-- [ ] All use case unit tests pass
-- [ ] Use cases only depend on ports (interfaces), not concrete implementations
+- [x] All use case interfaces are defined
+- [x] All output port interfaces are defined
+- [x] All use case implementations are complete
+- [x] All use case unit tests pass
+- [x] Use cases only depend on ports (interfaces), not concrete implementations
 
 ---
 
