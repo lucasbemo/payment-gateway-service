@@ -1,3 +1,28 @@
+# =============================================================================
+# ⚠️ SECURITY NOTICE: Development Docker Compose
+# =============================================================================
+# This file contains DEFAULT DEVELOPMENT CREDENTIALS for local development only.
+#
+# DEFAULT CREDENTIALS (CHANGE FOR PRODUCTION):
+#   - PostgreSQL: admin/admin
+#   - pgAdmin: admin@admin.com / admin
+#   - Grafana: admin/admin
+#   - MinIO: minioadmin/minioadmin
+#
+# For production:
+#   1. Use environment variables from .env file
+#   2. Use Docker secrets or external secrets management
+#   3. Enable TLS/SSL for all communications
+#   4. Restrict network access using Docker networks
+#   5. Use strong, randomly generated passwords
+#
+# Usage:
+#   docker-compose up -d
+#   # Or with override for local development:
+#   docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
+# =============================================================================
+version: '3.8'
+
 services:
   # Database
   postgres:
@@ -7,10 +32,11 @@ services:
       - "5433:5432"
     environment:
       POSTGRES_DB: payment_gateway
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      # ⚠️ DEVELOPMENT DEFAULTS - Override via .env for production!
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,8 +51,9 @@ services:
     ports:
       - "8080:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      # ⚠️ DEVELOPMENT DEFAULTS - Override via .env for production!
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     depends_on:
       - postgres
     volumes:
@@ -115,7 +142,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      # ⚠️ DEVELOPMENT DEFAULT - Override via .env for production!
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
     depends_on:
       - prometheus
     volumes:
@@ -140,8 +168,9 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      # ⚠️ DEVELOPMENT DEFAULTS - Override via .env for production!
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -162,9 +191,10 @@ services:
       redis:
         condition: service_healthy
     environment:
+      # ⚠️ DEVELOPMENT DEFAULTS - Override via .env for production!
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_gateway
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-admin}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-admin}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_DATA_REDIS_HOST: redis
       SPRING_PROFILES_ACTIVE: dev

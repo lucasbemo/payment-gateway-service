@@ -1,12 +1,27 @@
+# =============================================================================
+# ⚠️ SECURITY NOTICE: Development Configuration
+# =============================================================================
+# This file contains DEFAULT DEVELOPMENT CREDENTIALS for local development only.
+# DO NOT use these defaults in production or staging environments.
+#
+# For production, use application-prod.yml with environment variables:
+#   - DATASOURCE_USERNAME
+#   - DATASOURCE_PASSWORD
+#   - All other sensitive configuration
+#
+# Recommended: Override sensitive values using environment variables or
+# docker-compose override files even for development.
+# =============================================================================
 spring:
   config:
     activate:
       on-profile: dev
 
   datasource:
+    # ⚠️ DEVELOPMENT DEFAULTS - Override in production!
     url: jdbc:postgresql://localhost:5432/payment_gateway
-    username: admin
-    password: admin
+    username: ${DATASOURCE_USERNAME:admin}
+    password: ${DATASOURCE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
 
   jpa:
