@@ -258,7 +258,7 @@ Update this file as you progress. Commit after each major milestone.
 - [x] **Merchant Exceptions**
   - [x] Create `MerchantNotFoundException.java`
   - [x] Create `MerchantConfigurationException.java`
-  - [ ] Create `InvalidMerchantException.java`
+  - [x] Create `InvalidMerchantException.java`
 - [x] **Merchant Domain Tests**
   - [x] Create `MerchantTest.java`
     - [x] Test merchant registration
