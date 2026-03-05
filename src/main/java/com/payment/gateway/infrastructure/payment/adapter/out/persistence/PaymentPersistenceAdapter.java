@@ -27,6 +27,11 @@ public class PaymentPersistenceAdapter implements PaymentRepositoryPort, Payment
     }
 
     @Override
+    public Payment savePayment(Payment payment) {
+        return save(payment);
+    }
+
+    @Override
     public Optional<Payment> findById(String id) {
         return paymentJpaRepository.findById(id).map(paymentMapper::toDomain);
     }

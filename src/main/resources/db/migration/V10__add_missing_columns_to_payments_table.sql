@@ -1,0 +1,8 @@
+-- V10__add_missing_columns_to_payments_table.sql
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS gateway_transaction_id VARCHAR(128);
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS error_code VARCHAR(64);
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS error_message VARCHAR(1024);
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS authorized_at TIMESTAMP;
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS captured_at TIMESTAMP;
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP;
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS failed_at TIMESTAMP;

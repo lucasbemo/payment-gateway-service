@@ -14,7 +14,7 @@ public final class IdGenerator {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
     private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
-    private IdGenerator() {
+    public IdGenerator() {
         // Private constructor to prevent instantiation
     }
 

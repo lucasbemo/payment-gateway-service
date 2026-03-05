@@ -5,6 +5,20 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
 
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5433/payment_gateway}
+    username: ${DATASOURCE_USERNAME:admin}
+    password: ${DATASOURCE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9093}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:
