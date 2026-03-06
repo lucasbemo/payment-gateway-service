@@ -1,5 +1,6 @@
 package com.payment.gateway.infrastructure.merchant.adapter.out.persistence;
 
+import com.payment.gateway.application.merchant.port.out.MerchantCommandPort;
 import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.port.MerchantRepositoryPort;
@@ -11,11 +12,11 @@ import java.util.Optional;
 
 /**
  * Persistence adapter for Merchant repository.
- * Implements both the domain's MerchantRepositoryPort and application's MerchantQueryPort interfaces.
+ * Implements domain, application query, and application command port interfaces.
  */
 @Component
 @RequiredArgsConstructor
-public class MerchantPersistenceAdapter implements MerchantRepositoryPort, MerchantQueryPort {
+public class MerchantPersistenceAdapter implements MerchantRepositoryPort, MerchantQueryPort, MerchantCommandPort {
 
     private final MerchantJpaRepository merchantJpaRepository;
     private final MerchantMapper merchantMapper;
@@ -62,5 +63,10 @@ public class MerchantPersistenceAdapter implements MerchantRepositoryPort, Merch
     @Override
     public boolean existsById(String id) {
         return merchantJpaRepository.existsById(id);
+    }
+
+    @Override
+    public Merchant saveMerchant(Merchant merchant) {
+        return save(merchant);
     }
 }
