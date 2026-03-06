@@ -64,6 +64,24 @@ public class ReconciliationBatchJpaEntity {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    // Getters
+    public String getId() { return id; }
+    public String getMerchantId() { return merchantId; }
+    public LocalDate getReconciliationDate() { return reconciliationDate; }
+    public String getGatewayName() { return gatewayName; }
+    public String getStatus() { return status; }
+    public Integer getTotalTransactions() { return totalTransactions; }
+    public Integer getMatchedTransactions() { return matchedTransactions; }
+    public Integer getUnmatchedTransactions() { return unmatchedTransactions; }
+    public BigDecimal getTotalAmount() { return totalAmount; }
+    public BigDecimal getMatchedAmount() { return matchedAmount; }
+    public Integer getDiscrepancyCount() { return discrepancyCount; }
+    public String getInitiatedBy() { return initiatedBy; }
+    public Instant getStartedAt() { return startedAt; }
+    public Instant getCompletedAt() { return completedAt; }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
+
     private ReconciliationBatchJpaEntity(Builder builder) {
         this.id = builder.id;
         this.merchantId = builder.merchantId;

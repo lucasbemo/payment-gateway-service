@@ -14,10 +14,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,6 +53,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/payments - should process payment")
+    @WithMockUser
     void shouldProcessPayment() throws Exception {
         var appResponse = PaymentResponse.builder()
                 .id("pay-123")
@@ -87,13 +88,16 @@ class PaymentControllerTest {
 
         mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Idempotency-Key", "idem-1")
                         .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value("pay-123"));
     }
 
     @Test
     @DisplayName("GET /api/v1/payments/{id} - should get payment")
+    @WithMockUser
     void shouldGetPayment() throws Exception {
         var appResponse = PaymentResponse.builder()
                 .id("pay-123")
@@ -116,13 +120,16 @@ class PaymentControllerTest {
                         .status("AUTHORIZED")
                         .build());
 
-        mockMvc.perform(get("/api/v1/payments/pay-123"))
+        mockMvc.perform(get("/api/v1/payments/pay-123")
+                        .param("merchantId", "merchant-1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value("pay-123"));
     }
 
     @Test
     @DisplayName("POST /api/v1/payments/{id}/capture - should capture payment")
+    @WithMockUser
     void shouldCapturePayment() throws Exception {
         var appResponse = PaymentResponse.builder()
                 .id("pay-123")
@@ -144,6 +151,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/payments/{id}/cancel - should cancel payment")
+    @WithMockUser
     void shouldCancelPayment() throws Exception {
         var appResponse = PaymentResponse.builder()
                 .id("pay-123")
@@ -165,9 +173,11 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/payments - should fail validation with missing fields")
+    @WithMockUser
     void shouldFailValidationWithMissingFields() throws Exception {
         mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Idempotency-Key", "test-idem-key")
                         .content("{}"))
                 .andExpect(status().isBadRequest());
     }

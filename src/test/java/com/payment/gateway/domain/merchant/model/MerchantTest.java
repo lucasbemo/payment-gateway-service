@@ -21,6 +21,7 @@ class MerchantTest {
         Merchant merchant = Merchant.register(
             MERCHANT_NAME,
             MERCHANT_EMAIL,
+            API_KEY,
             hash(API_KEY),
             hash(API_SECRET),
             WEBHOOK_URL,
@@ -41,6 +42,7 @@ class MerchantTest {
             () -> Merchant.register(
                 null,
                 MERCHANT_EMAIL,
+                API_KEY,
                 hash(API_KEY),
                 hash(API_SECRET),
                 WEBHOOK_URL,
@@ -56,6 +58,7 @@ class MerchantTest {
             () -> Merchant.register(
                 MERCHANT_NAME,
                 "invalid-email",
+                API_KEY,
                 hash(API_KEY),
                 hash(API_SECRET),
                 WEBHOOK_URL,
@@ -72,6 +75,7 @@ class MerchantTest {
                 MERCHANT_NAME,
                 MERCHANT_EMAIL,
                 null,
+                hash(API_KEY),
                 hash(API_SECRET),
                 WEBHOOK_URL,
                 MerchantConfiguration.empty()
@@ -187,6 +191,7 @@ class MerchantTest {
         return Merchant.register(
             MERCHANT_NAME,
             MERCHANT_EMAIL,
+            API_KEY,
             hash(API_KEY),
             hash(API_SECRET),
             WEBHOOK_URL,

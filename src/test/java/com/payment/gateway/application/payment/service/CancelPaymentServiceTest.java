@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,7 +59,7 @@ class CancelPaymentServiceTest {
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
             given(externalPaymentProviderPort.cancel(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(true, "cancel_txn", null, null)
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "cancel_txn", null, null))
             );
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -85,7 +86,7 @@ class CancelPaymentServiceTest {
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
             given(externalPaymentProviderPort.cancel(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "ERR_CANCEL", "Provider cancel failed")
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "ERR_CANCEL", "Provider cancel failed"))
             );
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
 

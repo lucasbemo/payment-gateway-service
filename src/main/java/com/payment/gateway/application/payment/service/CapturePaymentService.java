@@ -67,12 +67,17 @@ public class CapturePaymentService implements CapturePaymentUseCase {
                         payment.getPaymentMethodId()
                 );
 
-        ExternalPaymentProviderPort.PaymentProviderResult result =
-                externalPaymentProviderPort.capture(request);
+        try {
+            ExternalPaymentProviderPort.PaymentProviderResult result =
+                    externalPaymentProviderPort.capture(request).join();
 
-        if (!result.success()) {
-            log.error("Payment capture failed: {} - {}", result.errorCode(), result.errorMessage());
-            throw new BusinessException("Payment capture failed: " + result.errorMessage());
+            if (!result.success()) {
+                log.error("Payment capture failed: {} - {}", result.errorCode(), result.errorMessage());
+                throw new BusinessException("Payment capture failed: " + result.errorMessage());
+            }
+        } catch (Exception e) {
+            log.error("Payment capture failed with exception: {}", e.getMessage());
+            throw new BusinessException("Payment capture failed: " + e.getMessage());
         }
     }
 

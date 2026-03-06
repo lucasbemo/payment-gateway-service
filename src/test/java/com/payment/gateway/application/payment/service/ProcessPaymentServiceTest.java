@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -104,7 +105,7 @@ class ProcessPaymentServiceTest {
                 return payment;
             });
             given(externalPaymentProviderPort.authorize(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(true, "txn_xyz", null, null)
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "txn_xyz", null, null))
             );
 
             // When
@@ -208,7 +209,7 @@ class ProcessPaymentServiceTest {
                 return payment;
             });
             given(externalPaymentProviderPort.authorize(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "ERR_001", "Authorization declined")
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "ERR_001", "Authorization declined"))
             );
 
             // When & Then
@@ -224,6 +225,7 @@ class ProcessPaymentServiceTest {
         Merchant merchant = Merchant.register(
                 "Test Merchant",
                 "test@merchant.com",
+                "test-api-key",
                 "hashed_key",
                 "hashed_secret",
                 "https://webhook.example.com",

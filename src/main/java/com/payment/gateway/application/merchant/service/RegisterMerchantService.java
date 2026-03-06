@@ -48,6 +48,7 @@ public class RegisterMerchantService implements RegisterMerchantUseCase {
         Merchant merchant = Merchant.register(
                 command.getName(),
                 command.getEmail(),
+                apiKey,
                 apiKeyHash,
                 apiSecretHash,
                 command.getWebhookUrl(),

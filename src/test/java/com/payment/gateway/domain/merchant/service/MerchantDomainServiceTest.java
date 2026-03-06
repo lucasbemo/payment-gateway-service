@@ -54,6 +54,7 @@ class MerchantDomainServiceTest {
             Merchant merchant = Merchant.register(
                 MERCHANT_NAME,
                 MERCHANT_EMAIL,
+                "test-api-key",
                 "hashed_key",
                 "hashed_secret",
                 WEBHOOK_URL,
@@ -318,6 +319,7 @@ class MerchantDomainServiceTest {
             Merchant merchant = Merchant.register(
                 MERCHANT_NAME,
                 MERCHANT_EMAIL,
+                "test-api-key",
                 "hashed_key",
                 "hashed_secret",
                 WEBHOOK_URL,
@@ -337,6 +339,7 @@ class MerchantDomainServiceTest {
         Merchant merchant = Merchant.register(
             MERCHANT_NAME,
             MERCHANT_EMAIL,
+            "test-api-key",
             "hashed_key",
             "hashed_secret",
             WEBHOOK_URL,
@@ -350,6 +353,7 @@ class MerchantDomainServiceTest {
         return Merchant.register(
             MERCHANT_NAME,
             MERCHANT_EMAIL,
+            "test-api-key",
             "hashed_key",
             "hashed_secret",
             WEBHOOK_URL,

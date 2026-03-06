@@ -15,6 +15,7 @@ public class Merchant {
     private String id;
     private String name;
     private String email;
+    private String apiKey;
     private String apiKeyHash;
     private String apiSecretHash;
     private MerchantStatus status;
@@ -31,16 +32,18 @@ public class Merchant {
      */
     public static Merchant register(String name,
                                      String email,
+                                     String apiKey,
                                      String apiKeyHash,
                                      String apiSecretHash,
                                      String webhookUrl,
                                      MerchantConfiguration configuration) {
-        validateMerchantData(name, email, apiKeyHash, apiSecretHash);
+        validateMerchantData(name, email, apiKey, apiKeyHash, apiSecretHash);
 
         Merchant merchant = new Merchant();
         merchant.id = UUID.randomUUID().toString();
         merchant.name = name;
         merchant.email = email;
+        merchant.apiKey = apiKey;
         merchant.apiKeyHash = apiKeyHash;
         merchant.apiSecretHash = apiSecretHash;
         merchant.status = MerchantStatus.PENDING;
@@ -54,12 +57,15 @@ public class Merchant {
     }
 
     private static void validateMerchantData(String name, String email,
-                                              String apiKeyHash, String apiSecretHash) {
+                                              String apiKey, String apiKeyHash, String apiSecretHash) {
         if (name == null || name.isBlank()) {
             throw new BusinessException("Merchant name is required");
         }
         if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new BusinessException("Invalid email address: " + email);
+        }
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new BusinessException("API key is required");
         }
         if (apiKeyHash == null || apiKeyHash.isBlank()) {
             throw new BusinessException("API key hash is required");
@@ -151,6 +157,13 @@ public class Merchant {
         if (!this.apiKeyHash.equals(apiKeyHash)) {
             throw new BusinessException("Invalid API key");
         }
+    }
+
+    /**
+     * Get the API key (public identifier).
+     */
+    public String getApiKey() {
+        return apiKey;
     }
 
     private static String generateWebhookSecret() {

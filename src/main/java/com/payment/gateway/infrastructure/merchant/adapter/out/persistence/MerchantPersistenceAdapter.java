@@ -44,6 +44,11 @@ public class MerchantPersistenceAdapter implements MerchantRepositoryPort, Merch
     }
 
     @Override
+    public Optional<Merchant> findByApiKey(String apiKey) {
+        return merchantJpaRepository.findByApiKey(apiKey).map(merchantMapper::toDomain);
+    }
+
+    @Override
     public List<Merchant> findAll() {
         return merchantJpaRepository.findAll().stream()
                 .map(merchantMapper::toDomain)

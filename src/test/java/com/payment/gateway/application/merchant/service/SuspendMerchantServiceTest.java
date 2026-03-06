@@ -86,6 +86,7 @@ class SuspendMerchantServiceTest {
         Merchant merchant = Merchant.register(
                 "Test Merchant",
                 "test@merchant.com",
+                "test-api-key",
                 "hashed_key",
                 "hashed_secret",
                 "https://webhook.example.com",

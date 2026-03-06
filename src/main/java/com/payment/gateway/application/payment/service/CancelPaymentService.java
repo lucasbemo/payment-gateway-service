@@ -67,12 +67,17 @@ public class CancelPaymentService implements CancelPaymentUseCase {
                         payment.getPaymentMethodId()
                 );
 
-        ExternalPaymentProviderPort.PaymentProviderResult result =
-                externalPaymentProviderPort.cancel(request);
+        try {
+            ExternalPaymentProviderPort.PaymentProviderResult result =
+                    externalPaymentProviderPort.cancel(request).join();
 
-        if (!result.success()) {
-            log.warn("Payment cancellation with provider failed: {} - {}",
-                    result.errorCode(), result.errorMessage());
+            if (!result.success()) {
+                log.warn("Payment cancellation with provider failed: {} - {}",
+                        result.errorCode(), result.errorMessage());
+                // Don't throw exception - allow local cancellation even if provider fails
+            }
+        } catch (Exception e) {
+            log.warn("Payment cancellation with provider failed with exception: {}", e.getMessage());
             // Don't throw exception - allow local cancellation even if provider fails
         }
     }

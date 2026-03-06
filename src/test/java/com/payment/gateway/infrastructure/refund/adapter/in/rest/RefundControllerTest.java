@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -45,6 +46,7 @@ class RefundControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/refunds - should process refund")
+    @WithMockUser
     void shouldProcessRefund() throws Exception {
         var response = RefundResponse.builder()
                 .id("ref-123")
@@ -70,6 +72,7 @@ class RefundControllerTest {
 
     @Test
     @DisplayName("GET /api/v1/refunds/{id} - should get refund")
+    @WithMockUser
     void shouldGetRefund() throws Exception {
         var response = RefundResponse.builder()
                 .id("ref-123")
@@ -92,6 +95,7 @@ class RefundControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/refunds/{id}/cancel - should cancel refund")
+    @WithMockUser
     void shouldCancelRefund() throws Exception {
         var response = RefundResponse.builder()
                 .id("ref-123")
@@ -115,6 +119,7 @@ class RefundControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/refunds - should fail validation with missing fields")
+    @WithMockUser
     void shouldFailValidation() throws Exception {
         mockMvc.perform(post("/api/v1/refunds")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -166,13 +166,22 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                         payment.getPaymentMethodId()
                 );
 
-        ExternalPaymentProviderPort.PaymentProviderResult result =
-                externalPaymentProviderPort.authorize(request);
+        try {
+            ExternalPaymentProviderPort.PaymentProviderResult result =
+                    externalPaymentProviderPort.authorize(request).join();
 
-        if (!result.success()) {
-            log.error("Payment authorization failed: {} - {}", result.errorCode(), result.errorMessage());
+            if (!result.success()) {
+                log.error("Payment authorization failed: {} - {}", result.errorCode(), result.errorMessage());
+                payment.fail();
+                throw new BusinessException("Payment authorization failed: " + result.errorMessage());
+            }
+        } catch (BusinessException e) {
+            // Re-throw business exceptions (already handled)
+            throw e;
+        } catch (Exception e) {
+            log.error("Payment authorization failed with exception: {}", e.getMessage());
             payment.fail();
-            throw new BusinessException("Payment authorization failed: " + result.errorMessage());
+            throw new BusinessException("Payment authorization failed: " + e.getMessage());
         }
     }
 

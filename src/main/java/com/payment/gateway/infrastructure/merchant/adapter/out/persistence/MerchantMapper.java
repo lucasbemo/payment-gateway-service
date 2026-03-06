@@ -14,6 +14,7 @@ public class MerchantMapper {
                 .id(merchant.getId())
                 .name(merchant.getName())
                 .email(merchant.getEmail())
+                .apiKey(merchant.getApiKey())
                 .apiKeyHash(merchant.getApiKeyHash())
                 .apiSecretHash(merchant.getApiSecretHash())
                 .status(MerchantStatus.valueOf(merchant.getStatus().name()))
@@ -28,6 +29,7 @@ public class MerchantMapper {
         Merchant merchant = Merchant.register(
                 entity.getName(),
                 entity.getEmail(),
+                entity.getApiKey(),
                 entity.getApiKeyHash(),
                 entity.getApiSecretHash(),
                 entity.getWebhookUrl(),

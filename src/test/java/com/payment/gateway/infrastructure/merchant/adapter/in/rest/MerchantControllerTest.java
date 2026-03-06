@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -48,6 +49,7 @@ class MerchantControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/merchants - should register merchant")
+    @WithMockUser
     void shouldRegisterMerchant() throws Exception {
         var response = MerchantResponse.builder()
                 .id("m-123")
@@ -69,6 +71,7 @@ class MerchantControllerTest {
 
     @Test
     @DisplayName("GET /api/v1/merchants/{id} - should get merchant")
+    @WithMockUser
     void shouldGetMerchant() throws Exception {
         var response = MerchantResponse.builder()
                 .id("m-123")
@@ -88,6 +91,7 @@ class MerchantControllerTest {
 
     @Test
     @DisplayName("PUT /api/v1/merchants/{id} - should update merchant")
+    @WithMockUser
     void shouldUpdateMerchant() throws Exception {
         var response = MerchantResponse.builder()
                 .id("m-123")
@@ -108,6 +112,7 @@ class MerchantControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/merchants/{id}/suspend - should suspend merchant")
+    @WithMockUser
     void shouldSuspendMerchant() throws Exception {
         var response = MerchantResponse.builder()
                 .id("m-123")
@@ -126,6 +131,7 @@ class MerchantControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/merchants - should fail validation with missing fields")
+    @WithMockUser
     void shouldFailValidation() throws Exception {
         mockMvc.perform(post("/api/v1/merchants")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.CompletableFuture;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PayPalPaymentProviderTest {
@@ -30,7 +32,7 @@ class PayPalPaymentProviderTest {
                     "pay-001", "merchant-001", 5000L, "USD", "tok_paypal_visa"
             );
 
-            PaymentProviderResult result = provider.authorize(request);
+            PaymentProviderResult result = provider.authorize(request).join();
 
             assertThat(result.success()).isTrue();
             assertThat(result.providerTransactionId()).isEqualTo("paypal-auth-pay-001");
@@ -45,7 +47,7 @@ class PayPalPaymentProviderTest {
                     "pay-abc-456", "merchant-002", 7500L, "EUR", "tok_paypal_mc"
             );
 
-            PaymentProviderResult result = provider.authorize(request);
+            PaymentProviderResult result = provider.authorize(request).join();
 
             assertThat(result.providerTransactionId()).contains("pay-abc-456");
         }
@@ -62,7 +64,7 @@ class PayPalPaymentProviderTest {
                     "pay-002", "merchant-001", 5000L, "USD", "tok_paypal_visa"
             );
 
-            PaymentProviderResult result = provider.capture(request);
+            PaymentProviderResult result = provider.capture(request).join();
 
             assertThat(result.success()).isTrue();
             assertThat(result.providerTransactionId()).isEqualTo("paypal-capture-pay-002");
@@ -82,7 +84,7 @@ class PayPalPaymentProviderTest {
                     "pay-003", "merchant-001", 5000L, "USD", "tok_paypal_visa"
             );
 
-            PaymentProviderResult result = provider.cancel(request);
+            PaymentProviderResult result = provider.cancel(request).join();
 
             assertThat(result.success()).isTrue();
             assertThat(result.providerTransactionId()).isEqualTo("paypal-cancel-pay-003");
@@ -102,7 +104,7 @@ class PayPalPaymentProviderTest {
                     "5555555555554444", "06", "2028", "456"
             );
 
-            String token = provider.tokenizeCard(request);
+            String token = provider.tokenizeCard(request).join();
 
             assertThat(token).startsWith("tok_paypal_");
         }
@@ -114,9 +116,9 @@ class PayPalPaymentProviderTest {
                     "5555555555554444", "06", "2028", "456"
             );
 
-            String token1 = provider.tokenizeCard(request);
+            String token1 = provider.tokenizeCard(request).join();
             Thread.sleep(5);
-            String token2 = provider.tokenizeCard(request);
+            String token2 = provider.tokenizeCard(request).join();
 
             assertThat(token1).startsWith("tok_paypal_");
             assertThat(token2).startsWith("tok_paypal_");

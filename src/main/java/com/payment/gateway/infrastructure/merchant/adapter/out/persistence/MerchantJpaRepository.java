@@ -15,6 +15,8 @@ public interface MerchantJpaRepository extends JpaRepository<MerchantJpaEntity, 
 
     Optional<MerchantJpaEntity> findByApiKeyHash(String apiKeyHash);
 
+    Optional<MerchantJpaEntity> findByApiKey(String apiKey);
+
     boolean existsByEmail(String email);
 
     boolean existsByApiKeyHash(String apiKeyHash);

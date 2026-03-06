@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -59,7 +60,7 @@ class CapturePaymentServiceTest {
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
             given(externalPaymentProviderPort.capture(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_123", null, null)
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_123", null, null))
             );
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -87,7 +88,7 @@ class CapturePaymentServiceTest {
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
             given(externalPaymentProviderPort.capture(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_456", null, null)
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_456", null, null))
             );
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -221,7 +222,7 @@ class CapturePaymentServiceTest {
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
             given(externalPaymentProviderPort.capture(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "CAPTURE_FAILED", "Insufficient funds")
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "CAPTURE_FAILED", "Insufficient funds"))
             );
 
             // When & Then
@@ -242,7 +243,7 @@ class CapturePaymentServiceTest {
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
             given(externalPaymentProviderPort.capture(any())).willReturn(
-                    new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "TIMEOUT", "Gateway timeout")
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "TIMEOUT", "Gateway timeout"))
             );
 
             // When & Then

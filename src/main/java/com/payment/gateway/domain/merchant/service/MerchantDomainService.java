@@ -46,6 +46,7 @@ public class MerchantDomainService {
         Merchant merchant = Merchant.register(
             name,
             email,
+            apiKey,
             apiKeyHash,
             apiSecretHash,
             webhookUrl,

@@ -12,4 +12,6 @@ public interface MerchantQueryPort {
     Optional<Merchant> findById(String id);
 
     boolean existsById(String id);
+
+    Optional<Merchant> findByApiKey(String apiKey);
 }

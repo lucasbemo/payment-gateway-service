@@ -30,6 +30,7 @@ class MerchantMapperTest {
             Merchant merchant = Merchant.register(
                     "Acme Corp",
                     "acme@example.com",
+                    "test-api-key",
                     "api-key-hash-123",
                     "api-secret-hash-456",
                     "https://acme.com/webhook",
@@ -43,6 +44,7 @@ class MerchantMapperTest {
             assertThat(entity.getId()).isEqualTo(merchant.getId());
             assertThat(entity.getName()).isEqualTo("Acme Corp");
             assertThat(entity.getEmail()).isEqualTo("acme@example.com");
+            assertThat(entity.getApiKey()).isEqualTo("test-api-key");
             assertThat(entity.getApiKeyHash()).isEqualTo("api-key-hash-123");
             assertThat(entity.getApiSecretHash()).isEqualTo("api-secret-hash-456");
             assertThat(entity.getStatus()).isEqualTo(MerchantStatus.PENDING);
@@ -58,6 +60,7 @@ class MerchantMapperTest {
             Merchant merchant = Merchant.register(
                     "Active Corp",
                     "active@example.com",
+                    "test-api-key-2",
                     "key-hash",
                     "secret-hash",
                     null,
@@ -84,6 +87,7 @@ class MerchantMapperTest {
                     .id("merchant-id-999")
                     .name("Test Merchant")
                     .email("test@merchant.com")
+                    .apiKey("test-api-key-123")
                     .apiKeyHash("hash-key-abc")
                     .apiSecretHash("hash-secret-def")
                     .status(MerchantStatus.ACTIVE)
@@ -114,6 +118,7 @@ class MerchantMapperTest {
                     .id("merchant-suspended")
                     .name("Suspended Merchant")
                     .email("suspended@merchant.com")
+                    .apiKey("suspended-api-key")
                     .apiKeyHash("key-hash")
                     .apiSecretHash("secret-hash")
                     .status(MerchantStatus.SUSPENDED)
@@ -137,6 +142,7 @@ class MerchantMapperTest {
             Merchant original = Merchant.register(
                     "RoundTrip Corp",
                     "rt@example.com",
+                    "rt-api-key",
                     "rt-key-hash",
                     "rt-secret-hash",
                     "https://rt.com/webhook",
@@ -149,6 +155,7 @@ class MerchantMapperTest {
             assertThat(restored.getId()).isEqualTo(original.getId());
             assertThat(restored.getName()).isEqualTo(original.getName());
             assertThat(restored.getEmail()).isEqualTo(original.getEmail());
+            assertThat(restored.getApiKey()).isEqualTo(original.getApiKey());
             assertThat(restored.getApiKeyHash()).isEqualTo(original.getApiKeyHash());
             assertThat(restored.getApiSecretHash()).isEqualTo(original.getApiSecretHash());
             assertThat(restored.getWebhookUrl()).isEqualTo(original.getWebhookUrl());

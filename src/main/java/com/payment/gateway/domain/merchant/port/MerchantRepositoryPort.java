@@ -18,6 +18,8 @@ public interface MerchantRepositoryPort {
 
     Optional<Merchant> findByApiKeyHash(String apiKeyHash);
 
+    Optional<Merchant> findByApiKey(String apiKey);
+
     List<Merchant> findAll();
 
     boolean existsByEmail(String email);

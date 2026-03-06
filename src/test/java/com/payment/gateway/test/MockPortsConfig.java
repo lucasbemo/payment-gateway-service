@@ -5,6 +5,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Test configuration providing mock implementations for ports not under test.
@@ -23,6 +24,11 @@ public class MockPortsConfig {
             @Override
             public boolean existsById(String id) {
                 return false;
+            }
+
+            @Override
+            public Optional<com.payment.gateway.domain.merchant.model.Merchant> findByApiKey(String apiKey) {
+                return Optional.empty();
             }
         };
     }
@@ -56,23 +62,23 @@ public class MockPortsConfig {
     public ExternalPaymentProviderPort mockExternalPaymentProviderPort() {
         return new ExternalPaymentProviderPort() {
             @Override
-            public PaymentProviderResult authorize(PaymentProviderRequest request) {
-                return new PaymentProviderResult(true, "test-txn-id", null, null);
+            public CompletableFuture<PaymentProviderResult> authorize(PaymentProviderRequest request) {
+                return CompletableFuture.completedFuture(new PaymentProviderResult(true, "test-txn-id", null, null));
             }
 
             @Override
-            public PaymentProviderResult capture(PaymentProviderRequest request) {
-                return new PaymentProviderResult(true, "test-txn-id", null, null);
+            public CompletableFuture<PaymentProviderResult> capture(PaymentProviderRequest request) {
+                return CompletableFuture.completedFuture(new PaymentProviderResult(true, "test-txn-id", null, null));
             }
 
             @Override
-            public PaymentProviderResult cancel(PaymentProviderRequest request) {
-                return new PaymentProviderResult(true, "test-txn-id", null, null);
+            public CompletableFuture<PaymentProviderResult> cancel(PaymentProviderRequest request) {
+                return CompletableFuture.completedFuture(new PaymentProviderResult(true, "test-txn-id", null, null));
             }
 
             @Override
-            public String tokenizeCard(CardTokenizationRequest request) {
-                return "tok_test";
+            public CompletableFuture<String> tokenizeCard(CardTokenizationRequest request) {
+                return CompletableFuture.completedFuture("tok_test");
             }
         };
     }

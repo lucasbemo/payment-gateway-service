@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -48,6 +49,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/customers - should register customer")
+    @WithMockUser
     void shouldRegisterCustomer() throws Exception {
         var response = CustomerResponse.builder()
                 .id("c-123")
@@ -70,6 +72,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("GET /api/v1/customers/{id} - should get customer")
+    @WithMockUser
     void shouldGetCustomer() throws Exception {
         var response = CustomerResponse.builder()
                 .id("c-123")
@@ -89,6 +92,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/customers/{id}/payment-methods - should add payment method")
+    @WithMockUser
     void shouldAddPaymentMethod() throws Exception {
         var response = CustomerResponse.builder()
                 .id("c-123")
@@ -121,6 +125,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("DELETE /api/v1/customers/{id}/payment-methods/{pmId} - should remove payment method")
+    @WithMockUser
     void shouldRemovePaymentMethod() throws Exception {
         var response = CustomerResponse.builder()
                 .id("c-123")
@@ -140,6 +145,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/customers - should fail validation with missing fields")
+    @WithMockUser
     void shouldFailValidation() throws Exception {
         mockMvc.perform(post("/api/v1/customers")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -44,4 +44,12 @@ public class MerchantConfiguration {
     public boolean isEmpty() {
         return settings.isEmpty();
     }
+
+    /**
+     * Check if merchant has developer access (can manage API keys, webhooks, etc.).
+     */
+    public boolean hasDeveloperAccess() {
+        String value = settings.get("developerAccess");
+        return "true".equalsIgnoreCase(value);
+    }
 }

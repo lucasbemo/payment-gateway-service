@@ -26,6 +26,9 @@ public class MerchantJpaEntity {
     @Column(name = "email", nullable = false, length = 255, unique = true)
     private String email;
 
+    @Column(name = "api_key", length = 64, unique = true)
+    private String apiKey;
+
     @Column(name = "api_key_hash", length = 255)
     private String apiKeyHash;
 
@@ -53,6 +56,7 @@ public class MerchantJpaEntity {
         this.id = builder.id;
         this.name = builder.name;
         this.email = builder.email;
+        this.apiKey = builder.apiKey;
         this.apiKeyHash = builder.apiKeyHash;
         this.apiSecretHash = builder.apiSecretHash;
         this.status = builder.status;
@@ -70,6 +74,7 @@ public class MerchantJpaEntity {
         private String id;
         private String name;
         private String email;
+        private String apiKey;
         private String apiKeyHash;
         private String apiSecretHash;
         private MerchantStatus status;
@@ -90,6 +95,11 @@ public class MerchantJpaEntity {
 
         public Builder email(String email) {
             this.email = email;
+            return this;
+        }
+
+        public Builder apiKey(String apiKey) {
+            this.apiKey = apiKey;
             return this;
         }
 

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -38,6 +39,7 @@ class TransactionControllerTest {
 
     @Test
     @DisplayName("GET /api/v1/transactions/{id} - should get transaction")
+    @WithMockUser
     void shouldGetTransaction() throws Exception {
         var response = TransactionResponse.builder()
                 .id("txn-123")
@@ -60,6 +62,7 @@ class TransactionControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/transactions/{id}/capture - should capture transaction")
+    @WithMockUser
     void shouldCaptureTransaction() throws Exception {
         var response = TransactionResponse.builder()
                 .id("txn-123")
@@ -81,6 +84,7 @@ class TransactionControllerTest {
 
     @Test
     @DisplayName("POST /api/v1/transactions/{id}/void - should void transaction")
+    @WithMockUser
     void shouldVoidTransaction() throws Exception {
         var response = TransactionResponse.builder()
                 .id("txn-123")
