@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Aspect
-@Component
+@Component("serviceObservationAspect")
 @RequiredArgsConstructor
 public class SpanAspect {
 

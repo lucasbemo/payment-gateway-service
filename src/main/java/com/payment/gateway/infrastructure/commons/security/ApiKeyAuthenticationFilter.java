@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -16,10 +15,9 @@ import java.util.List;
 
 /**
  * Filter that authenticates requests using an API key header.
- * Currently inactive in the security filter chain (Phase 5 will activate it).
+ * Not auto-registered as a bean. Will be wired into SecurityConfig in Phase 5.
  */
 @Slf4j
-@Component
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String API_KEY_HEADER = "X-Api-Key";
