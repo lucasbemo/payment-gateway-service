@@ -39,6 +39,8 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        // Enable observation for distributed tracing
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
     }
 }

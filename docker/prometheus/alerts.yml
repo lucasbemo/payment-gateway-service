@@ -1,0 +1,135 @@
+groups:
+  - name: payment_gateway_alerts
+    interval: 30s
+    rules:
+      # High Error Rate Alert
+      - alert: HighPaymentErrorRate
+        expr: |
+          (sum(rate(payment_gateway_payments_failed_total[5m])) / sum(rate(payment_gateway_payments_processed_total[5m]))) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High payment error rate detected"
+          description: "Payment error rate is above 5% for more than 2 minutes. Current value: {{ $value | humanizePercentage }}"
+
+      # Circuit Breaker Open Alert
+      - alert: CircuitBreakerOpen
+        expr: |
+          resilience4j_circuitbreaker_state{state="open"} == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Circuit breaker {{ $labels.name }} is OPEN"
+          description: "Circuit breaker '{{ $labels.name }}' has been open for more than 1 minute. Service may be unavailable."
+
+      # High Latency Alert
+      - alert: HighPaymentLatency
+        expr: |
+          histogram_quantile(0.95, rate(payment_gateway_payments_processing_duration_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High payment processing latency"
+          description: "95th percentile payment processing time is above 2 seconds. Current value: {{ $value }}s"
+
+      # Refund Rate Alert
+      - alert: HighRefundRate
+        expr: |
+          (sum(rate(payment_gateway_refunds_processed_total[1h])) / sum(rate(payment_gateway_payments_approved_total[1h]))) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High refund rate detected"
+          description: "Refund rate is above 10% of approved payments. Current value: {{ $value | humanizePercentage }}"
+
+      # Rate Limiter Triggered Alert
+      - alert: RateLimiterActive
+        expr: |
+          resilience4j_ratelimiter_waiting_threads > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Rate limiter is actively throttling requests"
+          description: "Rate limiter '{{ $labels.name }}' has {{ $value }} waiting threads. Consider increasing limits."
+
+      # Bulkhead Saturation Alert
+      - alert: BulkheadNearCapacity
+        expr: |
+          (resilience4j_bulkhead_concurrent_calls / resilience4j_bulkhead_available_calls) > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Bulkhead {{ $labels.name }} is near capacity"
+          description: "Bulkhead is at {{ $value | humanizePercentage }} capacity. Consider increasing batch size."
+
+      # Kafka Consumer Lag Alert (if available)
+      - alert: KafkaConsumerLag
+        expr: |
+          kafka_consumer_lag > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Kafka consumer lag is above 1000 messages. Current value: {{ $value }}"
+
+      # JVM Memory Alert
+      - alert: HighMemoryUsage
+        expr: |
+          (jvm_memory_used_bytes / jvm_memory_max_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High JVM memory usage"
+          description: "JVM memory usage is above 85%. Current value: {{ $value | humanizePercentage }}"
+
+      # Database Connection Pool Alert
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          (hikaricp_active_connections / hikaricp_max_connections) > 0.9
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Database connection pool is at {{ $value | humanizePercentage }} capacity."
+
+      # Health Check Failed Alert
+      - alert: HealthCheckFailed
+        expr: |
+          up{job="payment-gateway"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Payment Gateway health check failed"
+          description: "The payment gateway service is not responding to health checks."
+
+      # Disk Space Alert
+      - alert: LowDiskSpace
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10%. Current available: {{ $value | humanizePercentage }}"
+
+      # GC Pause Alert
+      - alert: HighGCPauseTime
+        expr: |
+          rate(jvm_gc_pause_sum[5m]) / rate(jvm_gc_pause_count[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GC pause time"
+          description: "Average GC pause time is above 100ms. Current value: {{ $value | humanizeDuration }}"

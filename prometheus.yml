@@ -2,6 +2,16 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rule files
+rule_files:
+  - "alerts.yml"
+
 scrape_configs:
   - job_name: 'payment-gateway'
     metrics_path: '/actuator/prometheus'

@@ -50,6 +50,24 @@ management:
   tracing:
     sampling:
       probability: 1.0
+    propagation:
+      type: B3,W3C
+    baggage:
+      remote-fields:
+        - X-Correlation-Id
+        - X-B3-TraceId
+        - X-B3-SpanId
+        - X-B3-ParentSpanId
+        - X-B3-Sampled
+      fields:
+        - X-Correlation-Id
+        - traceId
+        - spanId
+        - parentId
+        - sampled
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_BASE_URL:http://localhost:9411}/api/v2/spans
 
 security:
   jwt:
