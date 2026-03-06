@@ -436,6 +436,7 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Test payment with invalid data
   - [x] Create `GetPaymentServiceTest.java`
   - [x] Create `CancelPaymentServiceTest.java`
+  - [x] Create `CapturePaymentServiceTest.java`
 
 ### 3.2 Refund Use Cases
 - [x] **Input Ports**
@@ -457,6 +458,7 @@ Update this file as you progress. Commit after each major milestone.
 - [x] **Refund Use Case Tests**
   - [x] Create `ProcessRefundServiceTest.java`
   - [x] Create `GetRefundServiceTest.java`
+  - [x] Create `CancelRefundServiceTest.java`
 
 ### 3.3 Transaction Use Cases
 - [x] **Input Ports**
@@ -471,9 +473,10 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `GetTransactionService.java`
   - [x] Create `VoidTransactionService.java`
   - [x] Create `CaptureTransactionService.java`
-- [ ] **Transaction Use Case Tests**
+- [x] **Transaction Use Case Tests**
   - [x] Create `GetTransactionServiceTest.java`
   - [x] Create `VoidTransactionServiceTest.java`
+  - [x] Create `CaptureTransactionServiceTest.java`
 
 ### 3.4 Merchant Use Cases
 - [x] **Input Ports**
@@ -488,9 +491,11 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `GetMerchantService.java`
   - [x] Create `UpdateMerchantService.java`
   - [x] Create `SuspendMerchantService.java`
-- [ ] **Merchant Use Case Tests**
+- [x] **Merchant Use Case Tests**
   - [x] Create `RegisterMerchantServiceTest.java`
   - [x] Create `GetMerchantServiceTest.java`
+  - [x] Create `UpdateMerchantServiceTest.java`
+  - [x] Create `SuspendMerchantServiceTest.java`
 
 ### 3.5 Customer Use Cases
 - [x] **Input Ports**
@@ -506,9 +511,11 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `GetCustomerService.java`
   - [x] Create `AddPaymentMethodService.java`
   - [x] Create `RemovePaymentMethodService.java`
-- [ ] **Customer Use Case Tests**
+- [x] **Customer Use Case Tests**
   - [x] Create `RegisterCustomerServiceTest.java`
   - [x] Create `AddPaymentMethodServiceTest.java`
+  - [x] Create `GetCustomerServiceTest.java`
+  - [x] Create `RemovePaymentMethodServiceTest.java`
 
 ### 3.6 Reconciliation Use Cases
 - [x] **Input Ports**
@@ -1380,27 +1387,27 @@ Update this file as you progress. Commit after each major milestone.
 
 ### Project Statistics
 - Domain Models: **8/8** bounded contexts (all complete)
-- Use Cases: **0/~20** use cases
-- REST Endpoints: **0/~25** endpoints
-- Database Tables: **8/9** tables (migrations created)
+- Use Cases: **20/20** use cases (all complete)
+- REST Endpoints: **1/~25** endpoints (PaymentController only)
+- Database Tables: **12** migrations created
 - Kafka Topics: **0/8** topics
-- Unit Tests: **668** tests (all passing)
-- Integration Tests: **0** tests
+- Unit Tests: **758** tests (all passing)
+- Integration Tests: **1** test (PaymentJpaRepositoryIntegrationTest)
 - E2E Tests: **0** tests
-- Architecture Tests: **0** tests
-- Code Coverage: **~65%** (domain layer + enum tests)
+- Architecture Tests: **1** test (HexagonalArchitectureTest)
+- Code Coverage: **~70%** (domain + application + commons)
 
 ### Phase Status
 | Phase | Status | Description |
 |-------|--------|-------------|
 | Phase 1: Project Initialization | **100%** | All items complete: Git, Docker Compose, docker-compose.override, init scripts, Kafka tests |
 | Phase 2: Domain Layer | **100%** | All 8 domain models + domain services + all enum tests complete |
-| Phase 3: Application Layer | **0%** | Not started |
-| Phase 4: Infrastructure | **0%** | Not started |
+| Phase 3: Application Layer | **100%** | All 20 use cases + DTOs + ports + 20 service tests complete |
+| Phase 4: Infrastructure | **~20%** | Payment/Merchant/Customer persistence + PaymentController + Kafka publisher done |
 | Phase 5: Security | **0%** | Not started |
 | Phase 6: Resilience | **0%** | Not started |
 | Phase 7: Event-Driven | **0%** | Not started |
-| Phase 8: Testing | **~30%** | All domain layer unit tests + enum tests complete (668 tests) |
+| Phase 8: Testing | **~40%** | Domain + application unit tests complete (758 tests), 1 integration test |
 | Phase 9: Observability | **0%** | Not started |
 | Phase 10: Documentation | **0%** | Not started |
 | Phase 11: Production Ready | **0%** | Not started |
@@ -1418,20 +1425,22 @@ Add your notes, blockers, and observations here:
 - Money value object should use BigDecimal with consistent scale for equality comparisons
 - Domain status transitions must be carefully tested to respect valid state changes
 - Enum tests provide comprehensive coverage of all status transitions and edge cases
+- All application services should have 1:1 test coverage with their service implementations
 
 ### Future Improvements
-- Start Phase 3: Application Layer (Use Cases, DTOs, Ports)
-- Start Phase 4: Infrastructure Layer (Entities, Repositories, Controllers)
+- Continue Phase 4: Infrastructure Layer (remaining adapters, controllers, persistence)
+- Start Phase 5: Security (Spring Security config, JWT, API Key auth)
 
 ---
 
-**Last Updated:** 2026-03-04
-**Project Status:** Phase 1 (100% complete), Phase 2 (100% complete)
-**Tests:** 668 passing (all domain layer tests + all enum tests)
+**Last Updated:** 2026-03-05
+**Project Status:** Phase 1 (100%), Phase 2 (100%), Phase 3 (100%)
+**Tests:** 758 passing (domain + application + commons + architecture)
 **Test Coverage:**
 - Domain Model Tests: 8 classes
 - Domain Service Tests: 8 classes
 - Enum Tests: 16 classes (all enums covered)
+- Application Service Tests: 20 classes (all use cases covered)
 - Commons Tests: 4 classes (Money, CryptoUtils, IdGenerator, StringUtils)
-**Project Status:** Phase 1 (100% complete), Phase 2 (100% complete)
-**Tests:** 40 passing (MoneyTest: 16, PaymentTest: 11, MerchantTest: 13)
+- Architecture Tests: 1 class (HexagonalArchitectureTest)
+- Integration Tests: 1 class (PaymentJpaRepositoryIntegrationTest)

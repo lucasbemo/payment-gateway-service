@@ -198,6 +198,10 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_DATA_REDIS_HOST: redis
       SPRING_PROFILES_ACTIVE: dev
+      AWS_REGION: us-east-1
+      SPRING_CLOUD_AWS_S3_ENDPOINT: http://minio:9000
+      SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: minioadmin
+      SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY: minioadmin
     networks:
       - payment-network
 
