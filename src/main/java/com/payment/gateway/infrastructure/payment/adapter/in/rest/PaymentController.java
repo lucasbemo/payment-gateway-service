@@ -36,6 +36,7 @@ public class PaymentController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<PaymentResponse>> processPayment(
+            @RequestHeader("X-Idempotency-Key") String idempotencyKey,
             @Valid @RequestBody CreatePaymentRequest request) {
         log.info("Processing payment for merchant: {} amount: {} {}",
                 request.getMerchantId(), request.getAmountInCents(), request.getCurrency());
@@ -45,7 +46,7 @@ public class PaymentController {
                 .amount(request.getAmountInCents())
                 .currency(request.getCurrency())
                 .paymentMethodType("CREDIT_CARD")
-                .idempotencyKey(request.getIdempotencyKey())
+                .idempotencyKey(idempotencyKey)
                 .description(request.getDescription())
                 .customerId(request.getCustomerId())
                 .items(request.getItems() != null ?
@@ -87,11 +88,13 @@ public class PaymentController {
      * GET /api/v1/payments/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PaymentResponse>> getPayment(@PathVariable String id) {
-        log.info("Getting payment: {}", id);
+    public ResponseEntity<ApiResponse<PaymentResponse>> getPayment(
+            @PathVariable String id,
+            @RequestParam String merchantId) {
+        log.info("Getting payment: {} for merchant: {}", id, merchantId);
 
         com.payment.gateway.application.payment.dto.PaymentResponse response =
-                getPaymentUseCase.getPaymentById(id, null);
+                getPaymentUseCase.getPaymentById(id, merchantId);
 
         PaymentResponse paymentResponse = paymentRestMapper.toResponse(
                 com.payment.gateway.domain.payment.model.Payment.create(

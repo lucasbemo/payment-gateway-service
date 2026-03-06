@@ -33,6 +33,7 @@ public class CreatePaymentRequest {
 
     private String paymentMethodId;
 
+    // Idempotency key is extracted from X-Idempotency-Key header
     private String idempotencyKey;
 
     private String description;
