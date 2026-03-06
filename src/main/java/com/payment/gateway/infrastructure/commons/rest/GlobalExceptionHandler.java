@@ -1,6 +1,9 @@
 package com.payment.gateway.infrastructure.commons.rest;
 
 import com.payment.gateway.commons.exception.BusinessException;
+import com.payment.gateway.commons.exception.ExternalServiceException;
+import com.payment.gateway.commons.exception.NotFoundException;
+import com.payment.gateway.commons.exception.ValidationException;
 import com.payment.gateway.domain.payment.exception.PaymentNotFoundException;
 import com.payment.gateway.domain.merchant.exception.MerchantNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +38,31 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex) {
+        log.warn("Not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(ValidationException ex) {
+        log.warn("Validation exception: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
         log.warn("Business exception: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ApiResponse<Void>> handleExternalServiceException(ExternalServiceException ex) {
+        log.error("External service error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
