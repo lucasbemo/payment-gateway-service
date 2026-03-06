@@ -548,44 +548,45 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Handle ValidationException
     - [x] Handle ExternalServiceException
   - [x] Create `ApiResponse.java` (generic response wrapper)
-  - [ ] Create `BaseController.java`
-  - [ ] Create `PageInfo.java` (pagination metadata)
-  - [ ] Create `RequestValidationFilter.java`
+  - [x] Create `BaseController.java` (base class with ok/created/noContent/okPaged helpers)
+  - [x] Create `PageInfo.java` (pagination metadata from Spring Data Page)
+  - [x] Create `PagedResponse.java` (paginated response wrapper)
+  - [x] Create `RequestValidationFilter.java` (content-length + content-type validation)
 - [x] **Persistence Common Components**
-  - [x] Create `JpaConfig.java` (auto-configured via Spring Boot)
-  - [ ] Create `BaseEntity.java` (JPA base with @MappedSuperclass)
-  - [ ] Create `AuditingConfig.java`
-  - [ ] Create `AuditorAwareImpl.java`
-  - [ ] Create `PessimisticLockingConfig.java`
-  - [ ] Create `DataSourceConfig.java`
-  - [ ] Create `HikariPoolConfig.java`
+  - [x] Create `JpaConfig.java` (@EnableJpaAuditing, @EnableJpaRepositories)
+  - [x] Create `BaseEntity.java` (JPA base with @MappedSuperclass, audit fields)
+  - [x] Create `AuditingConfig.java` (provides AuditorAware bean)
+  - [x] Create `AuditorAwareImpl.java` (resolves auditor from SecurityContext)
+  - [x] Create `PessimisticLockingConfig.java` (lock timeout constants)
+  - [x] Create `DataSourceConfig.java` (explicit DataSource bean with @ConfigurationProperties)
+  - [x] Create `HikariPoolConfig.java` (pool size constants, settings in application.yml)
 - [x] **Security Common Components**
   - [x] Create `SecurityConfig.java` (CSRF disabled, stateless sessions, CORS configured)
-  - [ ] Create `JwtAuthenticationFilter.java`
-  - [ ] Create `JwtTokenProvider.java`
-  - [ ] Create `RbacConfig.java`
-  - [ ] Create `ApiKeyAuthenticationFilter.java`
-- [ ] **Resilience Common Components**
-  - [ ] Create `Resilience4jConfig.java`
-  - [ ] Create `CircuitBreakerConfig.java`
-  - [ ] Create `RetryConfig.java`
-  - [ ] Create `RateLimiterConfig.java`
-  - [ ] Create `BulkheadConfig.java`
-  - [ ] Create `TimeLimiterConfig.java`
-- [ ] **Logging Common Components**
-  - [ ] Create `LoggingConfig.java`
-  - [ ] Create `CorrelationIdInterceptor.java`
-  - [ ] Create `AuditLogAspect.java`
-  - [ ] Create `StructuredLogger.java`
-- [ ] **Monitoring Common Components**
-  - [ ] Create `MetricsConfig.java`
-  - [ ] Create `HealthIndicatorConfig.java`
-  - [ ] Create `CustomMetricsBinder.java`
-  - [ ] Create `TracingConfig.java`
-  - [ ] Create `SpanAspect.java`
+  - [x] Create `JwtAuthenticationFilter.java` (JWT extraction + validation filter, activated in Phase 5)
+  - [x] Create `JwtTokenProvider.java` (HMAC-SHA256 JWT generation + validation)
+  - [x] Create `RbacConfig.java` (@EnableMethodSecurity, role definitions)
+  - [x] Create `ApiKeyAuthenticationFilter.java` (API key header filter, activated in Phase 5)
+- [x] **Resilience Common Components**
+  - [x] Create `Resilience4jConfig.java` (main config, auto-configured via starter)
+  - [x] Create `CircuitBreakerConfig.java` (registry + paymentProvider/externalService breakers)
+  - [x] Create `RetryConfig.java` (registry + retry policies for payment/external service)
+  - [x] Create `RateLimiterConfig.java` (registry + API/payment rate limiters)
+  - [x] Create `BulkheadConfig.java` (registry + payment/externalService bulkheads)
+  - [x] Create `TimeLimiterConfig.java` (registry + payment/externalService time limiters)
+- [x] **Logging Common Components**
+  - [x] Create `LoggingConfig.java` (WebMvcConfigurer with interceptor registration)
+  - [x] Create `CorrelationIdInterceptor.java` (X-Correlation-Id MDC management)
+  - [x] Create `AuditLogAspect.java` (controller method entry/exit/error logging)
+  - [x] Create `StructuredLogger.java` (MDC-enriched logging for payment/transaction/security events)
+- [x] **Monitoring Common Components**
+  - [x] Create `MetricsConfig.java` (MeterRegistryCustomizer with common tags)
+  - [x] Create `HealthIndicatorConfig.java` (Kafka + payment provider health indicators)
+  - [x] Create `CustomMetricsBinder.java` (payment/refund counters + processing timer)
+  - [x] Create `TracingConfig.java` (Micrometer Tracing with Brave/Zipkin bridge)
+  - [x] Create `SpanAspect.java` (observation spans for application service methods)
 - [x] **Async Common Components**
   - [x] Create `AsyncConfig.java` (@EnableAsync, @EnableScheduling)
-  - [ ] Create `VirtualThreadsConfig.java`
+  - [x] Create `VirtualThreadsConfig.java` (Java 21 virtual threads, conditional on property)
 
 ### 4.2 Payment Infrastructure
 - [x] **Persistence Adapter (Driven)**
@@ -612,15 +613,18 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Configure Kafka topic
     - [x] Implement event publishing logic
 - [x] **External Payment Provider Adapters**
-  - [x] Create `StubExternalPaymentProvider.java` (stub for development)
-  - [ ] Create `StripePaymentProvider.java`
-  - [ ] Create `PayPalPaymentProvider.java`
+  - [x] Create `StubExternalPaymentProvider.java` (stub for development, active @Component)
+  - [x] Create `StripePaymentProvider.java` (Stripe API skeleton, activate by registering as bean)
+  - [x] Create `PayPalPaymentProvider.java` (PayPal API skeleton, activate by registering as bean)
 - [x] **Service Wiring**
   - [x] Add `@Service` to all application services
   - [x] Add `@Transactional` to all application and domain services
 - [x] **Payment Infrastructure Tests**
   - [x] Create `PaymentJpaRepositoryIntegrationTest.java` (7 tests passing)
   - [x] Create `PaymentControllerTest.java` (5 tests: process, get, capture, cancel, validation)
+  - [x] Create `PaymentMapperTest.java` (toEntity + toDomain mapping tests)
+  - [x] Create `StripePaymentProviderTest.java` (authorize, capture, cancel, tokenize)
+  - [x] Create `PayPalPaymentProviderTest.java` (authorize, capture, cancel, tokenize)
 
 ### 4.3 Refund Infrastructure
 - [x] **Persistence Adapter**
@@ -639,6 +643,7 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `StubRefundEventPublisher.java` (stub for RefundEventPublisherPort)
 - [x] **Refund Infrastructure Tests**
   - [x] Create `RefundControllerTest.java` (4 tests: process, get, cancel, validation)
+  - [x] Create `RefundMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.4 Transaction Infrastructure
 - [x] **Persistence Adapter**
@@ -657,6 +662,7 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `StubTransactionEventPublisher.java` (stub for TransactionEventPublisherPort)
 - [x] **Transaction Infrastructure Tests**
   - [x] Create `TransactionControllerTest.java` (3 tests: get, capture, void)
+  - [x] Create `TransactionMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.5 Merchant Infrastructure
 - [x] **Persistence Adapter**
@@ -673,6 +679,7 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Implement POST /api/v1/merchants/{id}/suspend
 - [x] **Merchant Infrastructure Tests**
   - [x] Create `MerchantControllerTest.java` (5 tests: register, get, update, suspend, validation)
+  - [x] Create `MerchantMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.6 Customer Infrastructure
 - [x] **Persistence Adapter**
@@ -694,6 +701,7 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `StubCustomerTokenizationService.java` (stub for TokenizationServicePort)
 - [x] **Customer Infrastructure Tests**
   - [x] Create `CustomerControllerTest.java` (5 tests: register, get, add payment method, remove, validation)
+  - [x] Create `CustomerMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.7 Outbox Infrastructure
 - [x] **Persistence Adapter**
@@ -709,6 +717,8 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Implement @Scheduled method to poll pending events (5s interval)
     - [x] Implement event publishing logic
     - [x] Implement retry logic for failed events (30s interval, max 3 retries)
+- [x] **Outbox Infrastructure Tests**
+  - [x] Create `OutboxEventMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.8 Idempotency Infrastructure
 - [x] **Persistence Adapter**
@@ -717,6 +727,8 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `IdempotencyKeyJpaRepository.java`
   - [x] Create `IdempotencyKeyPersistenceAdapter.java` (implements IdempotencyKeyRepositoryPort)
   - [x] Create database migration: `V6__create_idempotency_keys_table.sql`
+- [x] **Idempotency Infrastructure Tests**
+  - [x] Create `IdempotencyKeyMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.9 Reconciliation Infrastructure
 - [x] **Persistence Adapters**
@@ -738,6 +750,8 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Create `ReconciliationController.java`
     - [x] Implement POST /api/v1/reconciliation/reconcile
     - [x] Implement POST /api/v1/reconciliation/settlement-report
+- [x] **Reconciliation Infrastructure Tests**
+  - [x] Create `ReconciliationMapperTest.java` (toEntity + toDomain mapping tests)
 
 ### 4.10 Kafka Infrastructure
 - [x] **Kafka Configuration**
@@ -745,8 +759,8 @@ Update this file as you progress. Commit after each major milestone.
     - [x] Configure consumer properties
     - [x] Configure deserializers
   - [x] Create `KafkaProducerConfig.java` (via application.yml + KafkaTemplate auto-config)
-  - [ ] Create `KafkaTopicInitializer.java`
-  - [ ] Create `KafkaErrorHandler.java`
+  - [x] Create `KafkaTopicsConfig.java` (topic initializer with NewTopic beans for all event topics)
+  - [x] Create `KafkaErrorHandler.java` (DefaultErrorHandler with retry + dead-letter logging)
 
 ### 4.11 Global Configuration
 - [x] Create `SwaggerConfig.java`
@@ -754,18 +768,22 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Configure API info
 - [x] Create `SecurityConfig.java`
 - [x] Create `AsyncConfig.java`
-- [ ] Create `ActuatorConfig.java`
-- [ ] Create `FlywayConfig.java`
+- [x] Create `ActuatorConfig.java` (custom health indicator for payment gateway)
+- [x] Create `FlywayConfig.java` (repair + migrate strategy)
 
 **Phase 4 Completion Criteria:**
 - [x] All persistence adapters are implemented (Payment, Refund, Transaction, Merchant, Customer, Outbox, Idempotency, Reconciliation)
 - [x] All entities are mapped to domain models
 - [x] All REST controllers are working (Payment, Refund, Transaction, Merchant, Customer, Reconciliation)
-- [x] Kafka integration is functional (KafkaPaymentEventPublisher, KafkaOutboxEventPublisher, OutboxPollingScheduler)
+- [x] Kafka integration is functional (KafkaPaymentEventPublisher, KafkaOutboxEventPublisher, OutboxPollingScheduler, KafkaErrorHandler)
 - [x] Database migrations are created and applied (V1-V13)
-- [x] All infrastructure tests pass (780 tests)
+- [x] All infrastructure tests pass (928 tests total)
 - [x] Application can process payments end-to-end (verified in Docker)
 - [x] All domain and application services wired with @Service and @Transactional
+- [x] All common infrastructure components implemented (REST, Persistence, Security, Resilience, Logging, Monitoring, Async)
+- [x] All infrastructure commons tested (GlobalExceptionHandler, BaseController, PageInfo, RequestValidationFilter, AuditorAware, JwtTokenProvider, CorrelationIdInterceptor, CustomMetricsBinder)
+- [x] All mapper tests implemented (Payment, Merchant, Customer, Refund, Transaction, Outbox, Idempotency, Reconciliation)
+- [x] Payment provider stubs and skeletons implemented (Stub, Stripe, PayPal)
 
 ---
 
