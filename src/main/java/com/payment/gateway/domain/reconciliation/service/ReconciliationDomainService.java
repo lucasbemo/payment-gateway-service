@@ -6,6 +6,8 @@ import com.payment.gateway.domain.reconciliation.port.ReconciliationBatchReposit
 import com.payment.gateway.domain.reconciliation.port.SettlementReportRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +16,9 @@ import java.util.List;
  * Reconciliation domain service.
  * Contains business logic for reconciliation operations.
  */
+@Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class ReconciliationDomainService {
 

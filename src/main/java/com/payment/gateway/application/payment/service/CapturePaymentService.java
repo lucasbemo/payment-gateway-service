@@ -9,6 +9,8 @@ import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
  * Application service for capturing authorized payments.
  */
 @Slf4j
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class CapturePaymentService implements CapturePaymentUseCase {
 

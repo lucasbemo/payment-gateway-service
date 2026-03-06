@@ -6,11 +6,15 @@ import com.payment.gateway.application.merchant.port.out.MerchantCommandPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for updating merchants.
  */
 @Slf4j
+@Service
+@Transactional
 public class UpdateMerchantService implements UpdateMerchantUseCase {
 
     private final MerchantCommandPort merchantCommandPort;

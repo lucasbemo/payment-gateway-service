@@ -8,11 +8,15 @@ import com.payment.gateway.application.transaction.port.out.TransactionQueryPort
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for capturing transactions.
  */
 @Slf4j
+@Service
+@Transactional
 public class CaptureTransactionService implements CaptureTransactionUseCase {
 
     private final TransactionQueryPort transactionQueryPort;

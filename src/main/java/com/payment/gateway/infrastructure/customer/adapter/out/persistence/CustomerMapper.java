@@ -3,6 +3,8 @@ package com.payment.gateway.infrastructure.customer.adapter.out.persistence;
 import com.payment.gateway.domain.customer.model.Customer;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 /**
  * Mapper between Customer domain model and CustomerJpaEntity.
  */
@@ -13,6 +15,7 @@ public class CustomerMapper {
         return CustomerJpaEntity.builder()
                 .id(customer.getId())
                 .merchantId(customer.getMerchantId())
+                .token(UUID.randomUUID().toString())
                 .email(customer.getEmail())
                 .name(customer.getName())
                 .phone(customer.getPhone())
@@ -41,6 +44,7 @@ public class CustomerMapper {
             java.lang.reflect.Field statusField = Customer.class.getDeclaredField("status");
             statusField.setAccessible(true);
             statusField.set(customer, com.payment.gateway.domain.customer.model.CustomerStatus.valueOf(entity.getStatus().name()));
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to set customer fields", e);
         }

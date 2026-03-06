@@ -4,8 +4,10 @@ import com.payment.gateway.commons.utils.CryptoUtils;
 import com.payment.gateway.domain.idempotency.model.IdempotencyKey;
 import com.payment.gateway.domain.idempotency.model.IdempotencyStatus;
 import com.payment.gateway.domain.idempotency.port.IdempotencyKeyRepositoryPort;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,15 +16,22 @@ import java.util.UUID;
  * Idempotency domain service.
  * Contains business logic for idempotency operations.
  */
+@Service
 @Slf4j
-@RequiredArgsConstructor
+@Transactional
 public class IdempotencyDomainService {
 
     private final IdempotencyKeyRepositoryPort repository;
     private final int ttlSeconds;
 
+    @Autowired
     public IdempotencyDomainService(IdempotencyKeyRepositoryPort repository) {
         this(repository, 86400); // Default 24 hours
+    }
+
+    public IdempotencyDomainService(IdempotencyKeyRepositoryPort repository, int ttlSeconds) {
+        this.repository = repository;
+        this.ttlSeconds = ttlSeconds;
     }
 
     public IdempotencyKey createOrGetIdempotencyKey(String idempotencyKey, String merchantId,

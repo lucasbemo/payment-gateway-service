@@ -23,6 +23,9 @@ public class CustomerJpaEntity {
     @Column(name = "merchant_id", nullable = false, length = 36)
     private String merchantId;
 
+    @Column(name = "token", nullable = false, length = 255)
+    private String token;
+
     @Column(name = "email", nullable = false, length = 255)
     private String email;
 
@@ -46,6 +49,7 @@ public class CustomerJpaEntity {
     private CustomerJpaEntity(Builder builder) {
         this.id = builder.id;
         this.merchantId = builder.merchantId;
+        this.token = builder.token;
         this.email = builder.email;
         this.name = builder.name;
         this.phone = builder.phone;
@@ -61,6 +65,7 @@ public class CustomerJpaEntity {
     public static class Builder {
         private String id;
         private String merchantId;
+        private String token;
         private String email;
         private String name;
         private String phone;
@@ -75,6 +80,11 @@ public class CustomerJpaEntity {
 
         public Builder merchantId(String merchantId) {
             this.merchantId = merchantId;
+            return this;
+        }
+
+        public Builder token(String token) {
+            this.token = token;
             return this;
         }
 

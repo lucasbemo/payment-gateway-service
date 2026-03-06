@@ -10,11 +10,15 @@ import com.payment.gateway.commons.utils.IdGenerator;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for registering merchants.
  */
 @Slf4j
+@Service
+@Transactional
 public class RegisterMerchantService implements RegisterMerchantUseCase {
 
     private final MerchantCommandPort merchantCommandPort;

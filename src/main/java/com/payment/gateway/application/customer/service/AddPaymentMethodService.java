@@ -12,11 +12,15 @@ import com.payment.gateway.domain.customer.model.PaymentMethod;
 import com.payment.gateway.domain.customer.model.CardDetails;
 import com.payment.gateway.domain.customer.model.PaymentMethodType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for adding payment methods to customers.
  */
 @Slf4j
+@Service
+@Transactional
 public class AddPaymentMethodService implements AddPaymentMethodUseCase {
 
     private final CustomerCommandPort customerCommandPort;

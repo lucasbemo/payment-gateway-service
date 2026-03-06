@@ -6,6 +6,8 @@ import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
 import com.payment.gateway.domain.merchant.port.MerchantRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -15,6 +17,8 @@ import java.util.List;
 /**
  * Domain service for Merchant operations.
  */
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class MerchantDomainService {
 

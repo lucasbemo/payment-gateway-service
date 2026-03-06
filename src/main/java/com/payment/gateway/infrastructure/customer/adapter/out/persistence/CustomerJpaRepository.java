@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,4 +16,12 @@ public interface CustomerJpaRepository extends JpaRepository<CustomerJpaEntity, 
 
     @Query("SELECT c FROM CustomerJpaEntity c WHERE c.email = :email AND c.merchantId = :merchantId")
     Optional<CustomerJpaEntity> findByEmailAndMerchantId(@Param("email") String email, @Param("merchantId") String merchantId);
+
+    Optional<CustomerJpaEntity> findByEmail(String email);
+
+    List<CustomerJpaEntity> findByMerchantId(String merchantId);
+
+    List<CustomerJpaEntity> findByEmailContainingAndMerchantId(String email, String merchantId);
+
+    boolean existsByEmail(String email);
 }

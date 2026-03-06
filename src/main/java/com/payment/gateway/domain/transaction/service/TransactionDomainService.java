@@ -11,6 +11,8 @@ import com.payment.gateway.domain.transaction.port.TransactionEventPublisherPort
 import com.payment.gateway.domain.transaction.port.TransactionRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +21,9 @@ import java.util.Optional;
  * Transaction domain service.
  * Contains business logic for transaction operations.
  */
+@Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class TransactionDomainService {
 

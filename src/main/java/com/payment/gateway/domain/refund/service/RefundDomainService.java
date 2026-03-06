@@ -12,6 +12,8 @@ import com.payment.gateway.domain.refund.port.RefundEventPublisherPort;
 import com.payment.gateway.domain.refund.port.RefundRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +22,9 @@ import java.util.Optional;
  * Refund domain service.
  * Contains business logic for refund operations.
  */
+@Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class RefundDomainService {
 

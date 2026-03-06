@@ -6,11 +6,15 @@ import com.payment.gateway.application.customer.port.out.CustomerCommandPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.customer.model.Customer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for getting customer information.
  */
 @Slf4j
+@Service
+@Transactional
 public class GetCustomerService implements GetCustomerUseCase {
 
     private final CustomerCommandPort customerCommandPort;

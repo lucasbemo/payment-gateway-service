@@ -22,6 +22,7 @@ import com.payment.gateway.domain.payment.model.PaymentMethod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ProcessPaymentService implements ProcessPaymentUseCase {
 

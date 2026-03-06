@@ -6,6 +6,8 @@ import com.payment.gateway.application.reconciliation.port.out.ReconciliationBat
 import com.payment.gateway.domain.reconciliation.model.ReconciliationBatch;
 import com.payment.gateway.domain.reconciliation.service.ReconciliationDomainService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -13,6 +15,8 @@ import java.time.LocalDate;
  * Application service for reconciling transactions.
  */
 @Slf4j
+@Service
+@Transactional
 public class ReconcileTransactionsService implements ReconcileTransactionsUseCase {
 
     private final ReconciliationBatchPort reconciliationBatchPort;

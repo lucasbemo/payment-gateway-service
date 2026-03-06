@@ -1,6 +1,8 @@
 package com.payment.gateway.infrastructure.payment.adapter.in.rest;
 
 import com.payment.gateway.application.payment.dto.ProcessPaymentCommand;
+import com.payment.gateway.application.payment.port.in.CancelPaymentUseCase;
+import com.payment.gateway.application.payment.port.in.CapturePaymentUseCase;
 import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.in.ProcessPaymentUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class PaymentController {
 
     private final ProcessPaymentUseCase processPaymentUseCase;
+    private final CapturePaymentUseCase capturePaymentUseCase;
+    private final CancelPaymentUseCase cancelPaymentUseCase;
     private final GetPaymentUseCase getPaymentUseCase;
     private final PaymentRestMapper paymentRestMapper;
 
@@ -143,6 +147,32 @@ public class PaymentController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(ApiResponse.success(paymentResponses));
+    }
+
+    /**
+     * Capture an authorized payment.
+     * POST /api/v1/payments/{id}/capture
+     */
+    @PostMapping("/{id}/capture")
+    public ResponseEntity<ApiResponse<com.payment.gateway.application.payment.dto.PaymentResponse>> capturePayment(
+            @PathVariable String id,
+            @RequestParam String merchantId) {
+        log.info("Capturing payment: {} for merchant: {}", id, merchantId);
+        var response = capturePaymentUseCase.capturePayment(id, merchantId);
+        return ResponseEntity.ok(ApiResponse.success("Payment captured successfully", response));
+    }
+
+    /**
+     * Cancel a payment.
+     * POST /api/v1/payments/{id}/cancel
+     */
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<com.payment.gateway.application.payment.dto.PaymentResponse>> cancelPayment(
+            @PathVariable String id,
+            @RequestParam String merchantId) {
+        log.info("Cancelling payment: {} for merchant: {}", id, merchantId);
+        var response = cancelPaymentUseCase.cancelPayment(id, merchantId);
+        return ResponseEntity.ok(ApiResponse.success("Payment cancelled successfully", response));
     }
 
     // Helper method to set ID using reflection since PaymentResponse is immutable

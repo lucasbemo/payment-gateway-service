@@ -7,6 +7,8 @@ import com.payment.gateway.application.reconciliation.port.out.SettlementReportP
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -14,6 +16,8 @@ import java.time.LocalDate;
  * Application service for generating settlement reports.
  */
 @Slf4j
+@Service
+@Transactional
 public class GenerateSettlementReportService implements GenerateSettlementReportUseCase {
 
     private final ReportGeneratorPort reportGeneratorPort;

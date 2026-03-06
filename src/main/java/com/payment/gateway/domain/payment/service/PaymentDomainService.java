@@ -9,12 +9,16 @@ import com.payment.gateway.domain.payment.model.PaymentItem;
 import com.payment.gateway.domain.payment.port.PaymentRepositoryPort;
 import com.payment.gateway.domain.payment.exception.DuplicatePaymentException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Domain service for Payment operations.
  */
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentDomainService {
 

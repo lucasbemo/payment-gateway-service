@@ -7,6 +7,8 @@ import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import com.payment.gateway.domain.outbox.port.OutboxEventRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,7 +17,9 @@ import java.util.List;
  * Outbox domain service.
  * Contains business logic for outbox event operations.
  */
+@Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class OutboxEventDomainService {
 

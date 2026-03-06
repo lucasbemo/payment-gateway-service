@@ -2,14 +2,18 @@ package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistenc
 
 import com.payment.gateway.application.reconciliation.port.out.SettlementReportPort;
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
+import com.payment.gateway.domain.reconciliation.port.SettlementReportRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class SettlementReportPersistenceAdapter implements SettlementReportPort {
+public class SettlementReportPersistenceAdapter implements SettlementReportPort, SettlementReportRepositoryPort {
 
     private final SettlementReportJpaRepository settlementReportJpaRepository;
     private final SettlementReportMapper settlementReportMapper;
@@ -29,5 +33,36 @@ public class SettlementReportPersistenceAdapter implements SettlementReportPort 
     @Override
     public Optional<SettlementReport> findByGatewayReportId(String gatewayReportId) {
         return settlementReportJpaRepository.findByGatewayReportId(gatewayReportId).map(settlementReportMapper::toDomain);
+    }
+
+    @Override
+    public SettlementReport save(SettlementReport report) {
+        return saveReport(report);
+    }
+
+    @Override
+    public List<SettlementReport> findByMerchantId(String merchantId) {
+        return settlementReportJpaRepository.findByMerchantId(merchantId).stream()
+                .map(settlementReportMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SettlementReport> findByGatewayName(String gatewayName) {
+        return settlementReportJpaRepository.findByGatewayName(gatewayName).stream()
+                .map(settlementReportMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SettlementReport> findBySettlementDate(LocalDate date) {
+        return settlementReportJpaRepository.findBySettlementDate(date).stream()
+                .map(settlementReportMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteById(String id) {
+        settlementReportJpaRepository.deleteById(id);
     }
 }
