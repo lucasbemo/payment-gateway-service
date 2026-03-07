@@ -5,6 +5,17 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
+# Development build stage with debug support
+FROM maven:3.9.5-eclipse-temurin-21 AS development
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+# Enable hot reload with spring-boot-devtools
+RUN mvn clean package -DskipTests -Dspring-boot.devtools.restart.enabled=true
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080 5005
+ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "app.jar"]
+
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
