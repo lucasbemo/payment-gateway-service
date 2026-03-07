@@ -1417,7 +1417,7 @@ Update this file as you progress. Commit after each major milestone.
 - Kafka Topics: **8/8** topics configured
 - Unit Tests: **1,039** tests (all passing)
 - Integration Tests: **1** repository integration test + **27** controller/provider tests
-- E2E Tests: Pending (requires Docker Compose setup)
+- E2E Tests: **12** test classes with **~120** test scenarios implemented
 - Architecture Tests: **1** test (HexagonalArchitectureTest with 4 assertions)
 - Code Coverage: **>80%** (domain + application + commons)
 
@@ -1433,6 +1433,7 @@ Update this file as you progress. Commit after each major milestone.
 | Phase 7: Event-Driven | **100%** | Complete - Kafka topics, Outbox pattern, Event listeners, Schema versioning |
 | Phase 8: Testing | **100%** | **1,039 tests passing** - unit, integration, controller, architecture, commons tests |
 | Phase 9: Observability | **100%** | Complete - Health checks, metrics, distributed tracing, structured logging, dashboards, alerts |
+| Phase 9.5: E2E Tests | **100%** | Complete - **12 E2E test classes** covering payment flow, refund flow, transactions, Kafka events, outbox, merchant/customer management, security, resilience, reconciliation, and observability |
 | Phase 10: Documentation | **0%** | Not started |
 | Phase 11: Production Ready | **0%** | Not started |
 
@@ -1452,6 +1453,9 @@ Add your notes, blockers, and observations here:
 - All application services should have 1:1 test coverage with their service implementations
 - Testcontainers requires proper context initialization for E2E tests
 - ArchUnit is excellent for enforcing hexagonal architecture boundaries
+- E2E tests should use @SpringBootTest with RANDOM_PORT and extend a common base class for shared infrastructure
+- Test data factories make E2E tests more maintainable and readable
+- ParameterizedTypeReference is needed for generic type responses with RestTemplate
 
 ### Future Improvements
 - Phase 10: Complete API documentation with OpenAPI/Swagger
@@ -1460,8 +1464,8 @@ Add your notes, blockers, and observations here:
 ---
 
 **Last Updated:** 2026-03-06
-**Project Status:** Phase 1 (100%), Phase 2 (100%), Phase 3 (100%), Phase 4 (100%), Phase 5 (100%), Phase 6 (100%), Phase 7 (100%), Phase 8 (100%), Phase 9 (100%)
-**Tests:** 1,039 passing
+**Project Status:** Phase 1 (100%), Phase 2 (100%), Phase 3 (100%), Phase 4 (100%), Phase 5 (100%), Phase 6 (100%), Phase 7 (100%), Phase 8 (100%), Phase 9 (100%), Phase 9.5 E2E Tests (100%)
+**Tests:** 1,039 unit/integration tests + ~120 E2E tests
 **Test Coverage:**
 - Domain Model Tests: 8 classes (Payment, Transaction, Refund, Merchant, Customer, Outbox, Idempotency, Reconciliation)
 - Domain Service Tests: 8 classes (all domain services covered)

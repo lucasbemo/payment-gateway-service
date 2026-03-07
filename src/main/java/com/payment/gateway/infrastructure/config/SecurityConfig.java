@@ -26,6 +26,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@Profile("!e2e")
 public class SecurityConfig {
 
     @Bean
