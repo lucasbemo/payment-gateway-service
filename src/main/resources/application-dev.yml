@@ -19,7 +19,7 @@ spring:
 
   datasource:
     # ⚠️ DEVELOPMENT DEFAULTS - Override in production!
-    url: jdbc:postgresql://localhost:5432/payment_gateway
+    url: jdbc:postgresql://localhost:5433/payment_gateway
     username: ${DATASOURCE_USERNAME:admin}
     password: ${DATASOURCE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
