@@ -1274,7 +1274,7 @@ Update this file as you progress. Commit after each major milestone.
   - [ ] Document rate limits
   - [ ] Document idempotency
 
-### 10.3 Developer Portal (Optional)
+### 10.3 Developer Portal
 - [ ] Create getting started guide
 - [ ] Create SDK examples
 - [ ] Create webhook documentation

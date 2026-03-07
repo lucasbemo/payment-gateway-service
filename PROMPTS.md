@@ -16,18 +16,6 @@ The Project Structure is good, But i missing the domain semantic like, all payme
 a: You're absolutely right! This is about Domain-Driven Design (DDD) modularization - organizing by business capability/domain rather than by technical layer. This is often called "Vertical Slice Architecture" combined with Hexagonal.
 ---
 
-Idempotency Handling
-  - Idempotency keys for all payment endpoints
-  - Redis/distributed cache for key tracking
-  - Prevent duplicate charges
-
-  Reconciliation Engine
-  - Batch processing for settlements
-  - Discrepancy detection
-  - Report generation
-
----
-
 The plan looks good. Now before go ahead with implementations, I wanna you create a check point *.md file of all Phase Breakdown itens and subitens. So, you need to control each implementation phase and sub pahse on this check point markdown file, like a checkbox.
 
 ---
