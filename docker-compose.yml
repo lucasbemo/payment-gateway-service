@@ -77,14 +77,15 @@ services:
     image: confluentinc/cp-kafka:7.5.0
     container_name: payment-gateway-service-kafka
     ports:
-      - "9092:9092"
+      - "19092:29092"
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
@@ -101,7 +102,7 @@ services:
       - kafka
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
     networks:
       - payment-network
@@ -202,9 +203,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_gateway
       SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-admin}
       SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-admin}
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29093
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_DATA_REDIS_HOST: redis
       SPRING_PROFILES_ACTIVE: dev
+      ZIPKIN_BASE_URL: http://zipkin:9411
       AWS_REGION: us-east-1
       SPRING_CLOUD_AWS_S3_ENDPOINT: http://minio:9000
       SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: minioadmin
