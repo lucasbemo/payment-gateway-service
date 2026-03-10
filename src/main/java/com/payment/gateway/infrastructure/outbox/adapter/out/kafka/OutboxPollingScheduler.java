@@ -6,12 +6,14 @@ import com.payment.gateway.domain.outbox.port.OutboxEventRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Slf4j
 @Component
+@Profile("!test & !e2e")
 @RequiredArgsConstructor
 public class OutboxPollingScheduler {
 

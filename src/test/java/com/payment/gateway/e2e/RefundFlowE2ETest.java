@@ -144,7 +144,7 @@ class RefundFlowE2ETest extends E2ETestBase {
 
         // Verify total refunded amount
         Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM refund WHERE payment_id = ?", Integer.class, paymentId
+            "SELECT COUNT(*) FROM refunds WHERE payment_id = ?", Integer.class, paymentId
         );
         assertThat(count).isEqualTo(2);
     }

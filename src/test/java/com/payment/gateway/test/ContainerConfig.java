@@ -8,6 +8,7 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.containers.GenericContainer;
 
 /**
  * Base test configuration for integration tests with Testcontainers.
@@ -27,9 +28,16 @@ public abstract class ContainerConfig {
     )
             .waitingFor(Wait.forLogMessage(".*started \\(kafka\\.server\\.KafkaServer\\).*", 1));
 
+    static final GenericContainer<?> redis = new GenericContainer<>(
+            DockerImageName.parse("redis:7-alpine")
+    )
+            .withExposedPorts(6379)
+            .waitingFor(Wait.forLogMessage(".*Ready to accept connections.*\\n", 1));
+
     static {
         postgres.start();
         kafka.start();
+        redis.start();
     }
 
     @DynamicPropertySource
@@ -39,6 +47,8 @@ public abstract class ContainerConfig {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
 
     /**

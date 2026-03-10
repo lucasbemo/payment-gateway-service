@@ -29,9 +29,8 @@ import javax.sql.DataSource;
     properties = {
         "spring.profiles.active=e2e",
         "spring.main.allow-bean-definition-override=true",
-        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.jpa.hibernate.ddl-auto=validate",
         "spring.jpa.show-sql=false",
-        "spring.jpa.properties.hibernate.format_sql=false",
         "logging.level.org.hibernate.SQL=warn",
         "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=warn"
     }
@@ -119,17 +118,17 @@ public abstract class E2ETestBase extends ContainerConfig {
      */
     protected void cleanupDatabase() {
         try {
-            jdbcTemplate.execute("TRUNCATE TABLE reconciliation_batch CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE discrepancy CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE settlement_report CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE outbox_event CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE transaction CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE refund CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE payment CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE payment_method CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE customer CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE merchant CASCADE");
-            jdbcTemplate.execute("TRUNCATE TABLE idempotency_key CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE reconciliation_batches CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE discrepancies CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE settlement_reports CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE outbox_events CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE transactions CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE refunds CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE payments CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE payment_methods CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE customers CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE merchants CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE idempotency_keys CASCADE");
         } catch (Exception e) {
             // Ignore cleanup errors
         }

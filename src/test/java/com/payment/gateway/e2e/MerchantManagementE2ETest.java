@@ -52,7 +52,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
         // Verify merchant exists in database
         testMerchantId = (String) merchant.get("id");
-        assertThat(exists("merchant", "id", testMerchantId)).isTrue();
+        assertThat(exists("merchants", "id", testMerchantId)).isTrue();
     }
 
     @Test
@@ -114,7 +114,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
         // Verify in database
         String dbEmail = jdbcTemplate.queryForObject(
-            "SELECT email FROM merchant WHERE id = ?",
+            "SELECT email FROM merchants WHERE id = ?",
             String.class,
             merchantId
         );
@@ -146,7 +146,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
         // Verify in database
         String dbStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM merchant WHERE id = ?",
+            "SELECT status FROM merchants WHERE id = ?",
             String.class,
             merchantId
         );
@@ -175,7 +175,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
         // Verify API key format
         String apiKeyHash = jdbcTemplate.queryForObject(
-            "SELECT api_key_hash FROM merchant WHERE id = ?",
+            "SELECT api_key_hash FROM merchants WHERE id = ?",
             String.class,
             (String) merchant.get("id")
         );
@@ -200,7 +200,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
         String merchantId = (String) merchant.get("id");
 
         String webhookSecret = jdbcTemplate.queryForObject(
-            "SELECT webhook_secret FROM merchant WHERE id = ?",
+            "SELECT webhook_secret FROM merchants WHERE id = ?",
             String.class,
             merchantId
         );
@@ -251,7 +251,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
         String merchantId = (String) merchant.get("id");
 
         String createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM merchant WHERE id = ?",
+            "SELECT created_at FROM merchants WHERE id = ?",
             String.class,
             merchantId
         );

@@ -49,11 +49,11 @@ sleep 30
 
 ```bash
 # Build and run
-mvn clean package
+./mvnw clean package
 java -jar target/payment-gateway-0.0.1-SNAPSHOT.jar
 
 # Or use Maven directly
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
 ### 4. Access Services
@@ -165,19 +165,74 @@ SPRING_PROFILES_ACTIVE=local
 
 ## 🧪 Testing
 
-```bash
-# Unit tests
-mvn test
+### Running Tests
 
-# Integration tests
-mvn verify -Pintegration
+```bash
+# Run all unit and integration tests (recommended for development)
+# Note: Use single quotes to prevent shell expansion of '!'
+./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+
+# Alternative: Use surefire plugin parameter
+./mvnw surefire:test -Dtest='!com.payment.gateway.e2e.**'
+
+# Run specific test categories
+./mvnw test -Dtest="*Test"            # All tests ending with 'Test'
+./mvnw test -Dtest="*IntegrationTest" # Integration tests
+./mvnw test -Dtest="*ControllerTest"  # Controller tests
+
+# Run E2E tests separately (requires Docker)
+./mvnw test -Dtest="com.payment.gateway.e2e.**"
+
+# Run all tests
+./mvnw test
 
 # Code coverage
-mvn test jacoco:report
+./mvnw test jacoco:report
 
 # Open coverage report
 open target/site/jacoco/index.html
 ```
+
+### Test Structure
+
+| Test Type | Count | Description |
+|-----------|-------|-------------|
+| Unit Tests | 1,039 | Domain models, services, use cases, enums |
+| Integration Tests | 28 | Repository, controller, provider tests |
+| E2E Tests | ~120 | Full flow tests with Testcontainers |
+
+### E2E Test Configuration
+
+E2E tests use **Testcontainers** to spin up PostgreSQL, Kafka, and Redis containers. These tests are complex and may require:
+
+```bash
+# Ensure Docker is running
+docker ps
+
+# Increase Docker resources if tests timeout
+# Recommended: 4+ CPU cores, 8GB+ RAM for Docker
+```
+
+### CI/CD Recommendation
+
+For CI/CD pipelines, configure tests to run in two stages:
+
+```yaml
+# Stage 1: Fast unit/integration tests
+# Note: Use single quotes around the pattern in shell
+- run: ./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+
+# Stage 2: E2E tests (separate job with more resources)
+- run: ./mvnw test -Dtest='com.payment.gateway.e2e.**'
+  timeout_minutes: 30
+  resources:
+    docker: true
+```
+
+This approach:
+- Provides fast feedback on most changes (< 30 seconds for unit tests)
+- Isolates flaky E2E tests to a separate stage
+- Allows E2E tests to have dedicated resources and timeouts
 
 ---
 
@@ -219,10 +274,10 @@ open target/site/jacoco/index.html
 
 ```bash
 # Validate code style
-mvn spotless:check
+./mvnw spotless:check
 
 # Auto-format code
-mvn spotless:apply
+./mvnw spotless:apply
 ```
 
 ---

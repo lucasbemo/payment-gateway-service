@@ -129,7 +129,7 @@ Update this file as you progress. Commit after each major milestone.
 - [x] Test application startup with Docker Compose
 
 **Phase 1 Completion Criteria:**
-- [x] Project compiles successfully with `mvn clean compile`
+- [x] Project compiles successfully with `./mvnw clean compile`
 - [x] Docker Compose starts all services without errors
 - [x] Application connects to PostgreSQL successfully
 - [x] Application connects to Kafka successfully
@@ -1417,9 +1417,19 @@ Update this file as you progress. Commit after each major milestone.
 - Kafka Topics: **8/8** topics configured
 - Unit Tests: **1,039** tests (all passing)
 - Integration Tests: **1** repository integration test + **27** controller/provider tests
-- E2E Tests: **12** test classes with **~120** test scenarios implemented
+- E2E Tests: **12** test classes with **~120** test scenarios (require Docker/Testcontainers)
 - Architecture Tests: **1** test (HexagonalArchitectureTest with 4 assertions)
 - Code Coverage: **>80%** (domain + application + commons)
+
+### Test Execution
+
+| Test Category | Command | Execution Time |
+|---------------|---------|----------------|
+| Unit Tests | `./mvnw test -Dtest='!com.payment.gateway.e2e.**'` | ~20 seconds |
+| E2E Tests | `./mvnw test -Dtest='com.payment.gateway.e2e.**'` | ~10-30 minutes |
+| All Tests | `./mvnw test` | Varies |
+
+**Recommendation:** Run unit tests during development, E2E tests separately in CI/CD with dedicated resources.
 
 ### Phase Status
 | Phase | Status | Description |
@@ -1456,10 +1466,57 @@ Add your notes, blockers, and observations here:
 - E2E tests should use @SpringBootTest with RANDOM_PORT and extend a common base class for shared infrastructure
 - Test data factories make E2E tests more maintainable and readable
 - ParameterizedTypeReference is needed for generic type responses with RestTemplate
+- **E2E tests with Testcontainers can be slow and resource-intensive; run them separately from unit tests in CI/CD**
+- **For reliable CI/CD, configure two test stages: fast unit tests first, then E2E tests with dedicated resources and timeouts**
 
 ### Future Improvements
 - Phase 10: Complete API documentation with OpenAPI/Swagger
 - Phase 11: Production readiness (Dockerfile optimization, deployment guides, CI/CD)
+
+### E2E Test Troubleshooting
+
+If E2E tests fail or timeout:
+
+```bash
+# 1. Verify Docker is running
+docker ps
+
+# 2. Check Docker resources (recommended: 4+ CPU, 8GB+ RAM)
+docker stats
+
+# 3. Clean up old containers
+docker system prune -f
+
+# 4. Run unit tests only (faster feedback)
+# Note: Use single quotes to prevent shell expansion of '!'
+./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+
+# 5. Run single E2E test for debugging
+./mvnw test -Dtest="PaymentProcessingE2ETest#testProcessPayment_HappyPath"
+```
+
+**Known Issues:**
+- E2E tests may timeout if Docker resources are insufficient
+- Connection leaks can occur if tests are interrupted mid-execution
+- Testcontainers image pulls can be slow on first run
+
+**Recommended CI/CD Configuration:**
+```yaml
+# Run unit tests on every commit
+# Note: In YAML/bash, use single quotes around the pattern
+unit-tests:
+  script: ./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+  timeout: 10 minutes
+
+# Run E2E tests separately with more resources
+e2e-tests:
+  script: ./mvnw test -Dtest='com.payment.gateway.e2e.**'
+  timeout: 30 minutes
+  resources:
+    docker: true
+    cpu: 4
+    memory: 8GB
+```
 
 ---
 

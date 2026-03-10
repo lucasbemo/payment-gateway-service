@@ -84,7 +84,7 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
         // Verify payment exists in database
         String paymentId = (String) payment.get("id");
-        assertThat(exists("payment", "id", paymentId)).isTrue();
+        assertThat(exists("payments", "id", paymentId)).isTrue();
 
         // Verify transaction was created
         assertThat(exists("transaction", "payment_id", paymentId)).isTrue();
@@ -124,7 +124,7 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         // Verify only one payment exists in database
         String paymentId = (String) payment1.get("id");
         Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment WHERE id = ?", Integer.class, paymentId
+            "SELECT COUNT(*) FROM payments WHERE id = ?", Integer.class, paymentId
         );
         assertThat(count).isEqualTo(1);
     }
@@ -332,7 +332,7 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
         // Verify status in database
         String dbStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM payment WHERE id = ?", String.class, paymentId
+            "SELECT status FROM payments WHERE id = ?", String.class, paymentId
         );
         assertThat(dbStatus).isEqualTo("COMPLETED");
     }

@@ -57,7 +57,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         String paymentId = (String) payment.get("id");
 
         // Verify transaction exists in database
-        boolean transactionExists = exists("transaction", "payment_id", paymentId);
+        boolean transactionExists = exists("transactions", "payment_id", paymentId);
         assertThat(transactionExists).isTrue();
     }
 
@@ -80,7 +80,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // Get transaction ID from database
         String transactionId = jdbcTemplate.queryForObject(
-            "SELECT id FROM transaction WHERE payment_id = ?",
+            "SELECT id FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );
@@ -143,7 +143,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction from database
         String transactionStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM transaction WHERE payment_id = ?",
+            "SELECT status FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );
@@ -183,7 +183,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Querying transactions by created_at
         List<String> orderedIds = jdbcTemplate.queryForList(
-            "SELECT payment_id FROM transaction WHERE merchant_id = ? ORDER BY created_at ASC",
+            "SELECT payment_id FROM transactions WHERE merchant_id = ? ORDER BY created_at ASC",
             String.class,
             merchantId
         );
@@ -212,7 +212,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction amount from database
         Long transactionAmount = jdbcTemplate.queryForObject(
-            "SELECT amount FROM transaction WHERE payment_id = ?",
+            "SELECT amount FROM transactions WHERE payment_id = ?",
             Long.class,
             paymentId
         );
@@ -240,7 +240,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction currency from database
         String transactionCurrency = jdbcTemplate.queryForObject(
-            "SELECT currency FROM transaction WHERE payment_id = ?",
+            "SELECT currency FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );
@@ -267,7 +267,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction type from database
         String transactionType = jdbcTemplate.queryForObject(
-            "SELECT transaction_type FROM transaction WHERE payment_id = ?",
+            "SELECT transaction_type FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );
@@ -294,7 +294,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction merchant_id from database
         String transactionMerchantId = jdbcTemplate.queryForObject(
-            "SELECT merchant_id FROM transaction WHERE payment_id = ?",
+            "SELECT merchant_id FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );
@@ -336,7 +336,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction from database
         String transactionCustomerId = jdbcTemplate.queryForObject(
-            "SELECT customer_id FROM transaction WHERE payment_id = ?",
+            "SELECT customer_id FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );

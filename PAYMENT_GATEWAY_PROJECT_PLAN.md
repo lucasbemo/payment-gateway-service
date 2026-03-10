@@ -1367,10 +1367,10 @@ docker-compose up -d
 sleep 30
 
 # Run application
-mvn spring-boot:run
+./mvnw spring-boot:run
 
 # Or build and run JAR
-mvn clean package
+./mvnw clean package
 java -jar target/payment-gateway-0.0.1-SNAPSHOT.jar
 
 # Access services
@@ -1756,6 +1756,23 @@ CREATE INDEX idx_discrepancy_type ON discrepancies(type);
 - Idempotency flow (duplicate request handling)
 - Reconciliation flow (batch processing, discrepancy detection)
 - Merchant onboarding flow
+
+Note: E2E tests use Testcontainers and require Docker.
+For CI/CD, run E2E tests separately from unit tests with dedicated resources.
+```
+
+### Running Tests
+
+```bash
+# Unit tests only (fast, recommended for development)
+# Note: Use single quotes to prevent shell expansion of '!'
+./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+
+# E2E tests only (requires Docker, slower)
+./mvnw test -Dtest='com.payment.gateway.e2e.**'
+
+# All tests
+./mvnw test
 ```
 
 ---

@@ -9,11 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.DockerImageName;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -35,27 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({TestAwsConfig.class, com.payment.gateway.test.MockPortsConfig.class})
 @Transactional
 @ActiveProfiles("test")
-class PaymentJpaRepositoryIntegrationTest {
-
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:15-alpine")
-    )
-            .withDatabaseName("testdb")
-            .withUsername("test")
-            .withPassword("test")
-            .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*\\n", 2));
-
-    @DynamicPropertySource
-    static void registerProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
-    }
-
-    static {
-        postgres.start();
-    }
+class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.ContainerConfig {
 
     @Autowired
     private PaymentJpaRepository paymentJpaRepository;

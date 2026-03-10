@@ -60,7 +60,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         // Note: Outbox entries may be created asynchronously
         // Verify the outbox_event table exists and is accessible
         boolean tableExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'outbox_event'",
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'outbox_events'",
             Integer.class
         ) > 0;
 
@@ -75,17 +75,17 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Checking table structure
         boolean hasIdColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_event' AND column_name = 'id'",
+            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'id'",
             Integer.class
         ) > 0;
 
         boolean hasEventTypeColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_event' AND column_name = 'event_type'",
+            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'event_type'",
             Integer.class
         ) > 0;
 
         boolean hasPayloadColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_event' AND column_name = 'payload'",
+            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'payload'",
             Integer.class
         ) > 0;
 
@@ -102,7 +102,7 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Checking for status column
         boolean hasStatusColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_event' AND column_name = 'status'",
+            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'status'",
             Integer.class
         ) > 0;
 
@@ -121,7 +121,7 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Inserting an outbox event
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             eventId,
             eventType,
             aggregateId,
@@ -134,7 +134,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         assertThat(rowsInserted).isEqualTo(1);
 
         // Verify event can be queried
-        boolean eventExists = exists("outbox_event", "id", eventId);
+        boolean eventExists = exists("outbox_events", "id", eventId);
         assertThat(eventExists).isTrue();
     }
 
@@ -144,7 +144,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         // Given: An outbox event
         String eventId = "test-event-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             eventId,
             "TEST_EVENT",
             "test-aggregate",
@@ -155,7 +155,7 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Updating status to PUBLISHED
         int rowsUpdated = jdbcTemplate.update(
-            "UPDATE outbox_event SET status = ?, published_at = ? WHERE id = ?",
+            "UPDATE outbox_events SET status = ?, published_at = ? WHERE id = ?",
             "PUBLISHED",
             Timestamp.from(Instant.now()),
             eventId
@@ -165,7 +165,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         assertThat(rowsUpdated).isEqualTo(1);
 
         String status = jdbcTemplate.queryForObject(
-            "SELECT status FROM outbox_event WHERE id = ?",
+            "SELECT status FROM outbox_events WHERE id = ?",
             String.class,
             eventId
         );
@@ -180,7 +180,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         String event2Id = "test-event-2-" + System.currentTimeMillis();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             event1Id,
             "TEST_EVENT_1",
             "aggregate-1",
@@ -190,7 +190,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         );
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             event2Id,
             "TEST_EVENT_2",
             "aggregate-2",
@@ -201,13 +201,13 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Querying by status
         Integer pendingCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_event WHERE status = ?",
+            "SELECT COUNT(*) FROM outbox_events WHERE status = ?",
             Integer.class,
             "PENDING"
         );
 
         Integer publishedCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_event WHERE status = ?",
+            "SELECT COUNT(*) FROM outbox_events WHERE status = ?",
             Integer.class,
             "PUBLISHED"
         );
@@ -225,7 +225,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         String payload = "{\"paymentId\": \"" + paymentId + "\", \"amount\": 10000, \"currency\": \"USD\"}";
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             eventId,
             "PAYMENT_CREATED",
             paymentId,
@@ -236,7 +236,7 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Retrieving the payload
         String retrievedPayload = jdbcTemplate.queryForObject(
-            "SELECT payload FROM outbox_event WHERE id = ?",
+            "SELECT payload FROM outbox_events WHERE id = ?",
             String.class,
             eventId
         );
@@ -254,7 +254,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         Instant now = Instant.now();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             eventId,
             "TEST_EVENT",
             "test-aggregate",
@@ -265,7 +265,7 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Retrieving created_at
         Timestamp createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM outbox_event WHERE id = ?",
+            "SELECT created_at FROM outbox_events WHERE id = ?",
             Timestamp.class,
             eventId
         );
@@ -284,7 +284,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         Instant now = Instant.now();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_event (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             eventId,
             "TEST_EVENT",
             "test-aggregate",
@@ -296,14 +296,14 @@ class OutboxEventE2ETest extends E2ETestBase {
         // When: Setting published_at
         Instant publishedAt = Instant.now();
         jdbcTemplate.update(
-            "UPDATE outbox_event SET status = ?, published_at = ? WHERE id = ?",
+            "UPDATE outbox_events SET status = ?, published_at = ? WHERE id = ?",
             "PUBLISHED",
             Timestamp.from(publishedAt),
             eventId
         );
 
         Timestamp retrievedPublishedAt = jdbcTemplate.queryForObject(
-            "SELECT published_at FROM outbox_event WHERE id = ?",
+            "SELECT published_at FROM outbox_events WHERE id = ?",
             Timestamp.class,
             eventId
         );

@@ -41,9 +41,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Reconciliation Batch Table Exists")
     void testReconciliationBatchTableExists() {
-        // When: Checking for reconciliation_batch table
+        // When: Checking for reconciliation_batches table
         boolean tableExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'reconciliation_batch'",
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'reconciliation_batches'",
             Integer.class
         ) > 0;
 
@@ -54,9 +54,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Discrepancy Table Exists")
     void testDiscrepancyTableExists() {
-        // When: Checking for discrepancy table
+        // When: Checking for discrepancies table
         boolean tableExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'discrepancy'",
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'discrepancies'",
             Integer.class
         ) > 0;
 
@@ -67,9 +67,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Settlement Report Table Exists")
     void testSettlementReportTableExists() {
-        // When: Checking for settlement_report table
+        // When: Checking for settlement_reports table
         boolean tableExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'settlement_report'",
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'settlement_reports'",
             Integer.class
         ) > 0;
 
@@ -81,9 +81,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @DisplayName("E2E: Reconciliation Batch Schema Validation")
     void testReconciliationBatchSchemaValidation() {
         // When: Checking table columns
-        boolean hasIdColumn = hasColumn("reconciliation_batch", "id");
-        boolean hasStatusColumn = hasColumn("reconciliation_batch", "status");
-        boolean hasCreatedAtColumn = hasColumn("reconciliation_batch", "created_at");
+        boolean hasIdColumn = hasColumn("reconciliation_batches", "id");
+        boolean hasStatusColumn = hasColumn("reconciliation_batches", "status");
+        boolean hasCreatedAtColumn = hasColumn("reconciliation_batches", "created_at");
 
         // Then: Required columns exist
         assertThat(hasIdColumn).isTrue();
@@ -95,9 +95,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @DisplayName("E2E: Discrepancy Schema Validation")
     void testDiscrepancySchemaValidation() {
         // When: Checking table columns
-        boolean hasIdColumn = hasColumn("discrepancy", "id");
-        boolean hasTypeColumn = hasColumn("discrepancy", "type");
-        boolean hasStatusColumn = hasColumn("discrepancy", "status");
+        boolean hasIdColumn = hasColumn("discrepancies", "id");
+        boolean hasTypeColumn = hasColumn("discrepancies", "type");
+        boolean hasStatusColumn = hasColumn("discrepancies", "status");
 
         // Then: Required columns exist
         assertThat(hasIdColumn).isTrue();
@@ -109,9 +109,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @DisplayName("E2E: Settlement Report Schema Validation")
     void testSettlementReportSchemaValidation() {
         // When: Checking table columns
-        boolean hasIdColumn = hasColumn("settlement_report", "id");
-        boolean hasMerchantIdColumn = hasColumn("settlement_report", "merchant_id");
-        boolean hasAmountColumn = hasColumn("settlement_report", "total_amount");
+        boolean hasIdColumn = hasColumn("settlement_reports", "id");
+        boolean hasMerchantIdColumn = hasColumn("settlement_reports", "merchant_id");
+        boolean hasAmountColumn = hasColumn("settlement_reports", "total_amount");
 
         // Then: Required columns exist
         assertThat(hasIdColumn).isTrue();
@@ -127,7 +127,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Inserting a batch
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO reconciliation_batch (id, status, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO reconciliation_batches (id, status, created_at, updated_at) VALUES (?, ?, ?, ?)",
             batchId,
             "PENDING",
             Timestamp.from(Instant.now()),
@@ -136,7 +136,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // Then: Batch is created
         assertThat(rowsInserted).isEqualTo(1);
-        assertThat(exists("reconciliation_batch", "id", batchId)).isTrue();
+        assertThat(exists("reconciliation_batches", "id", batchId)).isTrue();
     }
 
     @Test
@@ -147,7 +147,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Inserting a discrepancy
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO discrepancy (id, type, status, amount, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO discrepancies (id, type, status, amount, created_at) VALUES (?, ?, ?, ?, ?)",
             discrepancyId,
             "MISSING_PAYMENT",
             "OPEN",
@@ -157,7 +157,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // Then: Discrepancy is created
         assertThat(rowsInserted).isEqualTo(1);
-        assertThat(exists("discrepancy", "id", discrepancyId)).isTrue();
+        assertThat(exists("discrepancies", "id", discrepancyId)).isTrue();
     }
 
     @Test
@@ -168,7 +168,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Inserting a settlement report
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO settlement_report (id, merchant_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO settlement_reports (id, merchant_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)",
             reportId,
             merchantId,
             100000L,
@@ -178,7 +178,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // Then: Report is created
         assertThat(rowsInserted).isEqualTo(1);
-        assertThat(exists("settlement_report", "id", reportId)).isTrue();
+        assertThat(exists("settlement_reports", "id", reportId)).isTrue();
     }
 
     @Test
@@ -187,7 +187,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         // Given: An open discrepancy
         String discrepancyId = "discrepancy-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO discrepancy (id, type, status, amount, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO discrepancies (id, type, status, amount, created_at) VALUES (?, ?, ?, ?, ?)",
             discrepancyId,
             "MISSING_PAYMENT",
             "OPEN",
@@ -197,7 +197,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Resolving the discrepancy
         int rowsUpdated = jdbcTemplate.update(
-            "UPDATE discrepancy SET status = ?, resolved_at = ? WHERE id = ?",
+            "UPDATE discrepancies SET status = ?, resolved_at = ? WHERE id = ?",
             "RESOLVED",
             Timestamp.from(Instant.now()),
             discrepancyId
@@ -207,7 +207,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         assertThat(rowsUpdated).isEqualTo(1);
 
         String status = jdbcTemplate.queryForObject(
-            "SELECT status FROM discrepancy WHERE id = ?",
+            "SELECT status FROM discrepancies WHERE id = ?",
             String.class,
             discrepancyId
         );
@@ -220,7 +220,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         // Given: A pending batch
         String batchId = "batch-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO reconciliation_batch (id, status, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO reconciliation_batches (id, status, created_at, updated_at) VALUES (?, ?, ?, ?)",
             batchId,
             "PENDING",
             Timestamp.from(Instant.now()),
@@ -229,7 +229,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Processing the batch
         jdbcTemplate.update(
-            "UPDATE reconciliation_batch SET status = ?, updated_at = ? WHERE id = ?",
+            "UPDATE reconciliation_batches SET status = ?, updated_at = ? WHERE id = ?",
             "PROCESSING",
             Timestamp.from(Instant.now()),
             batchId
@@ -237,7 +237,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // Then: Status is updated
         String status = jdbcTemplate.queryForObject(
-            "SELECT status FROM reconciliation_batch WHERE id = ?",
+            "SELECT status FROM reconciliation_batches WHERE id = ?",
             String.class,
             batchId
         );
@@ -250,7 +250,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         // Given: A settlement report for a merchant
         String reportId = "report-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO settlement_report (id, merchant_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO settlement_reports (id, merchant_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)",
             reportId,
             merchantId,
             250000L,
@@ -260,7 +260,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Querying by merchant
         String retrievedMerchantId = jdbcTemplate.queryForObject(
-            "SELECT merchant_id FROM settlement_report WHERE id = ?",
+            "SELECT merchant_id FROM settlement_reports WHERE id = ?",
             String.class,
             reportId
         );

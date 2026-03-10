@@ -66,7 +66,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
 
         // Verify customer exists in database
         String customerId = (String) customer.get("id");
-        assertThat(exists("customer", "id", customerId)).isTrue();
+        assertThat(exists("customers", "id", customerId)).isTrue();
     }
 
     @Test
@@ -132,7 +132,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
 
         // Verify payment method exists in database
         boolean pmExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_method WHERE customer_id = ?",
+            "SELECT COUNT(*) FROM payments_methods WHERE customer_id = ?",
             Integer.class,
             customerId
         ) > 0;
@@ -171,7 +171,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
 
         // Get payment method ID from database
         String paymentMethodId = jdbcTemplate.queryForObject(
-            "SELECT id FROM payment_method WHERE customer_id = ? LIMIT 1",
+            "SELECT id FROM payments_methods WHERE customer_id = ? LIMIT 1",
             String.class,
             customerId
         );
@@ -184,7 +184,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
 
         // Verify payment method is soft-deleted or removed
         Integer pmCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_method WHERE customer_id = ? AND deleted = true",
+            "SELECT COUNT(*) FROM payments_methods WHERE customer_id = ? AND deleted = true",
             Integer.class,
             customerId
         );
@@ -222,7 +222,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
 
         // Then: Card is tokenized (token stored)
         String token = jdbcTemplate.queryForObject(
-            "SELECT token FROM payment_method WHERE customer_id = ? LIMIT 1",
+            "SELECT token FROM payments_methods WHERE customer_id = ? LIMIT 1",
             String.class,
             customerId
         );
@@ -263,7 +263,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
 
         // Then: All payment methods are stored
         Integer pmCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_method WHERE customer_id = ?",
+            "SELECT COUNT(*) FROM payments_methods WHERE customer_id = ?",
             Integer.class,
             customerId
         );
@@ -327,7 +327,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
         String customerId = (String) customer.get("id");
 
         String dbExternalId = jdbcTemplate.queryForObject(
-            "SELECT external_id FROM customer WHERE id = ?",
+            "SELECT external_id FROM customers WHERE id = ?",
             String.class,
             customerId
         );
@@ -354,7 +354,7 @@ class CustomerManagementE2ETest extends E2ETestBase {
         String customerId = (String) customer.get("id");
 
         String createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM customer WHERE id = ?",
+            "SELECT created_at FROM customers WHERE id = ?",
             String.class,
             customerId
         );
