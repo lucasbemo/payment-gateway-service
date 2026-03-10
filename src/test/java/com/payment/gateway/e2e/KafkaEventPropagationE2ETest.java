@@ -139,7 +139,7 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
 
         // Verify payments in database
         for (String pid : paymentIds) {
-            assertThat(exists("payment", "id", pid)).isTrue();
+            assertThat(exists("payments", "id", pid)).isTrue();
         }
     }
 

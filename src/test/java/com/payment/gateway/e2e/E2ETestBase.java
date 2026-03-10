@@ -12,13 +12,15 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 
 /**
  * Base class for E2E tests with full Spring context.
  * Provides shared test infrastructure including REST client, Kafka, and database access.
+ *
+ * Note: This class is NOT @Transactional to avoid connection leaks.
+ * Individual test methods should manage their own transactions if needed.
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -42,7 +44,6 @@ import javax.sql.DataSource;
     "payment.gateway.idempotency.enabled=true"
 })
 @ActiveProfiles("e2e")
-@Transactional
 public abstract class E2ETestBase extends ContainerConfig {
 
     @Autowired
@@ -55,7 +56,7 @@ public abstract class E2ETestBase extends ContainerConfig {
     protected DataSource dataSource;
 
     @Autowired(required = false)
-    protected KafkaTemplate<String, String> kafkaTemplate;
+    protected KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     protected com.payment.gateway.infrastructure.merchant.adapter.in.rest.MerchantController merchantController;
