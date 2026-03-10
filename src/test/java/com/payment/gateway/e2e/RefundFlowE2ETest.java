@@ -79,7 +79,7 @@ class RefundFlowE2ETest extends E2ETestBase {
 
         // Verify refund exists in database
         String refundId = (String) refund.get("id");
-        assertThat(exists("refund", "id", refundId)).isTrue();
+        assertThat(exists("refunds", "id", refundId)).isTrue();
     }
 
     @Test
@@ -105,7 +105,7 @@ class RefundFlowE2ETest extends E2ETestBase {
         assertThat(refund.get("amount")).isEqualTo(refundAmount);
 
         // Verify original payment still exists
-        assertThat(exists("payment", "id", paymentId)).isTrue();
+        assertThat(exists("payments", "id", paymentId)).isTrue();
     }
 
     @Test
@@ -139,8 +139,8 @@ class RefundFlowE2ETest extends E2ETestBase {
         Map<String, Object> refund1 = (Map<String, Object>) response1.getBody().get("data");
         Map<String, Object> refund2 = (Map<String, Object>) response2.getBody().get("data");
 
-        assertThat(exists("refund", "id", (String) refund1.get("id"))).isTrue();
-        assertThat(exists("refund", "id", (String) refund2.get("id"))).isTrue();
+        assertThat(exists("refunds", "id", (String) refund1.get("id"))).isTrue();
+        assertThat(exists("refunds", "id", (String) refund2.get("id"))).isTrue();
 
         // Verify total refunded amount
         Integer count = jdbcTemplate.queryForObject(
