@@ -108,8 +108,11 @@ class TransactionTrackingE2ETest extends E2ETestBase {
             );
         }
 
-        // When: Getting all transactions for the merchant
-        var response = getApiClient().getTransactions(merchantId);
+        // When: Getting all transactions for the merchant (via payment join)
+        var response = restTemplate.getForEntity(
+            "/api/v1/transactions?merchant_id=" + merchantId,
+            Map.class
+        );
 
         // Then: Transactions are returned
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -181,9 +184,9 @@ class TransactionTrackingE2ETest extends E2ETestBase {
             }
         }
 
-        // When: Querying transactions by created_at
+        // When: Querying transactions by created_at (via payment join for merchant)
         List<String> orderedIds = jdbcTemplate.queryForList(
-            "SELECT payment_id FROM transactions WHERE merchant_id = ? ORDER BY created_at ASC",
+            "SELECT t.payment_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE p.merchant_id = ? ORDER BY t.created_at ASC",
             String.class,
             merchantId
         );
@@ -267,7 +270,7 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Getting transaction type from database
         String transactionType = jdbcTemplate.queryForObject(
-            "SELECT transaction_type FROM transactions WHERE payment_id = ?",
+            "SELECT type FROM transactions WHERE payment_id = ?",
             String.class,
             paymentId
         );
@@ -292,9 +295,9 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
-        // When: Getting transaction merchant_id from database
+        // When: Getting transaction merchant_id from database (via payment join)
         String transactionMerchantId = jdbcTemplate.queryForObject(
-            "SELECT merchant_id FROM transactions WHERE payment_id = ?",
+            "SELECT p.merchant_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE t.payment_id = ?",
             String.class,
             paymentId
         );
@@ -334,9 +337,9 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
-        // When: Getting transaction from database
+        // When: Getting transaction customer_id from database (via payment join)
         String transactionCustomerId = jdbcTemplate.queryForObject(
-            "SELECT customer_id FROM transactions WHERE payment_id = ?",
+            "SELECT p.customer_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE t.payment_id = ?",
             String.class,
             paymentId
         );

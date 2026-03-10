@@ -292,7 +292,7 @@ class ResilienceE2ETest extends E2ETestBase {
     @DisplayName("E2E: Transaction Rollback on Failure")
     void testTransactionRollbackOnFailure() {
         // Given: Initial payment count
-        int initialCount = getCount("payment");
+        int initialCount = getCount("payments");
 
         // When: Making a valid payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
@@ -304,7 +304,7 @@ class ResilienceE2ETest extends E2ETestBase {
         );
 
         // Then: Payment is created (not rolled back since it's valid)
-        int finalCount = getCount("payment");
+        int finalCount = getCount("payments");
         assertThat(finalCount).isEqualTo(initialCount + 1);
     }
 }

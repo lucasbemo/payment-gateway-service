@@ -127,8 +127,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
 
         // When: Inserting a batch
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO reconciliation_batches (id, status, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO reconciliation_batches (id, batch_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
             batchId,
+            java.time.LocalDate.now(),
             "PENDING",
             Timestamp.from(Instant.now()),
             Timestamp.from(Instant.now())
@@ -142,16 +143,28 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Create Discrepancy")
     void testCreateDiscrepancy() {
-        // Given: A discrepancy
+        // Given: A discrepancy and a batch
+        String batchId = "batch-" + System.currentTimeMillis();
         String discrepancyId = "discrepancy-" + System.currentTimeMillis();
+
+        // First create a batch
+        jdbcTemplate.update(
+            "INSERT INTO reconciliation_batches (id, batch_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            batchId,
+            java.time.LocalDate.now(),
+            "PENDING",
+            Timestamp.from(Instant.now()),
+            Timestamp.from(Instant.now())
+        );
 
         // When: Inserting a discrepancy
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO discrepancies (id, type, status, amount, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO discrepancies (id, reconciliation_batch_id, payment_id, discrepancy_type, resolution_status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             discrepancyId,
+            batchId,
+            "payment-123",
             "MISSING_PAYMENT",
             "OPEN",
-            10000L,
             Timestamp.from(Instant.now())
         );
 
@@ -163,15 +176,27 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Create Settlement Report")
     void testCreateSettlementReport() {
-        // Given: A settlement report
+        // Given: A settlement report and batch
+        String batchId = "batch-" + System.currentTimeMillis();
         String reportId = "report-" + System.currentTimeMillis();
+
+        // First create a batch
+        jdbcTemplate.update(
+            "INSERT INTO reconciliation_batches (id, batch_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            batchId,
+            java.time.LocalDate.now(),
+            "PENDING",
+            Timestamp.from(Instant.now()),
+            Timestamp.from(Instant.now())
+        );
 
         // When: Inserting a settlement report
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO settlement_reports (id, merchant_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO settlement_reports (id, reconciliation_batch_id, report_type, report_format, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             reportId,
-            merchantId,
-            100000L,
+            batchId,
+            "DAILY",
+            "JSON",
             "GENERATED",
             Timestamp.from(Instant.now())
         );
@@ -184,14 +209,27 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Discrepancy Resolution Flow")
     void testDiscrepancyResolutionFlow() {
-        // Given: An open discrepancy
+        // Given: An open discrepancy and batch
+        String batchId = "batch-" + System.currentTimeMillis();
         String discrepancyId = "discrepancy-" + System.currentTimeMillis();
+
+        // First create a batch
         jdbcTemplate.update(
-            "INSERT INTO discrepancies (id, type, status, amount, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO reconciliation_batches (id, batch_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            batchId,
+            java.time.LocalDate.now(),
+            "PENDING",
+            Timestamp.from(Instant.now()),
+            Timestamp.from(Instant.now())
+        );
+
+        jdbcTemplate.update(
+            "INSERT INTO discrepancies (id, reconciliation_batch_id, payment_id, discrepancy_type, resolution_status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             discrepancyId,
+            batchId,
+            "payment-123",
             "MISSING_PAYMENT",
             "OPEN",
-            10000L,
             Timestamp.from(Instant.now())
         );
 
@@ -220,8 +258,9 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         // Given: A pending batch
         String batchId = "batch-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO reconciliation_batches (id, status, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO reconciliation_batches (id, batch_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
             batchId,
+            java.time.LocalDate.now(),
             "PENDING",
             Timestamp.from(Instant.now()),
             Timestamp.from(Instant.now())
@@ -247,13 +286,27 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
     @Test
     @DisplayName("E2E: Settlement Report with Merchant Data")
     void testSettlementReportWithMerchantData() {
-        // Given: A settlement report for a merchant
+        // Given: A settlement report for a merchant and batch
+        String batchId = "batch-" + System.currentTimeMillis();
         String reportId = "report-" + System.currentTimeMillis();
+
+        // First create a batch
         jdbcTemplate.update(
-            "INSERT INTO settlement_reports (id, merchant_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO reconciliation_batches (id, batch_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            batchId,
+            java.time.LocalDate.now(),
+            "PENDING",
+            Timestamp.from(Instant.now()),
+            Timestamp.from(Instant.now())
+        );
+
+        // Create settlement report
+        jdbcTemplate.update(
+            "INSERT INTO settlement_reports (id, reconciliation_batch_id, report_type, report_format, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             reportId,
-            merchantId,
-            250000L,
+            batchId,
+            "DAILY",
+            "JSON",
             "GENERATED",
             Timestamp.from(Instant.now())
         );
@@ -266,6 +319,7 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         );
 
         // Then: Merchant ID matches
+        // Note: merchant_id is an added column, may be null for old records
         assertThat(retrievedMerchantId).isEqualTo(merchantId);
     }
 
