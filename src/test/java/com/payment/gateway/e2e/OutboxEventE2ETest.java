@@ -121,7 +121,7 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Inserting an outbox event
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
             eventId,
             eventType,
             "Payment",
@@ -144,7 +144,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         // Given: An outbox event
         String eventId = "test-event-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
             eventId,
             "TEST_EVENT",
             "Payment",
@@ -180,7 +180,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         String event2Id = "test-event-2-" + System.currentTimeMillis();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
             event1Id,
             "TEST_EVENT_1",
             "Payment",
@@ -190,7 +190,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         );
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
             event2Id,
             "TEST_EVENT_2",
             "Payment",
@@ -225,7 +225,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         String payload = "{\"paymentId\": \"" + paymentId + "\", \"amount\": 10000, \"currency\": \"USD\"}";
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
             eventId,
             "PAYMENT_CREATED",
             "Payment",
@@ -254,7 +254,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         Instant now = Instant.now();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?::jsonb, ?, ?)",
             eventId,
             "TEST_EVENT",
             "Payment",
@@ -284,7 +284,7 @@ class OutboxEventE2ETest extends E2ETestBase {
         String eventId = "test-event-" + System.currentTimeMillis();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
             eventId,
             "TEST_EVENT",
             "Payment",
