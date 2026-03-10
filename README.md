@@ -216,9 +216,16 @@ docker ps
 ```
 
 **Current Status:**
-- 122 E2E tests run without connection leaks or hanging
-- ~54 tests passing (functional test failures being addressed)
+- 122 E2E tests run without connection leaks or hanging (was: infinite loop)
+- ~59 tests passing (functional test failures being addressed)
 - All infrastructure/connection issues resolved
+- Tests complete in ~60 seconds
+
+**Known Issues (being fixed):**
+- Refund tests: Refund endpoint requires transaction but test profile payment flow doesn't create one
+- Security tests: Expect 401 but security is disabled in `e2e` profile (test design issue)
+- Customer tests: Some tests expect `external_id`, `phone` columns not in schema
+- Merchant tests: API response format differs from test expectations
 
 ### CI/CD Recommendation
 
