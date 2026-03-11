@@ -1,5 +1,6 @@
 package com.payment.gateway.infrastructure.customer.adapter.out.persistence;
 
+import com.payment.gateway.domain.customer.model.CardDetails;
 import com.payment.gateway.domain.customer.model.PaymentMethod;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class PaymentMethodMapper {
 
     public PaymentMethodJpaEntity toEntity(PaymentMethod paymentMethod) {
-        return PaymentMethodJpaEntity.builder()
+        PaymentMethodJpaEntity entity = PaymentMethodJpaEntity.builder()
                 .id(paymentMethod.getId())
                 .customerId(paymentMethod.getCustomerId())
                 .merchantId(null) // Will be set by the customer relationship
@@ -22,6 +23,19 @@ public class PaymentMethodMapper {
                 .createdAt(paymentMethod.getCreatedAt())
                 .updatedAt(paymentMethod.getUpdatedAt())
                 .build();
+
+        // Map card details if present
+        CardDetails cardDetails = paymentMethod.getCardDetails();
+        if (cardDetails != null) {
+            entity.setExpiryMonth(String.valueOf(cardDetails.getExpiryMonth()));
+            entity.setExpiryYear(String.valueOf(cardDetails.getExpiryYear()));
+            entity.setBrand(cardDetails.getCardBrand());
+            if (entity.getLastFour() == null) {
+                entity.setLastFour(cardDetails.getCardNumberLast4());
+            }
+        }
+
+        return entity;
     }
 
     public PaymentMethod toDomain(PaymentMethodJpaEntity entity) {

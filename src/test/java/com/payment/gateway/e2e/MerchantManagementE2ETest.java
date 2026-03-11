@@ -288,7 +288,6 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: Create Merchant with Missing Fields")
-    @org.junit.jupiter.api.Disabled("Passing null causes NullPointerException - validation behavior differs in E2E profile")
     void testCreateMerchant_MissingFields() {
         // Given: Invalid merchant data (missing name)
         // When: Registering with missing required fields

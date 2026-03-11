@@ -40,11 +40,10 @@ public class PaymentGatewayClient {
      * POST /api/v1/merchants
      */
     public ResponseEntity<Map<String, Object>> registerMerchant(String name, String email, String webhookUrl) {
-        Map<String, Object> body = Map.of(
-            "name", name,
-            "email", email,
-            "webhookUrl", webhookUrl != null ? webhookUrl : ""
-        );
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("name", name);
+        body.put("email", email);
+        body.put("webhookUrl", webhookUrl != null ? webhookUrl : "");
         return post("/api/v1/merchants", body, new LinkedMultiValueMap<>());
     }
 

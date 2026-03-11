@@ -38,7 +38,6 @@ class ResilienceE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: Multiple Concurrent Payments")
-    @org.junit.jupiter.api.Disabled("getPayments endpoint returns 500 in test profile - port not fully implemented")
     void testMultipleConcurrentPayments() {
         // Given: Multiple payment requests
         int numPayments = 5;
@@ -193,7 +192,6 @@ class ResilienceE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: System Handles Mixed Operations")
-    @org.junit.jupiter.api.Disabled("getPayments endpoint returns 500 in test profile - port not fully implemented")
     void testSystemHandlesMixedOperations() {
         // Given: Various operations
         // Register merchant

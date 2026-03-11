@@ -50,6 +50,23 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
         var entity = customerMapper.toEntity(customer);
         var savedEntity = customerJpaRepository.save(entity);
 
+        // Load existing payment methods from database
+        List<PaymentMethodJpaEntity> existingPaymentMethods = paymentMethodJpaRepository.findByCustomerId(savedEntity.getId());
+
+        // Get current payment method IDs from domain
+        List<String> currentPaymentMethodIds = customer.getPaymentMethods() != null
+                ? customer.getPaymentMethods().stream().map(PaymentMethod::getId).collect(Collectors.toList())
+                : List.of();
+
+        // Delete payment methods that are no longer in the domain model
+        for (PaymentMethodJpaEntity existingPm : existingPaymentMethods) {
+            if (!currentPaymentMethodIds.contains(existingPm.getId())) {
+                // Soft delete by setting status to INACTIVE
+                existingPm.setStatus(PaymentMethodStatus.INACTIVE);
+                paymentMethodJpaRepository.save(existingPm);
+            }
+        }
+
         // Save payment methods associated with the customer
         if (customer.getPaymentMethods() != null) {
             for (PaymentMethod paymentMethod : customer.getPaymentMethods()) {
@@ -67,12 +84,44 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
 
     @Override
     public Optional<Customer> findById(String id) {
-        return customerJpaRepository.findById(id).map(customerMapper::toDomain);
+        return customerJpaRepository.findById(id)
+                .map(entity -> {
+                    Customer customer = customerMapper.toDomain(entity);
+                    // Load payment methods from database
+                    List<PaymentMethod> paymentMethods = paymentMethodJpaRepository.findByCustomerId(id).stream()
+                            .map(paymentMethodMapper::toDomain)
+                            .collect(Collectors.toList());
+                    // Set payment methods using reflection since there's no setter
+                    try {
+                        java.lang.reflect.Field paymentMethodsField = Customer.class.getDeclaredField("paymentMethods");
+                        paymentMethodsField.setAccessible(true);
+                        paymentMethodsField.set(customer, paymentMethods);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to set payment methods", e);
+                    }
+                    return customer;
+                });
     }
 
     @Override
     public Optional<Customer> findByIdAndMerchantId(String id, String merchantId) {
-        return customerJpaRepository.findByIdAndMerchantId(id, merchantId).map(customerMapper::toDomain);
+        return customerJpaRepository.findByIdAndMerchantId(id, merchantId)
+                .map(entity -> {
+                    Customer customer = customerMapper.toDomain(entity);
+                    // Load payment methods from database
+                    List<PaymentMethod> paymentMethods = paymentMethodJpaRepository.findByCustomerId(id).stream()
+                            .map(paymentMethodMapper::toDomain)
+                            .collect(Collectors.toList());
+                    // Set payment methods using reflection
+                    try {
+                        java.lang.reflect.Field paymentMethodsField = Customer.class.getDeclaredField("paymentMethods");
+                        paymentMethodsField.setAccessible(true);
+                        paymentMethodsField.set(customer, paymentMethods);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to set payment methods", e);
+                    }
+                    return customer;
+                });
     }
 
     @Override

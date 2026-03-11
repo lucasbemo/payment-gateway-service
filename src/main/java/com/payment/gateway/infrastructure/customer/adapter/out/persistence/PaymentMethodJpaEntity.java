@@ -30,6 +30,26 @@ public class PaymentMethodJpaEntity {
         this.merchantId = merchantId;
     }
 
+    public void setExpiryMonth(String expiryMonth) {
+        this.expiryMonth = expiryMonth;
+    }
+
+    public void setExpiryYear(String expiryYear) {
+        this.expiryYear = expiryYear;
+    }
+
+    public void setLastFour(String lastFour) {
+        this.lastFour = lastFour;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public void setStatus(PaymentMethodStatus status) {
+        this.status = status;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 50)
     private PaymentMethodType type;
@@ -47,9 +67,11 @@ public class PaymentMethodJpaEntity {
     private String expiryYear;
 
     @Column(name = "last_four", length = 4)
+    @Getter
     private String lastFour;
 
     @Column(name = "brand", length = 50)
+    @Getter
     private String brand;
 
     @Column(name = "is_default", nullable = false)
