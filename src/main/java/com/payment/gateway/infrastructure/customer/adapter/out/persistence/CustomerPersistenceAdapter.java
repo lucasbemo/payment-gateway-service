@@ -49,6 +49,19 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
     public Customer saveCustomer(Customer customer) {
         var entity = customerMapper.toEntity(customer);
         var savedEntity = customerJpaRepository.save(entity);
+
+        // Save payment methods associated with the customer
+        if (customer.getPaymentMethods() != null) {
+            for (PaymentMethod paymentMethod : customer.getPaymentMethods()) {
+                var paymentMethodEntity = paymentMethodMapper.toEntity(paymentMethod);
+                // Set merchantId from customer if not set
+                if (paymentMethodEntity.getMerchantId() == null) {
+                    paymentMethodEntity.setMerchantId(savedEntity.getMerchantId());
+                }
+                paymentMethodJpaRepository.save(paymentMethodEntity);
+            }
+        }
+
         return customerMapper.toDomain(savedEntity);
     }
 

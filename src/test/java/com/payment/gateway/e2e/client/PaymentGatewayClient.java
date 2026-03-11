@@ -296,7 +296,7 @@ public class PaymentGatewayClient {
 
     private ResponseEntity<Map<String, Object>> get(String path, MultiValueMap<String, String> params) {
         HttpEntity<Void> entity = new HttpEntity<>(createAuthHeaders());
-        return restTemplate.exchange(path, HttpMethod.GET, entity, MAP_TYPE_REF, params);
+        return restTemplate.exchange(path + buildQueryString(params), HttpMethod.GET, entity, MAP_TYPE_REF);
     }
 
     private ResponseEntity<Map<String, Object>> post(String path, Map<String, Object> body) {

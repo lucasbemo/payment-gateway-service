@@ -51,6 +51,12 @@ public class ProcessRefundService implements ProcessRefundUseCase {
             throw new BusinessException("Payment does not belong to merchant: " + merchantId);
         }
 
+        // Validate refund amount doesn't exceed payment amount
+        Long refundAmount = amount != null ? amount : payment.getAmount().getAmountInCents();
+        if (refundAmount > payment.getAmount().getAmountInCents()) {
+            throw new BusinessException("Refund amount cannot exceed payment amount");
+        }
+
         // Get latest transaction
         Transaction transaction = refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)
                 .orElseThrow(() -> new BusinessException("No transaction found for payment: " + paymentId));

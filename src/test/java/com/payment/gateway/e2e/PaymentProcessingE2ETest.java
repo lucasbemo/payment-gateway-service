@@ -170,7 +170,6 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: Two-Phase Payment - Authorize then Capture")
-    @org.junit.jupiter.api.Disabled("Payment flow doesn't create AUTHORIZED status in test profile - payments go directly to PENDING")
     void testTwoPhasePayment_AuthorizeCapture() {
         // Note: The current implementation processes payment in one step
         // This test verifies the capture endpoint exists and works
@@ -223,7 +222,6 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: Get Payment by ID")
-    @org.junit.jupiter.api.Disabled("GetPaymentService.findById port not fully implemented - returns 500 in test profile")
     void testGetPaymentById() {
         // Given: A processed payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
@@ -249,7 +247,6 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: Get All Payments for Merchant")
-    @org.junit.jupiter.api.Disabled("GetPaymentService.getPaymentsByMerchantId returns empty list - port not fully implemented")
     void testGetPaymentsByMerchant() {
         // Given: Multiple payments for a merchant
         for (int i = 0; i < 3; i++) {
@@ -273,7 +270,6 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
     @Test
     @DisplayName("E2E: Payment with Line Items")
-    @org.junit.jupiter.api.Disabled("payment_items requires payment_id - application needs to handle items in payment flow")
     void testProcessPayment_WithLineItems() {
         // Given: A payment request with line items
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
@@ -298,7 +294,7 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
-        assertThat(payment.get("amount")).isEqualTo(10000L);
+        assertThat(((Number) payment.get("amountInCents")).longValue()).isEqualTo(10000L);
     }
 
     @Test

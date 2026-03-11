@@ -62,20 +62,7 @@ public class PaymentController {
         com.payment.gateway.application.payment.dto.PaymentResponse response =
                 processPaymentUseCase.processPayment(command);
 
-        PaymentResponse paymentResponse = paymentRestMapper.toResponse(
-                com.payment.gateway.domain.payment.model.Payment.create(
-                        response.getMerchantId(),
-                        com.payment.gateway.commons.model.Money.of(response.getAmount(),
-                                java.util.Currency.getInstance(response.getCurrency())),
-                        response.getCurrency(),
-                        com.payment.gateway.domain.payment.model.PaymentMethod.CREDIT_CARD,
-                        response.getIdempotencyKey(),
-                        response.getDescription(),
-                        com.payment.gateway.domain.payment.model.PaymentMetadata.empty(),
-                        null,
-                        response.getCustomerId()
-                )
-        );
+        PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
 
         // Set the ID from response
         setId(paymentResponse, response.getId());
@@ -96,20 +83,7 @@ public class PaymentController {
         com.payment.gateway.application.payment.dto.PaymentResponse response =
                 getPaymentUseCase.getPaymentById(id, merchantId);
 
-        PaymentResponse paymentResponse = paymentRestMapper.toResponse(
-                com.payment.gateway.domain.payment.model.Payment.create(
-                        response.getMerchantId(),
-                        com.payment.gateway.commons.model.Money.of(response.getAmount(),
-                                java.util.Currency.getInstance(response.getCurrency())),
-                        response.getCurrency(),
-                        com.payment.gateway.domain.payment.model.PaymentMethod.CREDIT_CARD,
-                        response.getIdempotencyKey(),
-                        response.getDescription(),
-                        com.payment.gateway.domain.payment.model.PaymentMetadata.empty(),
-                        null,
-                        response.getCustomerId()
-                )
-        );
+        PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
 
         setId(paymentResponse, response.getId());
 
@@ -130,20 +104,7 @@ public class PaymentController {
 
         List<PaymentResponse> paymentResponses = responses.stream()
                 .map(response -> {
-                    PaymentResponse paymentResponse = paymentRestMapper.toResponse(
-                            com.payment.gateway.domain.payment.model.Payment.create(
-                                    response.getMerchantId(),
-                                    com.payment.gateway.commons.model.Money.of(response.getAmount(),
-                                            java.util.Currency.getInstance(response.getCurrency())),
-                                    response.getCurrency(),
-                                    com.payment.gateway.domain.payment.model.PaymentMethod.CREDIT_CARD,
-                                    response.getIdempotencyKey(),
-                                    response.getDescription(),
-                                    com.payment.gateway.domain.payment.model.PaymentMetadata.empty(),
-                                    null,
-                                    response.getCustomerId()
-                            )
-                    );
+                    PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
                     setId(paymentResponse, response.getId());
                     return paymentResponse;
                 })

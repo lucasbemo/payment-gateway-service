@@ -20,7 +20,7 @@ public class PaymentMapper {
      */
     public PaymentJpaEntity toEntity(Payment payment) {
         long amountInCents = payment.getAmount().getAmountInCents();
-        return PaymentJpaEntity.builder()
+        PaymentJpaEntity entity = PaymentJpaEntity.builder()
                 .id(payment.getId())
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
@@ -32,9 +32,39 @@ public class PaymentMapper {
                 .description(payment.getDescription())
                 .createdAt(payment.getCreatedAt())
                 .updatedAt(payment.getUpdatedAt())
-                .items(payment.getItems() != null ?
-                        payment.getItems().stream().map(this::itemToEntity).collect(Collectors.toList()) : null)
                 .build();
+
+        // Map items and set the payment reference
+        if (payment.getItems() != null) {
+            List<PaymentItemJpaEntity> itemEntities = payment.getItems().stream()
+                    .map(item -> itemToEntity(item, entity))
+                    .collect(Collectors.toList());
+            entity.getItems().addAll(itemEntities);
+        }
+
+        return entity;
+    }
+
+    /**
+     * Map PaymentItem domain to JPA entity with payment reference.
+     */
+    private PaymentItemJpaEntity itemToEntity(PaymentItem item, PaymentJpaEntity payment) {
+        long unitPriceCents = item.getUnitPrice().getAmountInCents();
+        long totalCents = item.getTotal().getAmountInCents();
+        return PaymentItemJpaEntity.builder()
+                .payment(payment)
+                .description(item.getDescription())
+                .quantity(item.getQuantity())
+                .unitPrice(BigDecimal.valueOf(unitPriceCents))
+                .total(BigDecimal.valueOf(totalCents))
+                .build();
+    }
+
+    /**
+     * Map PaymentItem domain to JPA entity (without payment reference).
+     */
+    private PaymentItemJpaEntity itemToEntity(PaymentItem item) {
+        return itemToEntity(item, null);
     }
 
     /**
@@ -64,21 +94,23 @@ public class PaymentMapper {
         // Set the ID using reflection since Payment doesn't have a setter
         setId(payment, entity.getId());
 
+        // Set the status using reflection since Payment doesn't have a status setter
+        setStatus(payment, entity.getStatus());
+
         return payment;
     }
 
     /**
-     * Map PaymentItem domain to JPA entity.
+     * Set status using reflection since Payment domain object doesn't have a status setter.
      */
-    private PaymentItemJpaEntity itemToEntity(PaymentItem item) {
-        long unitPriceCents = item.getUnitPrice().getAmountInCents();
-        long totalCents = item.getTotal().getAmountInCents();
-        return PaymentItemJpaEntity.builder()
-                .description(item.getDescription())
-                .quantity(item.getQuantity())
-                .unitPrice(BigDecimal.valueOf(unitPriceCents))
-                .total(BigDecimal.valueOf(totalCents))
-                .build();
+    private void setStatus(Payment payment, PaymentStatus status) {
+        try {
+            java.lang.reflect.Field statusField = Payment.class.getDeclaredField("status");
+            statusField.setAccessible(true);
+            statusField.set(payment, com.payment.gateway.domain.payment.model.PaymentStatus.valueOf(status.name()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set payment status", e);
+        }
     }
 
     /**

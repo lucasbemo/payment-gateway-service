@@ -57,6 +57,11 @@ public class Transaction {
 
     public static Transaction create(String paymentId, String merchantId, TransactionType type,
                                       Money amount, String currency) {
+        return create(paymentId, merchantId, type, amount, currency, TransactionStatus.PENDING.name());
+    }
+
+    public static Transaction create(String paymentId, String merchantId, TransactionType type,
+                                      Money amount, String currency, String status) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())
@@ -66,7 +71,7 @@ public class Transaction {
                 .amount(amount)
                 .netAmount(calculateNetAmount(amount, type))
                 .currency(currency)
-                .status(TransactionStatus.PENDING)
+                .status(TransactionStatus.fromString(status))
                 .retryCount(0)
                 .createdAt(now)
                 .updatedAt(now)

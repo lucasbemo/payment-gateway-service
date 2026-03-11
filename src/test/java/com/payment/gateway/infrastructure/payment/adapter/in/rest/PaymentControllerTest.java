@@ -67,7 +67,7 @@ class PaymentControllerTest {
                 .build();
 
         given(processPaymentUseCase.processPayment(any())).willReturn(appResponse);
-        given(paymentRestMapper.toResponse(any(com.payment.gateway.domain.payment.model.Payment.class)))
+        given(paymentRestMapper.toResponse(any(com.payment.gateway.application.payment.dto.PaymentResponse.class)))
                 .willReturn(com.payment.gateway.infrastructure.payment.adapter.in.rest.PaymentResponse.builder()
                         .id("pay-123")
                         .merchantId("merchant-1")
@@ -111,7 +111,7 @@ class PaymentControllerTest {
                 .build();
 
         given(getPaymentUseCase.getPaymentById(eq("pay-123"), any())).willReturn(appResponse);
-        given(paymentRestMapper.toResponse(any(com.payment.gateway.domain.payment.model.Payment.class)))
+        given(paymentRestMapper.toResponse(any(com.payment.gateway.application.payment.dto.PaymentResponse.class)))
                 .willReturn(com.payment.gateway.infrastructure.payment.adapter.in.rest.PaymentResponse.builder()
                         .id("pay-123")
                         .merchantId("merchant-1")

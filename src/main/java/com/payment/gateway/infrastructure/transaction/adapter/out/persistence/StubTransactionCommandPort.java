@@ -1,7 +1,9 @@
 package com.payment.gateway.infrastructure.transaction.adapter.out.persistence;
 
 import com.payment.gateway.application.payment.port.out.TransactionCommandPort;
+import com.payment.gateway.application.payment.port.out.TransactionCommandPort.CreateTransactionCommand;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@ConditionalOnMissingBean(name = "transactionPersistenceAdapter")
 public class StubTransactionCommandPort implements TransactionCommandPort {
 
     @Override

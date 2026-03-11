@@ -42,9 +42,10 @@ public class GetPaymentService implements GetPaymentUseCase {
     @Override
     public List<PaymentResponse> getPaymentsByMerchantId(String merchantId) {
         log.info("Getting payments for merchant: {}", merchantId);
-        // Note: This would need a new method in the port for finding by merchant ID
-        // For now, returning empty list - the actual implementation would need the port method
-        return List.of();
+        List<Payment> payments = paymentQueryPort.findByMerchantId(merchantId);
+        return payments.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     private PaymentResponse mapToResponse(Payment payment) {

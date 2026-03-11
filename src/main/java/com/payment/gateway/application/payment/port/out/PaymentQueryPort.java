@@ -2,6 +2,7 @@ package com.payment.gateway.application.payment.port.out;
 
 import com.payment.gateway.domain.payment.model.Payment;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,4 +18,6 @@ public interface PaymentQueryPort {
     Optional<Payment> findByIdempotencyKey(String idempotencyKey);
 
     boolean existsByIdempotencyKey(String idempotencyKey);
+
+    List<Payment> findByMerchantId(String merchantId);
 }

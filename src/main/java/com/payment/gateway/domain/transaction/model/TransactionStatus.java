@@ -41,4 +41,12 @@ public enum TransactionStatus {
     public boolean isSuccessful() {
         return Set.of(AUTHORIZED, CAPTURED, SETTLED, REFUNDED, PARTIALLY_REFUNDED).contains(this);
     }
+
+    public static TransactionStatus fromString(String value) {
+        try {
+            return TransactionStatus.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return PENDING;
+        }
+    }
 }

@@ -108,4 +108,35 @@ public class PaymentRestMapper {
                 .capturedAt(entity.getCapturedAt())
                 .build();
     }
+
+    /**
+     * Map application PaymentResponse DTO to REST PaymentResponse DTO.
+     */
+    public PaymentResponse toResponse(com.payment.gateway.application.payment.dto.PaymentResponse response) {
+        List<PaymentResponse.PaymentItemResponse> items = null;
+        if (response.getItems() != null) {
+            items = response.getItems().stream()
+                    .map(item -> PaymentResponse.PaymentItemResponse.builder()
+                            .description(item.getDescription())
+                            .quantity(item.getQuantity())
+                            .unitPriceInCents(item.getUnitPrice())
+                            .totalInCents(item.getTotal())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        return PaymentResponse.builder()
+                .id(response.getId())
+                .merchantId(response.getMerchantId())
+                .customerId(response.getCustomerId())
+                .paymentMethodId(response.getPaymentMethodId())
+                .amountInCents(response.getAmount())
+                .currency(response.getCurrency())
+                .status(response.getStatus())
+                .idempotencyKey(response.getIdempotencyKey())
+                .description(response.getDescription())
+                .items(items)
+                .createdAt(response.getCreatedAt())
+                .build();
+    }
 }

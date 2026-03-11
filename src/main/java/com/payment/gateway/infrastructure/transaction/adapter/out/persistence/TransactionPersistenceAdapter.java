@@ -4,11 +4,14 @@ import com.payment.gateway.application.transaction.port.out.TransactionCommandPo
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
+import com.payment.gateway.domain.transaction.model.TransactionType;
 import com.payment.gateway.domain.transaction.port.TransactionRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 @Primary
 @RequiredArgsConstructor
-public class TransactionPersistenceAdapter implements TransactionQueryPort, TransactionCommandPort, TransactionRepositoryPort {
+public class TransactionPersistenceAdapter implements TransactionQueryPort, TransactionCommandPort, TransactionRepositoryPort, com.payment.gateway.application.payment.port.out.TransactionCommandPort {
 
     private final TransactionJpaRepository transactionJpaRepository;
     private final TransactionMapper transactionMapper;
@@ -36,6 +39,22 @@ public class TransactionPersistenceAdapter implements TransactionQueryPort, Tran
         var entity = transactionMapper.toEntity(transaction);
         var saved = transactionJpaRepository.save(entity);
         return transactionMapper.toDomain(saved);
+    }
+
+    @Override
+    public String createTransaction(com.payment.gateway.application.payment.port.out.TransactionCommandPort.CreateTransactionCommand command) {
+        Currency currency = Currency.getInstance(command.currency());
+        var domainTransaction = Transaction.create(
+                command.paymentId(),
+                command.merchantId(),
+                TransactionType.valueOf(command.type()),
+                com.payment.gateway.commons.model.Money.of(BigDecimal.valueOf(command.amount()), currency),
+                command.currency(),
+                command.status() != null ? command.status() : "PENDING"
+        );
+        var entity = transactionMapper.toEntity(domainTransaction);
+        var saved = transactionJpaRepository.save(entity);
+        return saved.getId();
     }
 
     @Override

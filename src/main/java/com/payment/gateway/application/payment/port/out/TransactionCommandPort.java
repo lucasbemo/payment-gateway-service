@@ -15,6 +15,7 @@ public interface TransactionCommandPort {
         String merchantId,
         String type,
         Long amount,
-        String currency
+        String currency,
+        String status
     ) {}
 }

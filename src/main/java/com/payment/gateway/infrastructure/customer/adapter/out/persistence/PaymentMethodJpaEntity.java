@@ -26,6 +26,10 @@ public class PaymentMethodJpaEntity {
     @Column(name = "merchant_id", nullable = false, length = 36)
     private String merchantId;
 
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 50)
     private PaymentMethodType type;

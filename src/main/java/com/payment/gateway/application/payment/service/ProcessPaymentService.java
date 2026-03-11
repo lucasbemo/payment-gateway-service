@@ -194,7 +194,8 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                         payment.getMerchantId(),
                         "PAYMENT",
                         payment.getAmount().getAmountInCents(),
-                        payment.getCurrency()
+                        payment.getCurrency(),
+                        payment.getStatus().name()
                 );
 
         transactionCommandPort.createTransaction(command);
