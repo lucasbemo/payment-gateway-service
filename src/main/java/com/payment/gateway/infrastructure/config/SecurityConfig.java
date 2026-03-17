@@ -29,24 +29,42 @@ import java.util.List;
 @Profile("!e2e")
 public class SecurityConfig {
 
+    /**
+     * Security filter chain for local/development with open access.
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Profile({"local", "dev"})
+    public SecurityFilterChain localSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .anyRequest().permitAll()
+                );
+        return http.build();
+    }
+
+    /**
+     * Security filter chain for default profile (restricted access).
+     */
+    @Bean
+    @Profile("!e2e & !local & !dev & !production")
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        // Health and info endpoints
                         .requestMatchers("/api/v1/health/**").permitAll()
-                        // All other API requests require authentication
                         .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 

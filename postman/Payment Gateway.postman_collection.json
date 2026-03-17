@@ -1,0 +1,1393 @@
+{
+	"info": {
+		"_postman_id": "payment-gateway-api-collection",
+		"name": "Payment Gateway API",
+		"description": "Complete API collection for the Payment Gateway Service with all endpoints for merchant management, customer management, payment processing, transactions, refunds, and reconciliation.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "version",
+			"value": "1.0.0",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Health & Info",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has status field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('status');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Prometheus Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/prometheus",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "prometheus"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains metrics\", function () {",
+									"    pm.expect(pm.response.text()).to.include('#');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/swagger-ui.html",
+							"host": ["{{baseUrl}}"],
+							"path": ["swagger-ui.html"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains Swagger\", function () {",
+									"    pm.expect(pm.response.text()).to.include('swagger');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "1. Merchant Management",
+			"item": [
+				{
+					"name": "Register Merchant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate unique merchant email for each run",
+									"const timestamp = Date.now();",
+									"pm.variables.set('merchantEmail', `merchant${timestamp}@test.com`);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Extract merchant ID from response\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data && json.data.id) {",
+									"        pm.environment.set('merchantId', json.data.id);",
+									"        console.log('Merchant ID saved:', json.data.id);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Merchant data has required fields\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('name');",
+									"    pm.expect(json.data).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Merchant\",\n    \"email\": \"{{merchantEmail}}\",\n    \"webhookUrl\": \"https://webhook.site/test-merchant\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/merchants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "merchants"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Merchant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Merchant ID matches request\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data.id).to.equal(pm.environment.get('merchantId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/merchants/{{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "merchants", "{{merchantId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Merchant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message', 'Merchant updated successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Test Merchant\",\n    \"email\": \"updated-merchant@test.com\",\n    \"webhookUrl\": \"https://webhook.site/updated\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/merchants/{{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "merchants", "{{merchantId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Suspend Merchant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message', 'Merchant suspended successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/merchants/{{merchantId}}/suspend",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "merchants", "{{merchantId}}", "suspend"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Customer Management",
+			"item": [
+				{
+					"name": "Register Customer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate unique customer email for each run",
+									"const timestamp = Date.now();",
+									"pm.variables.set('customerEmail', `customer${timestamp}@test.com`);",
+									"pm.variables.set('customerExternalId', `EXT-${timestamp}`);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Extract customer ID from response\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data && json.data.id) {",
+									"        pm.environment.set('customerId', json.data.id);",
+									"        console.log('Customer ID saved:', json.data.id);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Customer data has required fields\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('email');",
+									"    pm.expect(json.data).to.have.property('name');",
+									"    pm.expect(json.data).to.have.property('merchantId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"email\": \"{{customerEmail}}\",\n    \"name\": \"Test Customer\",\n    \"phone\": \"+1234567890\",\n    \"externalId\": \"{{customerExternalId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Customer ID matches request\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data.id).to.equal(pm.environment.get('customerId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers/{{customerId}}?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers", "{{customerId}}"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Payment Method",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Test card numbers for different scenarios",
+									"// Visa: 4111111111111111",
+									"// Mastercard: 5500000000000004",
+									"// Amex: 340000000000009",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});",
+									"",
+									"pm.test(\"Extract payment method ID from response\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data && json.data.paymentMethods && json.data.paymentMethods.length > 0) {",
+									"        const pm = json.data.paymentMethods.find(p => p.isDefault);",
+									"        if (pm && pm.id) {",
+									"            pm.environment.set('paymentMethodId', pm.id);",
+									"            console.log('Payment Method ID saved:', pm.id);",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"cardNumber\": \"4111111111111111\",\n    \"cardExpiryMonth\": \"12\",\n    \"cardExpiryYear\": \"2028\",\n    \"cardCvv\": \"123\",\n    \"cardholderName\": \"Test Customer\",\n    \"isDefault\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers/{{customerId}}/payment-methods",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers", "{{customerId}}", "payment-methods"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Payment Method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers/{{customerId}}/payment-methods/{{paymentMethodId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers", "{{customerId}}", "payment-methods", "{{paymentMethodId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Payment Processing",
+			"item": [
+				{
+					"name": "Process Payment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate UUID for idempotency key",
+									"const idempotencyKey = crypto.randomUUID();",
+									"pm.environment.set('idempotencyKey', idempotencyKey);",
+									"console.log('Generated idempotency key:', idempotencyKey);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Extract payment ID from response\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data && json.data.id) {",
+									"        pm.environment.set('paymentId', json.data.id);",
+									"        console.log('Payment ID saved:', json.data.id);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Payment has required fields\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('amountInCents');",
+									"    pm.expect(json.data).to.have.property('currency');",
+									"    pm.expect(json.data).to.have.property('status');",
+									"    pm.expect(json.data).to.have.property('merchantId');",
+									"});",
+									"",
+									"pm.test(\"Idempotency key is preserved\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data.idempotencyKey).to.equal(pm.environment.get('idempotencyKey'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{idempotencyKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"amountInCents\": 10000,\n    \"currency\": \"USD\",\n    \"customerId\": \"{{customerId}}\",\n    \"description\": \"Test payment from Postman\",\n    \"items\": [\n        {\n            \"description\": \"Test Item\",\n            \"quantity\": 2,\n            \"unitPriceInCents\": 5000\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Payment ID matches request\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data.id).to.equal(pm.environment.get('paymentId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments/{{paymentId}}?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments", "{{paymentId}}"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Payments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Response contains payments\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data.length > 0) {",
+									"        pm.expect(json.data[0]).to.have.property('id');",
+									"        pm.expect(json.data[0]).to.have.property('merchantId');",
+									"        pm.expect(json.data[0]).to.have.property('amountInCents');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capture Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});",
+									"",
+									"pm.test(\"Extract transaction ID\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data && json.data.id) {",
+									"        pm.environment.set('transactionId', json.data.id);",
+									"        console.log('Transaction ID saved:', json.data.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments/{{paymentId}}/capture?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments", "{{paymentId}}", "capture"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments/{{paymentId}}/cancel?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments", "{{paymentId}}", "cancel"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Transaction Management",
+			"item": [
+				{
+					"name": "Get Transaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transactions/{{transactionId}}?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "transactions", "{{transactionId}}"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capture Transaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transactions/{{transactionId}}/capture?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "transactions", "{{transactionId}}", "capture"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Void Transaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transactions/{{transactionId}}/void?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "transactions", "{{transactionId}}", "void"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Refund Processing",
+			"item": [
+				{
+					"name": "Process Refund",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate UUID for refund idempotency key",
+									"const refundIdempotencyKey = crypto.randomUUID();",
+									"pm.environment.set('refundIdempotencyKey', refundIdempotencyKey);",
+									"console.log('Generated refund idempotency key:', refundIdempotencyKey);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Extract refund ID from response\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.data && json.data.id) {",
+									"        pm.environment.set('refundId', json.data.id);",
+									"        console.log('Refund ID saved:', json.data.id);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Refund has required fields\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('amount');",
+									"    pm.expect(json.data).to.have.property('status');",
+									"    pm.expect(json.data).to.have.property('paymentId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"paymentId\": \"{{paymentId}}\",\n    \"merchantId\": \"{{merchantId}}\",\n    \"amount\": 5000,\n    \"idempotencyKey\": \"{{refundIdempotencyKey}}\",\n    \"reason\": \"Customer requested refund via Postman\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/refunds",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "refunds"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Refund",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Refund ID matches request\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data.id).to.equal(pm.environment.get('refundId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/refunds/{{refundId}}?merchantId={{merchantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "refunds", "{{refundId}}"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Refund",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/refunds/{{refundId}}/cancel?merchantId={{merchantId}}&reason=Customer changed mind",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "refunds", "{{refundId}}", "cancel"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								},
+								{
+									"key": "reason",
+									"value": "Customer changed mind"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Reconciliation",
+			"item": [
+				{
+					"name": "Reconcile Transactions",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate current date in YYYY-MM-DD format",
+									"const today = new Date();",
+									"const dateStr = today.toISOString().split('T')[0];",
+									"pm.environment.set('reconciliationDate', dateStr);",
+									"console.log('Reconciliation date:', dateStr);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Reconciliation response has required fields\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('matchedCount');",
+									"    pm.expect(json.data).to.have.property('unmatchedCount');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reconciliation/reconcile?merchantId={{merchantId}}&date={{reconciliationDate}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "reconciliation", "reconcile"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								},
+								{
+									"key": "date",
+									"value": "{{reconciliationDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Settlement Report",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate date range (last 7 days to today)",
+									"const today = new Date();",
+									"const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);",
+									"",
+									"const startDate = lastWeek.toISOString().split('T')[0];",
+									"const endDate = today.toISOString().split('T')[0];",
+									"",
+									"pm.environment.set('settlementStartDate', startDate);",
+									"pm.environment.set('settlementEndDate', endDate);",
+									"",
+									"console.log('Settlement date range:', startDate, 'to', endDate);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Settlement report has required fields\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('totalAmount');",
+									"    pm.expect(json.data).to.have.property('transactionCount');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reconciliation/settlement-report?merchantId={{merchantId}}&startDate={{settlementStartDate}}&endDate={{settlementEndDate}}&format=JSON",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "reconciliation", "settlement-report"],
+							"query": [
+								{
+									"key": "merchantId",
+									"value": "{{merchantId}}"
+								},
+								{
+									"key": "startDate",
+									"value": "{{settlementStartDate}}"
+								},
+								{
+									"key": "endDate",
+									"value": "{{settlementEndDate}}"
+								},
+								{
+									"key": "format",
+									"value": "JSON"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Complete Flow",
+			"item": [
+				{
+					"name": "Full Payment Flow",
+					"description": "Complete end-to-end flow: Register Merchant → Register Customer → Add Payment Method → Process Payment → Capture → Refund",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate all unique identifiers for the flow",
+									"const timestamp = Date.now();",
+									"",
+									"pm.variables.set('flowMerchantEmail', `merchant-${timestamp}@test.com`);",
+									"pm.variables.set('flowCustomerEmail', `customer-${timestamp}@test.com`);",
+									"pm.variables.set('flowCustomerExternalId', `FLOW-EXT-${timestamp}`);",
+									"",
+									"const idempotencyKey = crypto.randomUUID();",
+									"pm.variables.set('flowIdempotencyKey', idempotencyKey);",
+									"",
+									"console.log('Starting full payment flow...');",
+									"console.log('Merchant Email:', pm.variables.get('flowMerchantEmail'));",
+									"console.log('Customer Email:', pm.variables.get('flowCustomerEmail'));",
+									"console.log('Idempotency Key:', idempotencyKey);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Flow completed successfully\", function () {",
+									"    pm.test(\"All IDs were captured\", function () {",
+									"        pm.expect(pm.environment.get('merchantId')).to.not.be.empty;",
+									"        pm.expect(pm.environment.get('customerId')).to.not.be.empty;",
+									"        pm.expect(pm.environment.get('paymentId')).to.not.be.empty;",
+									"    });",
+									"});",
+									"",
+									"console.log('Full payment flow completed!');",
+									"console.log('Merchant ID:', pm.environment.get('merchantId'));",
+									"console.log('Customer ID:', pm.environment.get('customerId'));",
+									"console.log('Payment ID:', pm.environment.get('paymentId'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "IDEMPOTENCY TEST - First Request",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate a fixed idempotency key for testing",
+									"const testKey = 'idempotency-test-' + Date.now();",
+									"pm.environment.set('idempotencyTestKey', testKey);",
+									"console.log('Idempotency test key:', testKey);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"// Store first response payment ID for comparison",
+									"const json = pm.response.json();",
+									"if (json.data && json.data.id) {",
+									"    pm.collectionVariables.set('firstPaymentId', json.data.id);",
+									"    console.log('First payment ID:', json.data.id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{idempotencyTestKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"amountInCents\": 1000,\n    \"currency\": \"USD\",\n    \"customerId\": \"{{customerId}}\",\n    \"description\": \"Idempotency test - first request\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "IDEMPOTENCY TEST - Second Request (Same Key)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test(\"Idempotency check - same payment ID returned\", function () {",
+									"    const json = pm.response.json();",
+									"    const firstPaymentId = pm.collectionVariables.get('firstPaymentId');",
+									"    pm.expect(json.data.id).to.equal(firstPaymentId);",
+									"    console.log('SUCCESS: Same payment ID returned for duplicate request');",
+									"    console.log('First Payment ID:', firstPaymentId);",
+									"    console.log('Second Payment ID:', json.data.id);",
+									"});",
+									"",
+									"pm.test(\"Amount is the same\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data.amountInCents).to.equal(1000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{idempotencyTestKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"amountInCents\": 1000,\n    \"currency\": \"USD\",\n    \"customerId\": \"{{customerId}}\",\n    \"description\": \"Idempotency test - duplicate request\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
