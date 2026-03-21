@@ -7,6 +7,7 @@ import com.payment.gateway.application.merchant.port.in.RegisterMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.SuspendMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.UpdateMerchantUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
+import com.payment.gateway.infrastructure.docs.MerchantApi;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -23,13 +24,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/merchants")
 @RequiredArgsConstructor
-public class MerchantController {
+public class MerchantController implements MerchantApi {
 
     private final RegisterMerchantUseCase registerMerchantUseCase;
     private final GetMerchantUseCase getMerchantUseCase;
     private final UpdateMerchantUseCase updateMerchantUseCase;
     private final SuspendMerchantUseCase suspendMerchantUseCase;
 
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<MerchantResponse>> registerMerchant(
             @Valid @RequestBody CreateMerchantRequest request) {
@@ -44,6 +46,7 @@ public class MerchantController {
                 .body(ApiResponse.success("Merchant registered successfully", response));
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MerchantResponse>> getMerchant(@PathVariable String id) {
         log.info("Getting merchant: {}", id);
@@ -51,6 +54,7 @@ public class MerchantController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MerchantResponse>> updateMerchant(
             @PathVariable String id,
@@ -60,6 +64,7 @@ public class MerchantController {
         return ResponseEntity.ok(ApiResponse.success("Merchant updated successfully", response));
     }
 
+    @Override
     @PostMapping("/{id}/suspend")
     public ResponseEntity<ApiResponse<MerchantResponse>> suspendMerchant(@PathVariable String id) {
         log.info("Suspending merchant: {}", id);

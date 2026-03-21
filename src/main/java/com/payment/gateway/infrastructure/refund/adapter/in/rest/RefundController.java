@@ -5,6 +5,7 @@ import com.payment.gateway.application.refund.port.in.CancelRefundUseCase;
 import com.payment.gateway.application.refund.port.in.GetRefundUseCase;
 import com.payment.gateway.application.refund.port.in.ProcessRefundUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
+import com.payment.gateway.infrastructure.docs.RefundApi;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,12 +24,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/refunds")
 @RequiredArgsConstructor
-public class RefundController {
+public class RefundController implements RefundApi {
 
     private final ProcessRefundUseCase processRefundUseCase;
     private final GetRefundUseCase getRefundUseCase;
     private final CancelRefundUseCase cancelRefundUseCase;
 
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<RefundResponse>> processRefund(
             @Valid @RequestBody CreateRefundRequest request) {
@@ -44,6 +46,7 @@ public class RefundController {
                 .body(ApiResponse.success("Refund processed successfully", response));
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RefundResponse>> getRefund(
             @PathVariable String id,
@@ -53,6 +56,7 @@ public class RefundController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @Override
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<RefundResponse>> cancelRefund(
             @PathVariable String id,

@@ -80,3 +80,24 @@ logging:
     com.payment.gateway: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+    deep-linking: true
+    default-models-expand-depth: 1
+    default-model-expand-depth: 1
+  show-actuator: true
+  default-flat-param-object: true
+  override-with-generic-response: false
+  packages-to-scan: com.payment.gateway.infrastructure
+  paths-to-match: /api/v1/**

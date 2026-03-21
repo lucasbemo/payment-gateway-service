@@ -141,6 +141,14 @@ class PaymentControllerTest {
                 .build();
 
         given(capturePaymentUseCase.capturePayment("pay-123", "merchant-1")).willReturn(appResponse);
+        given(paymentRestMapper.toResponse(any(com.payment.gateway.application.payment.dto.PaymentResponse.class)))
+                .willReturn(com.payment.gateway.infrastructure.payment.adapter.in.rest.PaymentResponse.builder()
+                        .id("pay-123")
+                        .merchantId("merchant-1")
+                        .amountInCents(10000L)
+                        .currency("USD")
+                        .status("CAPTURED")
+                        .build());
 
         mockMvc.perform(post("/api/v1/payments/pay-123/capture")
                         .param("merchantId", "merchant-1"))
@@ -163,6 +171,14 @@ class PaymentControllerTest {
                 .build();
 
         given(cancelPaymentUseCase.cancelPayment("pay-123", "merchant-1")).willReturn(appResponse);
+        given(paymentRestMapper.toResponse(any(com.payment.gateway.application.payment.dto.PaymentResponse.class)))
+                .willReturn(com.payment.gateway.infrastructure.payment.adapter.in.rest.PaymentResponse.builder()
+                        .id("pay-123")
+                        .merchantId("merchant-1")
+                        .amountInCents(10000L)
+                        .currency("USD")
+                        .status("CANCELLED")
+                        .build());
 
         mockMvc.perform(post("/api/v1/payments/pay-123/cancel")
                         .param("merchantId", "merchant-1"))

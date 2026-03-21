@@ -6,6 +6,7 @@ import com.payment.gateway.application.payment.port.in.CapturePaymentUseCase;
 import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.in.ProcessPaymentUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
+import com.payment.gateway.infrastructure.docs.PaymentApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * REST controller for payment operations.
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
-public class PaymentController {
+public class PaymentController implements PaymentApi {
 
     private final ProcessPaymentUseCase processPaymentUseCase;
     private final CapturePaymentUseCase capturePaymentUseCase;
@@ -30,10 +28,7 @@ public class PaymentController {
     private final GetPaymentUseCase getPaymentUseCase;
     private final PaymentRestMapper paymentRestMapper;
 
-    /**
-     * Process a new payment.
-     * POST /api/v1/payments
-     */
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<PaymentResponse>> processPayment(
             @RequestHeader("X-Idempotency-Key") String idempotencyKey,
@@ -63,17 +58,12 @@ public class PaymentController {
                 processPaymentUseCase.processPayment(command);
 
         PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
-
-        // Set the ID from response
         setId(paymentResponse, response.getId());
 
         return ResponseEntity.ok(ApiResponse.success("Payment processed successfully", paymentResponse));
     }
 
-    /**
-     * Get payment by ID.
-     * GET /api/v1/payments/{id}
-     */
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPayment(
             @PathVariable String id,
@@ -84,16 +74,12 @@ public class PaymentController {
                 getPaymentUseCase.getPaymentById(id, merchantId);
 
         PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
-
         setId(paymentResponse, response.getId());
 
         return ResponseEntity.ok(ApiResponse.success(paymentResponse));
     }
 
-    /**
-     * Get all payments for a merchant.
-     * GET /api/v1/payments?merchantId={merchantId}
-     */
+    @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getPayments(
             @RequestParam String merchantId) {
@@ -113,33 +99,30 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(paymentResponses));
     }
 
-    /**
-     * Capture an authorized payment.
-     * POST /api/v1/payments/{id}/capture
-     */
+    @Override
     @PostMapping("/{id}/capture")
-    public ResponseEntity<ApiResponse<com.payment.gateway.application.payment.dto.PaymentResponse>> capturePayment(
+    public ResponseEntity<ApiResponse<PaymentResponse>> capturePayment(
             @PathVariable String id,
             @RequestParam String merchantId) {
         log.info("Capturing payment: {} for merchant: {}", id, merchantId);
         var response = capturePaymentUseCase.capturePayment(id, merchantId);
-        return ResponseEntity.ok(ApiResponse.success("Payment captured successfully", response));
+        PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
+        setId(paymentResponse, response.getId());
+        return ResponseEntity.ok(ApiResponse.success("Payment captured successfully", paymentResponse));
     }
 
-    /**
-     * Cancel a payment.
-     * POST /api/v1/payments/{id}/cancel
-     */
+    @Override
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<ApiResponse<com.payment.gateway.application.payment.dto.PaymentResponse>> cancelPayment(
+    public ResponseEntity<ApiResponse<PaymentResponse>> cancelPayment(
             @PathVariable String id,
             @RequestParam String merchantId) {
         log.info("Cancelling payment: {} for merchant: {}", id, merchantId);
         var response = cancelPaymentUseCase.cancelPayment(id, merchantId);
-        return ResponseEntity.ok(ApiResponse.success("Payment cancelled successfully", response));
+        PaymentResponse paymentResponse = paymentRestMapper.toResponse(response);
+        setId(paymentResponse, response.getId());
+        return ResponseEntity.ok(ApiResponse.success("Payment cancelled successfully", paymentResponse));
     }
 
-    // Helper method to set ID using reflection since PaymentResponse is immutable
     private void setId(PaymentResponse response, String id) {
         try {
             java.lang.reflect.Field idField = PaymentResponse.class.getDeclaredField("id");

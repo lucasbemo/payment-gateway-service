@@ -8,6 +8,7 @@ import com.payment.gateway.application.customer.port.in.GetCustomerUseCase;
 import com.payment.gateway.application.customer.port.in.RegisterCustomerUseCase;
 import com.payment.gateway.application.customer.port.in.RemovePaymentMethodUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
+import com.payment.gateway.infrastructure.docs.CustomerApi;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,13 +25,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
-public class CustomerController {
+public class CustomerController implements CustomerApi {
 
     private final RegisterCustomerUseCase registerCustomerUseCase;
     private final GetCustomerUseCase getCustomerUseCase;
     private final AddPaymentMethodUseCase addPaymentMethodUseCase;
     private final RemovePaymentMethodUseCase removePaymentMethodUseCase;
 
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<CustomerResponse>> registerCustomer(
             @Valid @RequestBody CreateCustomerRequest request) {
@@ -47,6 +49,7 @@ public class CustomerController {
                 .body(ApiResponse.success("Customer registered successfully", response));
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(
             @PathVariable String id,
@@ -56,6 +59,7 @@ public class CustomerController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @Override
     @PostMapping("/{id}/payment-methods")
     public ResponseEntity<ApiResponse<CustomerResponse>> addPaymentMethod(
             @PathVariable String id,
@@ -76,6 +80,7 @@ public class CustomerController {
                 .body(ApiResponse.success("Payment method added successfully", response));
     }
 
+    @Override
     @DeleteMapping("/{id}/payment-methods/{pmId}")
     public ResponseEntity<ApiResponse<CustomerResponse>> removePaymentMethod(
             @PathVariable String id,

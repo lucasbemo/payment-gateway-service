@@ -5,6 +5,7 @@ import com.payment.gateway.application.reconciliation.dto.SettlementReportDTO;
 import com.payment.gateway.application.reconciliation.port.in.GenerateSettlementReportUseCase;
 import com.payment.gateway.application.reconciliation.port.in.ReconcileTransactionsUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
+import com.payment.gateway.infrastructure.docs.ReconciliationApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/reconciliation")
 @RequiredArgsConstructor
-public class ReconciliationController {
+public class ReconciliationController implements ReconciliationApi {
 
     private final ReconcileTransactionsUseCase reconcileTransactionsUseCase;
     private final GenerateSettlementReportUseCase generateSettlementReportUseCase;
 
+    @Override
     @PostMapping("/reconcile")
     public ResponseEntity<ApiResponse<ReconciliationResponse>> reconcileTransactions(
             @RequestParam String merchantId,
@@ -28,6 +30,7 @@ public class ReconciliationController {
         return ResponseEntity.ok(ApiResponse.success("Reconciliation completed", response));
     }
 
+    @Override
     @PostMapping("/settlement-report")
     public ResponseEntity<ApiResponse<SettlementReportDTO>> generateSettlementReport(
             @RequestParam String merchantId,
