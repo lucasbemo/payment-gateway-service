@@ -9,6 +9,7 @@ import com.payment.gateway.application.customer.port.in.RegisterCustomerUseCase;
 import com.payment.gateway.application.customer.port.in.RemovePaymentMethodUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
 import com.payment.gateway.infrastructure.docs.CustomerApi;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -94,14 +95,25 @@ public class CustomerController implements CustomerApi {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @Schema(description = "Request to register a new customer")
     public static class CreateCustomerRequest {
+
+        @Schema(description = "Merchant ID that will own this customer", example = "merch_abc123", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Merchant ID is required")
         private String merchantId;
+
+        @Schema(description = "Customer email address", example = "john@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Email is required")
         private String email;
+
+        @Schema(description = "Customer full name", example = "John Doe", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Name is required")
         private String name;
+
+        @Schema(description = "Customer phone number", example = "+1234567890")
         private String phone;
+
+        @Schema(description = "External ID from merchant's system", example = "EXT-12345")
         private String externalId;
     }
 
@@ -109,18 +121,33 @@ public class CustomerController implements CustomerApi {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @Schema(description = "Request to add a payment method to a customer")
     public static class AddPaymentMethodRequest {
+
+        @Schema(description = "Merchant ID", example = "merch_abc123", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Merchant ID is required")
         private String merchantId;
+
+        @Schema(description = "Card number (test: 4111111111111111)", example = "4111111111111111", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Card number is required")
         private String cardNumber;
+
+        @Schema(description = "Card expiry month (MM)", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Expiry month is required")
         private String cardExpiryMonth;
+
+        @Schema(description = "Card expiry year (YYYY)", example = "2028", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Expiry year is required")
         private String cardExpiryYear;
+
+        @Schema(description = "Card CVV", example = "123", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "CVV is required")
         private String cardCvv;
+
+        @Schema(description = "Cardholder name", example = "John Doe")
         private String cardholderName;
+
+        @Schema(description = "Set as default payment method", example = "true")
         private Boolean isDefault;
     }
 }

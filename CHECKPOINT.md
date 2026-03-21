@@ -1280,30 +1280,66 @@ Update this file as you progress. Commit after each major milestone.
   - [x] Configure swagger-ui path
 
 ### 10.2 API Documentation Pages
-- [ ] Create `docs/API_DOCUMENTATION.md`
-  - [ ] Document authentication
-  - [ ] Document all endpoints
-  - [ ] Document error codes
-  - [ ] Document rate limits
-  - [ ] Document idempotency
+- [x] Create `docs/API_DOCUMENTATION.md`
+  - [x] Document authentication
+  - [x] Document all endpoints
+  - [x] Document error codes
+  - [x] Document rate limits
+  - [x] Document idempotency
+  - [x] SDK examples (JavaScript, Python, Java)
 
 ### 10.3 Developer Portal
-- [ ] Create getting started guide
-- [ ] Create SDK examples
-- [ ] Create webhook documentation
-- [ ] Create Postman collection
+- [x] Create `docs/GETTING_STARTED.md`
+  - [x] Quick start guide with 5-step flow
+  - [x] curl examples for all operations
+  - [x] Test card numbers
+  - [x] SDK examples
+- [x] Create `docs/WEBHOOKS.md`
+  - [x] Event types documentation
+  - [x] Webhook payload examples
+  - [x] Signature verification (HMAC-SHA256)
+  - [x] Retry policy
+  - [x] Best practices
+- [x] Create `docs/ERROR_CODES.md`
+  - [x] All 20 error codes documented
+  - [x] HTTP status mapping
+  - [x] Error examples
+  - [x] Best practices
+- [x] Postman collection (already existed - verified complete)
+
+### 10.4 Additional DTO Schema Annotations
+- [x] Add @Schema annotations to `MerchantResponse.java`
+- [x] Add @Schema annotations to `CustomerResponse.java`
+- [x] Add @Schema annotations to `TransactionResponse.java`
+- [x] Add @Schema annotations to `RefundResponse.java`
+- [x] Add @Schema annotations to `ReconciliationResponse.java`
+- [x] Add @Schema annotations to `SettlementReportDTO.java`
+- [x] Add @Schema annotations to `PagedResponse.java`
+- [x] Add @Schema annotations to `PageInfo.java`
+- [x] Add @Schema annotations to controller inner classes:
+  - [x] `MerchantController.CreateMerchantRequest`
+  - [x] `MerchantController.UpdateMerchantRequest`
+  - [x] `CustomerController.CreateCustomerRequest`
+  - [x] `CustomerController.AddPaymentMethodRequest`
+  - [x] `RefundController.CreateRefundRequest`
 
 **Phase 10 Completion Criteria:**
 - [x] Swagger UI is accessible at /swagger-ui.html
 - [x] OpenAPI spec is available at /v3/api-docs
 - [x] All endpoints are documented (21 endpoints across 6 API groups)
+- [x] All DTOs have @Schema annotations (16 DTOs)
 - [x] API documentation is complete and accurate
-- [x] All 1,039 tests pass after implementation
+- [x] Error codes documentation complete
+- [x] Getting started guide complete
+- [x] Webhooks documentation complete
+- [x] All 1,161 tests pass after implementation
 
 **Implementation Notes:**
 - Used Interface-Based Documentation (Approach B) to keep controllers clean
 - Solved import collision with `io.swagger.v3.oas.annotations.responses.ApiResponse` by using fully qualified names
 - Fixed missing mock setup in `PaymentControllerTest.java` for `paymentRestMapper`
+- Created comprehensive documentation with full JSON examples
+- Extracted all error codes from exception classes for ERROR_CODES.md
 
 ---
 
@@ -1463,7 +1499,7 @@ Update this file as you progress. Commit after each major milestone.
 | Phase 8: Testing | **100%** | **1,039 tests passing** - unit, integration, controller, architecture, commons tests |
 | Phase 9: Observability | **100%** | Complete - Health checks, metrics, distributed tracing, structured logging, dashboards, alerts |
 | Phase 9.5: E2E Tests | **100%** | Complete - **12 E2E test classes** covering payment flow, refund flow, transactions, Kafka events, outbox, merchant/customer management, security, resilience, reconciliation, and observability |
-| Phase 10: Documentation | **95%** | Complete - OpenAPI/Swagger with 21 endpoints documented across 6 API groups, interface-based approach, all tests passing |
+| Phase 10: Documentation | **100%** | Complete - OpenAPI/Swagger, all DTOs annotated, comprehensive documentation |
 | Phase 11: Production Ready | **0%** | Not started |
 
 ---
@@ -1489,7 +1525,6 @@ Add your notes, blockers, and observations here:
 - **For reliable CI/CD, configure two test stages: fast unit tests first, then E2E tests with dedicated resources and timeouts**
 
 ### Future Improvements
-- Phase 10: Complete remaining documentation pages (API_DOCUMENTATION.md, developer portal, Postman collection)
 - Phase 11: Production readiness (Dockerfile optimization, deployment guides, CI/CD)
 
 ### E2E Test Troubleshooting
@@ -1540,8 +1575,8 @@ e2e-tests:
 ---
 
 **Last Updated:** 2026-03-20
-**Project Status:** Phase 1 (100%), Phase 2 (100%), Phase 3 (100%), Phase 4 (100%), Phase 5 (100%), Phase 6 (100%), Phase 7 (100%), Phase 8 (100%), Phase 9 (100%), Phase 9.5 E2E Tests (100%), Phase 10 API Documentation (95%)
-**Tests:** 1,039 unit/integration tests + ~120 E2E tests
+**Project Status:** Phase 1 (100%), Phase 2 (100%), Phase 3 (100%), Phase 4 (100%), Phase 5 (100%), Phase 6 (100%), Phase 7 (100%), Phase 8 (100%), Phase 9 (100%), Phase 9.5 E2E Tests (100%), Phase 10 API Documentation (100%)
+**Tests:** 1,161 unit/integration tests + ~120 E2E tests
 **Test Coverage:**
 - Domain Model Tests: 8 classes (Payment, Transaction, Refund, Merchant, Customer, Outbox, Idempotency, Reconciliation)
 - Domain Service Tests: 8 classes (all domain services covered)

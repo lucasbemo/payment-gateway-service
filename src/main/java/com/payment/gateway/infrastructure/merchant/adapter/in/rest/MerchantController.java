@@ -8,6 +8,7 @@ import com.payment.gateway.application.merchant.port.in.SuspendMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.UpdateMerchantUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
 import com.payment.gateway.infrastructure.docs.MerchantApi;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -76,11 +77,18 @@ public class MerchantController implements MerchantApi {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @Schema(description = "Request to register a new merchant")
     public static class CreateMerchantRequest {
+
+        @Schema(description = "Merchant display name", example = "Acme Corporation", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Name is required")
         private String name;
+
+        @Schema(description = "Merchant email address", example = "contact@acme.com", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Email is required")
         private String email;
+
+        @Schema(description = "Webhook URL for event notifications", example = "https://acme.com/webhooks")
         private String webhookUrl;
     }
 
@@ -88,9 +96,16 @@ public class MerchantController implements MerchantApi {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @Schema(description = "Request to update merchant information")
     public static class UpdateMerchantRequest {
+
+        @Schema(description = "New merchant display name", example = "Acme Corp Updated")
         private String name;
+
+        @Schema(description = "New merchant email address", example = "new-contact@acme.com")
         private String email;
+
+        @Schema(description = "New webhook URL", example = "https://acme.com/new-webhooks")
         private String webhookUrl;
     }
 }

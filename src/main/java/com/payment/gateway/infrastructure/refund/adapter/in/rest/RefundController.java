@@ -6,6 +6,7 @@ import com.payment.gateway.application.refund.port.in.GetRefundUseCase;
 import com.payment.gateway.application.refund.port.in.ProcessRefundUseCase;
 import com.payment.gateway.infrastructure.commons.rest.ApiResponse;
 import com.payment.gateway.infrastructure.docs.RefundApi;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -71,15 +72,26 @@ public class RefundController implements RefundApi {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @Schema(description = "Request to process a refund")
     public static class CreateRefundRequest {
+
+        @Schema(description = "Payment ID to refund", example = "pay_abc123", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Payment ID is required")
         private String paymentId;
+
+        @Schema(description = "Merchant ID", example = "merch_abc123", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Merchant ID is required")
         private String merchantId;
+
+        @Schema(description = "Refund amount in cents", example = "5000", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "Amount is required")
         @Positive(message = "Amount must be positive")
         private Long amount;
+
+        @Schema(description = "Idempotency key for duplicate protection", example = "550e8400-e29b-41d4-a716-446655440000")
         private String idempotencyKey;
+
+        @Schema(description = "Reason for the refund", example = "Customer requested")
         private String reason;
     }
 }
