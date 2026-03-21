@@ -1493,7 +1493,25 @@ Update this file as you progress. Commit after each major milestone.
 - [ ] **Database Migration**
   - [ ] Create webhook_deliveries table
 
-### 12.3 Documentation
+### 12.3 Dashboard Analytics Endpoints
+- [ ] **Analytics Service**
+  - [ ] Create DashboardAnalyticsService
+  - [ ] Implement aggregation queries
+  - [ ] Add caching for performance
+- [ ] **Analytics Endpoints**
+  - [ ] GET /admin/analytics/overview - Dashboard overview
+  - [ ] GET /admin/analytics/payments - Payment analytics
+  - [ ] GET /admin/analytics/merchants - Merchant analytics
+  - [ ] GET /admin/analytics/revenue - Revenue analytics
+  - [ ] GET /admin/analytics/transactions - Transaction analytics
+  - [ ] GET /admin/analytics/system-health - System health
+- [ ] **DTOs**
+  - [ ] DashboardOverview, PaymentAnalytics, MerchantAnalytics
+  - [ ] RevenueAnalytics, TransactionAnalytics, SystemHealth
+- [ ] **Security**
+  - [ ] Require ADMIN role for all endpoints
+
+### 12.4 Documentation
 - [ ] **STRIPE_INTEGRATION.md**
   - [ ] Setup instructions
   - [ ] API key configuration
@@ -1503,12 +1521,18 @@ Update this file as you progress. Commit after each major milestone.
   - [ ] Signature verification
   - [ ] Retry policy
   - [ ] Best practices
+- [ ] **ADMIN_ANALYTICS.md**
+  - [ ] Available endpoints
+  - [ ] Request/response formats
+  - [ ] Authentication requirements
 
 **Phase 12 Completion Criteria:**
 - [ ] Stripe payments work in test mode
 - [ ] All payment flows work (authorize, capture, cancel, refund)
 - [ ] Webhooks are delivered to merchant URLs
 - [ ] Retry logic works for failed deliveries
+- [ ] Analytics endpoints return correct data
+- [ ] Admin role required for analytics
 - [ ] All tests pass
 - [ ] Documentation is complete
 

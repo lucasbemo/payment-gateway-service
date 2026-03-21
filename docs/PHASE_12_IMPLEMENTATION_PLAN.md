@@ -1,19 +1,20 @@
-# Phase 12: Real Stripe Integration & Webhook System - Implementation Plan
+# Phase 12: Stripe Integration, Webhook System & Dashboard Analytics - Implementation Plan
 
 **Created:** 2026-03-21  
 **Status:** Ready for Implementation  
-**Estimated Time:** 8-10 hours
+**Estimated Time:** 12-14 hours
 
 ---
 
 ## Executive Summary
 
-Phase 12 focuses on two major features:
+Phase 12 focuses on three major features:
 
 | Feature | Description | Est. Time |
 |---------|-------------|-----------|
 | **Real Stripe Integration** | Replace stub with real Stripe SDK | 4-5 hours |
-| **Webhook System** | Implement webhook delivery service | 4-5 hours |
+| **Webhook System** | Implement webhook delivery service | 3-4 hours |
+| **Dashboard Analytics** | Admin analytics endpoints | 4-5 hours |
 
 ---
 
@@ -88,15 +89,6 @@ payment:
     provider: ${PAYMENT_PROVIDER:stub}  # stub or stripe
 ```
 
-#### 1.2.6 Update Application Properties
-
-```yaml
-stripe:
-  api-key: ${STRIPE_API_KEY}
-  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
-  api-version: 2023-10-16
-```
-
 ### 1.3 Files to Create
 
 | File | Purpose |
@@ -108,14 +100,18 @@ stripe:
 | `StripePaymentMapper.java` | Map Stripe objects to domain |
 | `StripeExceptionTranslator.java` | Convert Stripe exceptions |
 
-### 1.4 Files to Modify
+### 1.4 Documentation
 
-| File | Changes |
-|------|---------|
-| `pom.xml` | Add Stripe dependency |
-| `application.yml` | Add Stripe configuration |
-| `PaymentGatewayPort.java` | May need interface updates |
-| `.env.example` | Add Stripe variables |
+**File:** `docs/STRIPE_INTEGRATION.md`
+
+**Contents:**
+- Setup Stripe account
+- Get API keys (test vs production)
+- Configure environment variables
+- Supported payment flows
+- Error handling
+- Testing with Stripe CLI
+- Webhook setup in Stripe Dashboard
 
 ---
 
@@ -140,71 +136,21 @@ The webhook system allows merchants to receive real-time notifications about pay
                          └──────────────────┘
 ```
 
-### 2.3 Implementation Tasks
+### 2.3 Files to Create
 
-#### 2.3.1 Create Webhook Entity
+| File | Purpose |
+|------|---------|
+| `domain/webhook/model/WebhookDelivery.java` | Domain entity |
+| `domain/webhook/model/WebhookStatus.java` | Status enum |
+| `domain/webhook/port/WebhookDeliveryRepository.java` | Repository port |
+| `application/webhook/service/WebhookDeliveryService.java` | Application service |
+| `infrastructure/webhook/adapter/out/WebhookPublisher.java` | HTTP publisher |
+| `infrastructure/webhook/scheduler/WebhookRetryScheduler.java` | Retry scheduler |
+| `infrastructure/webhook/util/WebhookSignatureGenerator.java` | HMAC signature |
+| `infrastructure/webhook/mapper/EventToWebhookMapper.java` | Map events |
+| `V013__create_webhook_deliveries.sql` | Database migration |
 
-**File:** `domain/webhook/model/WebhookDelivery.java`
-
-```java
-@Entity
-public class WebhookDelivery {
-    private String id;
-    private String merchantId;
-    private String eventType;
-    private String payload;
-    private WebhookStatus status;
-    private int attemptCount;
-    private Instant nextAttemptAt;
-    private Instant deliveredAt;
-}
-```
-
-#### 2.3.2 Create Webhook Service
-
-**File:** `application/webhook/service/WebhookDeliveryService.java`
-
-**Features:**
-- Queue webhook for delivery
-- Retry failed deliveries (exponential backoff)
-- Track delivery status
-- Generate HMAC signatures
-
-#### 2.3.3 Create Webhook Publisher
-
-**File:** `infrastructure/webhook/adapter/out/WebhookPublisher.java`
-
-**Features:**
-- HTTP POST to merchant webhook URL
-- Timeout handling
-- Signature header generation
-- Response validation
-
-#### 2.3.4 Create Webhook Retry Scheduler
-
-**File:** `infrastructure/webhook/scheduler/WebhookRetryScheduler.java`
-
-```java
-@Scheduled(fixedDelay = 60000)  // Every minute
-public void processPendingWebhooks() {
-    // Find pending webhooks
-    // Attempt delivery
-    // Update status
-}
-```
-
-#### 2.3.5 Create Webhook Endpoint (for testing)
-
-**File:** `infrastructure/webhook/adapter/in/rest/WebhookTestController.java`
-
-- Endpoint to test webhook delivery
-- Endpoint to view delivery logs
-
-#### 2.3.6 Create Event to Webhook Mapper
-
-**File:** `application/webhook/mapper/EventToWebhookMapper.java`
-
-Map domain events to webhook payloads:
+### 2.4 Event Types
 
 | Domain Event | Webhook Event Type |
 |--------------|-------------------|
@@ -215,74 +161,7 @@ Map domain events to webhook payloads:
 | RefundProcessedEvent | `refund.processed` |
 | RefundFailedEvent | `refund.failed` |
 
-### 2.4 Files to Create
-
-| File | Purpose |
-|------|---------|
-| `WebhookDelivery.java` | Domain entity |
-| `WebhookStatus.java` | Status enum |
-| `WebhookDeliveryRepository.java` | Repository port |
-| `WebhookDeliveryService.java` | Application service |
-| `WebhookPublisher.java` | HTTP publisher |
-| `WebhookRetryScheduler.java` | Retry scheduler |
-| `WebhookSignatureGenerator.java` | HMAC signature |
-| `WebhookPayloadBuilder.java` | Build JSON payloads |
-| `EventToWebhookMapper.java` | Map events |
-| `WebhookController.java` | Test endpoints |
-| `V013__create_webhook_deliveries.sql` | Database migration |
-
-### 2.5 Webhook Payload Format
-
-```json
-{
-  "id": "evt_abc123",
-  "type": "payment.completed",
-  "created": "2026-03-21T10:00:00Z",
-  "data": {
-    "payment": {
-      "id": "pay_xyz789",
-      "merchantId": "merch_abc123",
-      "amount": 10000,
-      "currency": "USD",
-      "status": "CAPTURED",
-      "createdAt": "2026-03-21T09:55:00Z",
-      "capturedAt": "2026-03-21T10:00:00Z"
-    }
-  },
-  "signature": "sha256=abc123..."
-}
-```
-
-### 2.6 Signature Verification
-
-```java
-public String generateSignature(String payload, String secret) {
-    Mac mac = Mac.getInstance("HmacSHA256");
-    SecretKeySpec key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
-    mac.init(key);
-    byte[] hash = mac.doFinal(payload.getBytes());
-    return "sha256=" + Hex.encodeHexString(hash);
-}
-```
-
----
-
-## Part 3: Documentation
-
-### 3.1 Stripe Integration Documentation
-
-**File:** `docs/STRIPE_INTEGRATION.md`
-
-**Contents:**
-- Setup Stripe account
-- Get API keys (test vs production)
-- Configure environment variables
-- Supported payment flows
-- Error handling
-- Testing with Stripe CLI
-- Webhook setup in Stripe Dashboard
-
-### 3.2 Webhook Delivery Documentation
+### 2.5 Documentation
 
 **File:** `docs/WEBHOOK_DELIVERY.md`
 
@@ -294,14 +173,341 @@ public String generateSignature(String payload, String secret) {
 - Testing webhooks
 - Troubleshooting
 
-### 3.3 Update Existing Documentation
+---
 
-| File | Changes |
+## Part 3: Dashboard Analytics Endpoints
+
+### 3.1 Overview
+
+Admin dashboard analytics endpoints provide real-time insights into payment operations, merchant performance, and system health.
+
+### 3.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Admin Dashboard API                           │
+├─────────────────────────────────────────────────────────────────┤
+│  /api/v1/admin/analytics/*                                       │
+│  ├── /overview          → Dashboard overview metrics             │
+│  ├── /payments          → Payment analytics                      │
+│  ├── /merchants         → Merchant analytics                     │
+│  ├── /revenue           → Revenue analytics                      │
+│  ├── /transactions      → Transaction analytics                  │
+│  └── /health            → System health metrics                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 3.3 Endpoints
+
+#### 3.3.1 Dashboard Overview
+
+```
+GET /api/v1/admin/analytics/overview
+GET /api/v1/admin/analytics/overview?period=today|week|month|year
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "period": "month",
+    "totalPayments": 15420,
+    "totalAmount": 154200000,
+    "totalRefunds": 342,
+    "refundAmount": 3420000,
+    "netRevenue": 150780000,
+    "activeMerchants": 156,
+    "newMerchants": 12,
+    "successRate": 98.2,
+    "averageProcessingTime": 1.2,
+    "periodComparison": {
+      "paymentsGrowth": 12.5,
+      "revenueGrowth": 15.3,
+      "merchantsGrowth": 8.2
+    }
+  }
+}
+```
+
+#### 3.3.2 Payment Analytics
+
+```
+GET /api/v1/admin/analytics/payments
+GET /api/v1/admin/analytics/payments/trends
+GET /api/v1/admin/analytics/payments/by-status
+GET /api/v1/admin/analytics/payments/by-currency
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalPayments": 15420,
+    "byStatus": {
+      "AUTHORIZED": 1200,
+      "CAPTURED": 12500,
+      "CANCELLED": 850,
+      "FAILED": 370,
+      "REFUNDED": 500
+    },
+    "byCurrency": {
+      "USD": 12000,
+      "EUR": 2500,
+      "GBP": 920
+    },
+    "trends": [
+      { "date": "2026-03-01", "count": 520, "amount": 5200000 },
+      { "date": "2026-03-02", "count": 480, "amount": 4800000 }
+    ],
+    "averageAmount": 10000,
+    "averageProcessingTimeMs": 1200
+  }
+}
+```
+
+#### 3.3.3 Merchant Analytics
+
+```
+GET /api/v1/admin/analytics/merchants
+GET /api/v1/admin/analytics/merchants/{merchantId}
+GET /api/v1/admin/analytics/merchants/top
+GET /api/v1/admin/analytics/merchants/performance
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalMerchants": 156,
+    "activeMerchants": 142,
+    "suspendedMerchants": 14,
+    "newMerchantsThisMonth": 12,
+    "topMerchants": [
+      {
+        "id": "merch_abc123",
+        "name": "Acme Corp",
+        "totalPayments": 5000,
+        "totalAmount": 50000000,
+        "successRate": 99.5
+      }
+    ],
+    "performanceDistribution": {
+      "high": 45,
+      "medium": 78,
+      "low": 19
+    }
+  }
+}
+```
+
+#### 3.3.4 Revenue Analytics
+
+```
+GET /api/v1/admin/analytics/revenue
+GET /api/v1/admin/analytics/revenue/trends
+GET /api/v1/admin/analytics/revenue/by-merchant
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalRevenue": 150780000,
+    "grossRevenue": 154200000,
+    "refunds": 3420000,
+    "chargebacks": 0,
+    "fees": 500000,
+    "netRevenue": 150280000,
+    "trends": [
+      { "date": "2026-03-01", "gross": 5200000, "net": 5100000 },
+      { "date": "2026-03-02", "gross": 4800000, "net": 4700000 }
+    ],
+    "byMerchant": [
+      { "merchantId": "merch_abc123", "name": "Acme Corp", "revenue": 50000000 }
+    ]
+  }
+}
+```
+
+#### 3.3.5 Transaction Analytics
+
+```
+GET /api/v1/admin/analytics/transactions
+GET /api/v1/admin/analytics/transactions/by-type
+GET /api/v1/admin/analytics/transactions/by-status
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalTransactions": 45000,
+    "byType": {
+      "PAYMENT": 15420,
+      "CAPTURE": 12500,
+      "REFUND": 500,
+      "AUTHORIZATION": 15000,
+      "REVERSAL": 580
+    },
+    "byStatus": {
+      "AUTHORIZED": 1200,
+      "CAPTURED": 12500,
+      "SETTLED": 15000,
+      "FAILED": 370,
+      "REFUNDED": 500
+    },
+    "averageProcessingTimeMs": 850,
+    "failureRate": 0.8
+  }
+}
+```
+
+#### 3.3.6 System Health Metrics
+
+```
+GET /api/v1/admin/analytics/system-health
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "uptime": "99.99%",
+    "averageResponseTime": 120,
+    "requestsPerMinute": 850,
+    "errorRate": 0.02,
+    "components": {
+      "database": { "status": "healthy", "latency": 5 },
+      "kafka": { "status": "healthy", "consumerLag": 12 },
+      "redis": { "status": "healthy", "latency": 1 },
+      "stripe": { "status": "healthy", "latency": 150 }
+    },
+    "alerts": []
+  }
+}
+```
+
+### 3.4 Implementation Tasks
+
+#### 3.4.1 Create Analytics Service
+
+**File:** `application/analytics/service/DashboardAnalyticsService.java`
+
+```java
+@Service
+public class DashboardAnalyticsService {
+    public DashboardOverview getOverview(Period period);
+    public PaymentAnalytics getPaymentAnalytics(Period period);
+    public MerchantAnalytics getMerchantAnalytics();
+    public RevenueAnalytics getRevenueAnalytics(Period period);
+    public TransactionAnalytics getTransactionAnalytics();
+    public SystemHealth getSystemHealth();
+}
+```
+
+#### 3.4.2 Create Analytics Controller
+
+**File:** `infrastructure/analytics/adapter/in/rest/AdminAnalyticsController.java`
+
+```java
+@RestController
+@RequestMapping("/api/v1/admin/analytics")
+@RequiredArgsConstructor
+public class AdminAnalyticsController implements AdminAnalyticsApi {
+    
+    private final DashboardAnalyticsService analyticsService;
+    
+    @GetMapping("/overview")
+    public ResponseEntity<ApiResponse<DashboardOverview>> getOverview(
+        @RequestParam(defaultValue = "month") String period
+    );
+    
+    @GetMapping("/payments")
+    public ResponseEntity<ApiResponse<PaymentAnalytics>> getPaymentAnalytics(
+        @RequestParam(defaultValue = "month") String period
+    );
+    
+    // ... other endpoints
+}
+```
+
+#### 3.4.3 Create DTOs
+
+| DTO | Purpose |
+|-----|---------|
+| `DashboardOverview.java` | Overview metrics |
+| `PaymentAnalytics.java` | Payment statistics |
+| `MerchantAnalytics.java` | Merchant statistics |
+| `RevenueAnalytics.java` | Revenue statistics |
+| `TransactionAnalytics.java` | Transaction statistics |
+| `SystemHealth.java` | System health metrics |
+| `TrendData.java` | Time-series data point |
+
+#### 3.4.4 Create Repository Methods
+
+Add aggregation queries to repositories:
+
+```java
+public interface PaymentRepositoryCustom {
+    Long countByStatusAndCreatedAtBetween(PaymentStatus status, Instant from, Instant to);
+    Long sumAmountByCreatedAtBetween(Instant from, Instant to);
+    List<Object[]> countByCurrencyGroupBy(Instant from, Instant to);
+    List<TrendData> getDailyTrends(Instant from, Instant to);
+}
+```
+
+#### 3.4.5 Add Caching
+
+```java
+@Cacheable(value = "analytics", key = "#period")
+public DashboardOverview getOverview(Period period) {
+    // Cached for 5 minutes
+}
+```
+
+### 3.5 Files to Create
+
+| File | Purpose |
 |------|---------|
-| `docs/GETTING_STARTED.md` | Add Stripe setup |
-| `docs/DEPLOYMENT_GUIDE.md` | Add production Stripe config |
-| `docs/SECURITY_GUIDE.md` | Add webhook security |
-| `.env.example` | Add Stripe variables |
+| `DashboardAnalyticsService.java` | Analytics business logic |
+| `AdminAnalyticsController.java` | REST endpoints |
+| `AdminAnalyticsApi.java` | OpenAPI interface |
+| `DashboardOverview.java` | Overview DTO |
+| `PaymentAnalytics.java` | Payment analytics DTO |
+| `MerchantAnalytics.java` | Merchant analytics DTO |
+| `RevenueAnalytics.java` | Revenue analytics DTO |
+| `TransactionAnalytics.java` | Transaction analytics DTO |
+| `SystemHealth.java` | System health DTO |
+| `TrendData.java` | Time-series DTO |
+| `Period.java` | Time period enum |
+| `PaymentRepositoryCustom.java` | Custom repository |
+| `PaymentRepositoryImpl.java` | Custom repository impl |
+
+### 3.6 Security
+
+All analytics endpoints require `ADMIN` role:
+
+```java
+@PreAuthorize("hasRole('ADMIN')")
+@GetMapping("/api/v1/admin/analytics/**")
+```
+
+### 3.7 Documentation
+
+**File:** `docs/ADMIN_ANALYTICS.md`
+
+**Contents:**
+- Available endpoints
+- Request/response formats
+- Authentication requirements
+- Caching behavior
+- Rate limits
 
 ---
 
@@ -333,6 +539,26 @@ CREATE INDEX idx_webhook_next_attempt ON webhook_deliveries(next_attempt_at);
 CREATE INDEX idx_webhook_merchant ON webhook_deliveries(merchant_id);
 ```
 
+### 4.2 Analytics Materialized Views (Optional)
+
+**File:** `V014__create_analytics_views.sql`
+
+```sql
+-- Daily payment summaries for fast analytics
+CREATE MATERIALIZED VIEW daily_payment_stats AS
+SELECT 
+    DATE(created_at) as stat_date,
+    merchant_id,
+    COUNT(*) as payment_count,
+    SUM(amount) as total_amount,
+    currency
+FROM payments
+GROUP BY DATE(created_at), merchant_id, currency;
+
+-- Refresh every hour
+CREATE INDEX idx_daily_stats_date ON daily_payment_stats(stat_date);
+```
+
 ---
 
 ## Part 5: Tests
@@ -355,6 +581,14 @@ CREATE INDEX idx_webhook_merchant ON webhook_deliveries(merchant_id);
 | `WebhookRetryTest.java` | Retry logic tests |
 | `WebhookE2ETest.java` | End-to-end webhook flow |
 
+### 5.3 Analytics Tests
+
+| Test Class | Purpose |
+|------------|---------|
+| `DashboardAnalyticsServiceTest.java` | Service unit tests |
+| `AdminAnalyticsControllerTest.java` | Controller tests |
+| `PaymentRepositoryCustomTest.java` | Custom queries tests |
+
 ---
 
 ## Execution Order
@@ -363,16 +597,18 @@ CREATE INDEX idx_webhook_merchant ON webhook_deliveries(merchant_id);
 |-------|------|-------|-----------|
 | 1 | Add Stripe dependency | pom.xml | 10 min |
 | 2 | Create Stripe config | 1 file | 20 min |
-| 3 | Implement Stripe gateway | 4 files | 2 hours |
+| 3 | Implement Stripe gateway | 6 files | 2.5 hours |
 | 4 | Create webhook domain | 3 files | 45 min |
-| 5 | Create webhook service | 3 files | 1 hour |
-| 6 | Create webhook publisher | 2 files | 45 min |
-| 7 | Create retry scheduler | 1 file | 30 min |
-| 8 | Create database migration | 1 file | 15 min |
-| 9 | Create documentation | 2 files | 1 hour |
-| 10 | Write tests | 8 files | 2 hours |
-| 11 | Update CHECKPOINT.md | 1 file | 10 min |
-| **Total** | | **26 files** | **~9 hours** |
+| 5 | Create webhook service | 4 files | 1 hour |
+| 6 | Create webhook publisher | 2 files | 30 min |
+| 7 | Create analytics DTOs | 8 files | 1 hour |
+| 8 | Create analytics service | 2 files | 1.5 hours |
+| 9 | Create analytics controller | 2 files | 45 min |
+| 10 | Create database migrations | 2 files | 20 min |
+| 11 | Create documentation | 3 files | 1 hour |
+| 12 | Write tests | 12 files | 2.5 hours |
+| 13 | Update CHECKPOINT.md | 1 file | 10 min |
+| **Total** | | **45 files** | **~13 hours** |
 
 ---
 
@@ -400,6 +636,8 @@ After implementation:
 - [ ] Webhooks are queued after events
 - [ ] Webhooks are delivered to merchant URLs
 - [ ] Retry logic works for failed deliveries
-- [ ] Signatures can be verified
+- [ ] Analytics endpoints return correct data
+- [ ] Analytics are cached properly
+- [ ] Admin role required for analytics
 - [ ] All tests pass
 - [ ] Documentation is complete
