@@ -1,0 +1,252 @@
+# =============================================================================
+# Production Docker Compose Configuration
+# =============================================================================
+# This file is optimized for production deployments.
+# 
+# Key differences from development docker-compose.yml:
+# - No development credentials
+# - Resource limits configured
+# - Restart policies
+# - Logging drivers
+# - Health checks with longer intervals
+#
+# Usage:
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# Required environment variables (set in .env or secrets):
+#   - POSTGRES_USER, POSTGRES_PASSWORD
+#   - JWT_SECRET
+#   - ENCRYPTION_KEY
+#   - STRIPE_API_KEY (for real Stripe integration)
+# =============================================================================
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: payment-gateway-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: payment_gateway
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d payment_gateway"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - payment-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: payment-gateway-kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_RETENTION_BYTES: 1073741824
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - payment-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: payment-gateway-zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - payment-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: payment-gateway-redis
+    restart: always
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    networks:
+      - payment-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  payment-gateway:
+    image: payment-gateway-service:${APP_VERSION:-latest}
+    container_name: payment-gateway-app
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_gateway
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    networks:
+      - payment-network
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: payment-gateway-prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - payment-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: payment-gateway-grafana
+    restart: always
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-piechart-panel
+      GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/etc/grafana/dashboards:ro
+    networks:
+      - payment-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+  kafka_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  payment-network:
+    driver: bridge
