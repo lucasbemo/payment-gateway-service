@@ -20,12 +20,12 @@ public class HealthIndicatorConfig {
     private final RedisConnectionFactory redisConnectionFactory;
     private final CircuitBreakerRegistry circuitBreakerRegistry;
     private final RateLimiterRegistry rateLimiterRegistry;
-    private final Optional<KafkaTemplate<String, String>> kafkaTemplate;
+    private final Optional<KafkaTemplate<String, Object>> kafkaTemplate;
 
     public HealthIndicatorConfig(RedisConnectionFactory redisConnectionFactory,
                                   CircuitBreakerRegistry circuitBreakerRegistry,
                                   RateLimiterRegistry rateLimiterRegistry,
-                                  Optional<KafkaTemplate<String, String>> kafkaTemplate) {
+                                  Optional<KafkaTemplate<String, Object>> kafkaTemplate) {
         this.redisConnectionFactory = redisConnectionFactory;
         this.circuitBreakerRegistry = circuitBreakerRegistry;
         this.rateLimiterRegistry = rateLimiterRegistry;
@@ -60,7 +60,6 @@ public class HealthIndicatorConfig {
                         .build();
             }
             try {
-                // Send a test message to verify Kafka connectivity
                 kafkaTemplate.get().send("health-check-topic", "health-check").get();
                 return Health.up()
                         .withDetail("component", "kafka")
@@ -69,7 +68,7 @@ public class HealthIndicatorConfig {
             } catch (Exception e) {
                 return Health.down()
                         .withDetail("component", "kafka")
-                        .withException(e)
+                        .withDetail("error", e.getMessage())
                         .build();
             }
         };

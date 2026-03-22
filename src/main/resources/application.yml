@@ -65,19 +65,16 @@ management:
         - spanId
         - parentId
         - sampled
-  zipkin:
+zipkin:
     tracing:
-      endpoint: ${ZIPKIN_BASE_URL:http://zipkin:9411}/api/v2/spans
-
-security:
-  jwt:
-    secret: ${JWT_SECRET:default-dev-secret-key-change-in-production}
-    expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
 
 logging:
   level:
     root: INFO
     com.payment.gateway: DEBUG
+    io.micrometer.tracing: DEBUG
+    brave: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 

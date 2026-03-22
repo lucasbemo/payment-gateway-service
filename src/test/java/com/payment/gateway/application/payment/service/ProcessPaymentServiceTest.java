@@ -18,6 +18,7 @@ import com.payment.gateway.domain.merchant.model.MerchantStatus;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
+import com.payment.gateway.application.commons.port.out.MetricsPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -65,6 +66,9 @@ class ProcessPaymentServiceTest {
     @Mock
     private IdGenerator idGenerator;
 
+    @Mock
+    private MetricsPort metricsPort;
+
     private ProcessPaymentService processPaymentService;
 
     @BeforeEach
@@ -76,7 +80,8 @@ class ProcessPaymentServiceTest {
                 externalPaymentProviderPort,
                 tokenizationServicePort,
                 transactionCommandPort,
-                idGenerator
+                idGenerator,
+                metricsPort
         );
     }
 

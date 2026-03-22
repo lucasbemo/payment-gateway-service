@@ -11,6 +11,7 @@ import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
 import com.payment.gateway.domain.transaction.model.Transaction;
+import com.payment.gateway.application.commons.port.out.MetricsPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class ProcessRefundService implements ProcessRefundUseCase {
 
     private final RefundQueryPort refundQueryPort;
     private final RefundPaymentQueryPort refundPaymentQueryPort;
+    private final MetricsPort metricsPort;
 
     @Override
     public RefundResponse processRefund(String paymentId, String merchantId, Long amount,
@@ -80,6 +82,8 @@ public class ProcessRefundService implements ProcessRefundUseCase {
         savedRefund = refundQueryPort.saveRefund(savedRefund);
 
         log.info("Refund processed successfully: {}", savedRefund.getId());
+        metricsPort.recordRefundApproved();
+        metricsPort.recordRefundAmount(savedRefund.getAmount().getAmountInCents());
         return mapToResponse(savedRefund);
     }
 

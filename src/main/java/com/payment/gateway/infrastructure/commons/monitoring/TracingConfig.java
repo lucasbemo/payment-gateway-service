@@ -4,14 +4,17 @@ import io.micrometer.tracing.Tracer;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * Distributed tracing configuration.
  * Configures Micrometer Tracing with Brave/Zipkin bridge.
  */
 @Configuration
+@EnableAspectJAutoProxy
 public class TracingConfig {
 
     /**
@@ -96,16 +99,19 @@ public class TracingConfig {
     }
 
     @Bean
+    @ConditionalOnBean(Tracer.class)
     public PaymentTracingAspect paymentTracingAspect(Tracer tracer) {
         return new PaymentTracingAspect(tracer);
     }
 
     @Bean
+    @ConditionalOnBean(Tracer.class)
     public RefundTracingAspect refundTracingAspect(Tracer tracer) {
         return new RefundTracingAspect(tracer);
     }
 
     @Bean
+    @ConditionalOnBean(Tracer.class)
     public TransactionTracingAspect transactionTracingAspect(Tracer tracer) {
         return new TransactionTracingAspect(tracer);
     }
