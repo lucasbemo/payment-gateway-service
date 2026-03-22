@@ -6,9 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Stub implementation of ExternalPaymentProviderPort for testing/development.
- */
 @Slf4j
 @Component
 public class StubPaymentProvider implements ExternalPaymentProviderPort {
@@ -54,5 +51,15 @@ public class StubPaymentProvider implements ExternalPaymentProviderPort {
         log.info("StubPaymentProvider.tokenizeCard: cardNumber=****{}",
                 request.cardNumber().substring(request.cardNumber().length() - 4));
         return CompletableFuture.completedFuture("tok_stub_" + System.currentTimeMillis());
+    }
+
+    @Override
+    public String getProviderName() {
+        return "STUB";
+    }
+
+    @Override
+    public boolean isHealthy() {
+        return true;
     }
 }

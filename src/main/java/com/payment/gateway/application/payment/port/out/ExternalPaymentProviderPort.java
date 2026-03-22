@@ -2,30 +2,19 @@ package com.payment.gateway.application.payment.port.out;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Output port for external payment provider operations.
- */
 public interface ExternalPaymentProviderPort {
 
-    /**
-     * Authorize a payment with the external provider.
-     */
     CompletableFuture<PaymentProviderResult> authorize(PaymentProviderRequest request);
 
-    /**
-     * Capture a payment with the external provider.
-     */
     CompletableFuture<PaymentProviderResult> capture(PaymentProviderRequest request);
 
-    /**
-     * Cancel a payment with the external provider.
-     */
     CompletableFuture<PaymentProviderResult> cancel(PaymentProviderRequest request);
 
-    /**
-     * Tokenize card information.
-     */
     CompletableFuture<String> tokenizeCard(CardTokenizationRequest request);
+
+    String getProviderName();
+
+    boolean isHealthy();
 
     record PaymentProviderRequest(
         String paymentId,

@@ -80,6 +80,16 @@ public class MockPortsConfig {
             public CompletableFuture<String> tokenizeCard(CardTokenizationRequest request) {
                 return CompletableFuture.completedFuture("tok_test");
             }
+
+            @Override
+            public String getProviderName() {
+                return "MOCK";
+            }
+
+            @Override
+            public boolean isHealthy() {
+                return true;
+            }
         };
     }
 

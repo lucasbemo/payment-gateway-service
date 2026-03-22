@@ -141,4 +141,14 @@ public class PayPalPaymentProvider implements ExternalPaymentProviderPort {
         log.error("PayPal tokenizeCard failed after retries (fallback): error={}", t.getMessage());
         return "tok_fallback_" + System.currentTimeMillis();
     }
+
+    @Override
+    public String getProviderName() {
+        return "PAYPAL";
+    }
+
+    @Override
+    public boolean isHealthy() {
+        return true;
+    }
 }
