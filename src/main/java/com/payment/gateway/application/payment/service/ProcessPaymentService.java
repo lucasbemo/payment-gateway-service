@@ -20,6 +20,7 @@ import com.payment.gateway.domain.payment.model.PaymentItem;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentMethod;
 import com.payment.gateway.application.commons.port.out.MetricsPort;
+import com.payment.gateway.application.commons.port.out.AuditPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
     private final TransactionCommandPort transactionCommandPort;
     private final IdGenerator idGenerator;
     private final MetricsPort metricsPort;
+    private final AuditPort auditPort;
 
     @Override
     public PaymentResponse processPayment(ProcessPaymentCommand command) {
@@ -88,6 +90,13 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
         log.info("Payment processed successfully: {}", savedPayment.getId());
         metricsPort.recordPaymentApproved();
         metricsPort.recordPaymentAmount(savedPayment.getAmount().getAmountInCents());
+        auditPort.logPaymentOperation(
+                savedPayment.getId(),
+                savedPayment.getMerchantId(),
+                "AUTHORIZE",
+                "SUCCESS",
+                savedPayment.getAmount().getAmountInCents()
+        );
         return mapToResponse(savedPayment);
     }
 
@@ -178,6 +187,13 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 log.error("Payment authorization failed: {} - {}", result.errorCode(), result.errorMessage());
                 payment.fail();
                 metricsPort.recordPaymentFailed();
+                auditPort.logPaymentOperation(
+                        payment.getId(),
+                        payment.getMerchantId(),
+                        "AUTHORIZE",
+                        "FAILED",
+                        payment.getAmount().getAmountInCents()
+                );
                 throw new BusinessException("Payment authorization failed: " + result.errorMessage());
             }
         } catch (BusinessException e) {

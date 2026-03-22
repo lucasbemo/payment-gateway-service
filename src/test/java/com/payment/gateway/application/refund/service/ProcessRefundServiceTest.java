@@ -16,6 +16,7 @@ import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
 import com.payment.gateway.application.commons.port.out.MetricsPort;
+import com.payment.gateway.application.commons.port.out.AuditPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,11 +50,14 @@ class ProcessRefundServiceTest {
     @Mock
     private MetricsPort metricsPort;
 
+    @Mock
+    private AuditPort auditPort;
+
     private ProcessRefundService processRefundService;
 
     @BeforeEach
     void setUp() {
-        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, metricsPort);
+        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, metricsPort, auditPort);
     }
 
     @Nested
