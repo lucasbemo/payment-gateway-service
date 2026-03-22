@@ -592,6 +592,56 @@ Consumers: Active and connected
 
 ---
 
+### 8.3 Kafka Metrics (Custom)
+
+**Status:** ✅ PASS
+
+**Custom Kafka Metrics Implemented:**
+
+| Metric | Description | Type |
+|--------|-------------|------|
+| `kafka_consumer_lag_total` | Total consumer lag across all partitions | Gauge |
+| `kafka_consumer_lag_topic` | Consumer lag per topic | Gauge |
+| `kafka_consumer_lag_check_timestamp` | Timestamp of last lag check | Gauge |
+| `kafka_producer_messages_sent_total` | Total messages sent by producer | Counter |
+| `kafka_producer_messages_sent_topic` | Messages sent per topic | Counter |
+| `kafka_producer_messages_failed_total` | Total failed sends | Counter |
+| `kafka_producer_errors` | Producer errors by type | Counter |
+| `kafka_producer_latency` | Producer send latency | Timer |
+| `kafka_consumer_messages_consumed_total` | Total messages consumed | Counter |
+| `kafka_consumer_messages_consumed_topic` | Messages consumed per topic | Counter |
+| `kafka_consumer_messages_failed_total` | Total failed consumptions | Counter |
+| `kafka_consumer_errors` | Consumer errors by type | Counter |
+| `kafka_consumer_latency` | Consumer processing latency | Timer |
+| `kafka_monitor_healthy` | Lag monitor health status | Gauge |
+
+**Implementation Files:**
+- `KafkaLagMonitor.java` - Monitors consumer lag via AdminClient
+- `KafkaMetricsBinder.java` - Exposes custom Kafka metrics to Prometheus
+- `KafkaMetricsScheduler.java` - Updates metrics every 30 seconds
+
+**Configuration:**
+```yaml
+spring:
+  kafka:
+    consumer:
+      metrics:
+        enabled: true
+    producer:
+      metrics:
+        enabled: true
+    listener:
+      observation-enabled: true
+      micrometer-enabled: true
+```
+
+**Verification Command:**
+```bash
+curl -s http://localhost:8085/actuator/prometheus | grep kafka_
+```
+
+---
+
 ## Phase 9: End-to-End Flow
 
 ### 9.1 Complete Payment Flow

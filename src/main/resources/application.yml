@@ -20,6 +20,22 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9093}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:payment-gateway-group}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      metrics:
+        enabled: true
+    producer:
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+      metrics:
+        enabled: true
+    listener:
+      observation-enabled: true
+      micrometer-enabled: true
 
   data:
     redis:
@@ -47,6 +63,8 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+    enable:
+      kafka: true
   tracing:
     sampling:
       probability: 1.0

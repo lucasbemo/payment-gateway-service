@@ -3,6 +3,8 @@ package com.payment.gateway.infrastructure.outbox.adapter.out.kafka;
 import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
+import com.payment.gateway.infrastructure.commons.monitoring.KafkaMetricsBinder;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,6 +36,12 @@ class KafkaOutboxEventPublisherTest {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Mock
+    private KafkaMetricsBinder kafkaMetricsBinder;
+
+    @Mock
+    private Timer.Sample timerSample;
+
+    @Mock
     private CompletableFuture<SendResult<String, Object>> future;
 
     @Mock
@@ -45,7 +53,7 @@ class KafkaOutboxEventPublisherTest {
 
     @BeforeEach
     void setUp() {
-        publisher = new KafkaOutboxEventPublisher(kafkaTemplate);
+        publisher = new KafkaOutboxEventPublisher(kafkaTemplate, kafkaMetricsBinder);
         ReflectionTestUtils.setField(publisher, "outboxEventsTopic", "outbox-events");
 
         testEvent = OutboxEvent.builder()
@@ -66,9 +74,10 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should publish event to Kafka successfully")
         void shouldPublishEventSuccessfully() throws Exception {
-            when(kafkaTemplate.send(eq("outbox-events"), any(), any()))
+            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
                     .thenReturn(future);
             when(future.get()).thenReturn(sendResult);
+            when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
             boolean result = publisher.publish(testEvent);
 
@@ -76,7 +85,7 @@ class KafkaOutboxEventPublisherTest {
 
             ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<Object> valueCaptor = ArgumentCaptor.forClass(Object.class);
-            verify(kafkaTemplate).send(eq("outbox-events"), keyCaptor.capture(), valueCaptor.capture());
+            verify(kafkaTemplate).send(eq("payment.created"), keyCaptor.capture(), valueCaptor.capture());
 
             assertThat(keyCaptor.getValue()).isEqualTo("pay_test_123");
             assertThat(valueCaptor.getValue()).isEqualTo(testEvent.getPayload());
@@ -85,9 +94,10 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should return false when Kafka publish fails")
         void shouldReturnFalseWhenPublishFails() throws Exception {
-            when(kafkaTemplate.send(eq("outbox-events"), any(), any()))
+            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
                     .thenReturn(future);
             when(future.get()).thenThrow(new RuntimeException("Kafka broker unavailable"));
+            when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
             boolean result = publisher.publish(testEvent);
 
@@ -97,14 +107,15 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should use aggregateId as message key")
         void shouldUseAggregateIdAsKey() throws Exception {
-            when(kafkaTemplate.send(eq("outbox-events"), any(), any()))
+            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
                     .thenReturn(future);
             when(future.get()).thenReturn(sendResult);
+            when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
             publisher.publish(testEvent);
 
             ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-            verify(kafkaTemplate).send(eq("outbox-events"), keyCaptor.capture(), any());
+            verify(kafkaTemplate).send(eq("payment.created"), keyCaptor.capture(), any());
 
             assertThat(keyCaptor.getValue()).isEqualTo("pay_test_123");
         }
@@ -112,16 +123,31 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should publish event payload to Kafka")
         void shouldPublishEventPayload() throws Exception {
-            when(kafkaTemplate.send(eq("outbox-events"), any(), any()))
+            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
                     .thenReturn(future);
             when(future.get()).thenReturn(sendResult);
+            when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
             publisher.publish(testEvent);
 
             ArgumentCaptor<Object> valueCaptor = ArgumentCaptor.forClass(Object.class);
-            verify(kafkaTemplate).send(eq("outbox-events"), any(), valueCaptor.capture());
+            verify(kafkaTemplate).send(eq("payment.created"), any(), valueCaptor.capture());
 
             assertThat(valueCaptor.getValue()).isEqualTo("{\"paymentId\":\"pay_test\",\"amount\":100.00}");
+        }
+
+        @Test
+        @DisplayName("Should record metrics on successful publish")
+        void shouldRecordMetricsOnSuccess() throws Exception {
+            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
+                    .thenReturn(future);
+            when(future.get()).thenReturn(sendResult);
+            when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
+
+            publisher.publish(testEvent);
+
+            verify(kafkaMetricsBinder).recordMessageProduced("payment.created");
+            verify(kafkaMetricsBinder).recordProducerLatency(timerSample);
         }
     }
 }

@@ -31,6 +31,8 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.ACKS_CONFIG, "all");
         configProps.put(ProducerConfig.RETRIES_CONFIG, 3);
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        configProps.put(ProducerConfig.METRICS_SAMPLE_WINDOW_MS_CONFIG, 60000);
+        configProps.put(ProducerConfig.METRICS_NUM_SAMPLES_CONFIG, 5);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
