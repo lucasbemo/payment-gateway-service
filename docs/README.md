@@ -8,15 +8,84 @@ Welcome to the Payment Gateway Service documentation.
 
 | Document | Description |
 |----------|-------------|
-| [Postman Collection Guide](./POSTMAN_COLLECTION_GUIDE.md) | Complete guide for using the Postman collection |
-| [API Reference](./API_REFERENCE.md) | Full API endpoint reference |
-| [Testing Guide](./TESTING_GUIDE.md) | Testing procedures and test scenarios |
+| [Getting Started](./GETTING_STARTED.md) | Quick start guide for new developers |
+| [Development Guide](./DEVELOPMENT_GUIDE.md) | Development workflow and best practices |
+| [Deployment Guide](./DEPLOYMENT_GUIDE.md) | Deployment procedures and configurations |
+| [Security Guide](./SECURITY_GUIDE.md) | Security best practices and compliance |
 
-### Quick Links
+### API Documentation
+
+| Document | Description |
+|----------|-------------|
+| [API Reference](./API_REFERENCE.md) | Full API endpoint reference |
+| [API Documentation](./API_DOCUMENTATION.md) | Detailed API documentation with examples |
+| [Error Codes](./ERROR_CODES.md) | Error code reference |
+| [Webhooks](./WEBHOOKS.md) | Webhook configuration and events |
+
+### Testing & Integration
+
+| Document | Description |
+|----------|-------------|
+| [Testing Guide](./TESTING_GUIDE.md) | Testing procedures and test scenarios |
+| [Postman Collection Guide](./POSTMAN_COLLECTION_GUIDE.md) | Complete guide for using the Postman collection |
+| [Troubleshooting](./TROUBLESHOOTING.md) | Common issues and solutions |
+
+### Architecture & Design
+
+| Document | Description |
+|----------|-------------|
+| [Stripe Integration Architecture](./STRIPE_INTEGRATION_ARCHITECTURE.md) | Stripe integration design |
+| [Observability Test Report](./OBSERVABILITY_TEST_REPORT.md) | Observability validation results |
+| [Implementation Checkpoint](./IMPLEMENTATION_CHECKPOINT.md) | Implementation progress tracker |
+| [ADR Decisions](./decisions/) | Architecture Decision Records |
+
+### Archive
+
+| Document | Description |
+|----------|-------------|
+| [archive/](./archive/) | Completed implementation plans and historical docs |
+
+---
+
+## Quick Links
 
 - **Postman Collection**: `../postman/Payment Gateway.postman_collection.json`
 - **Environments**: `../postman/*.postman_environment.json`
 - **Main README**: `../README.md`
+
+---
+
+## Documentation Structure
+
+```
+docs/
+├── README.md                           # This file
+├── GETTING_STARTED.md                  # Quick start guide
+├── DEVELOPMENT_GUIDE.md                # Development workflow
+├── DEPLOYMENT_GUIDE.md                 # Deployment procedures
+├── SECURITY_GUIDE.md                   # Security practices
+├── API_REFERENCE.md                    # API endpoint reference
+├── API_DOCUMENTATION.md                # Detailed API docs
+├── ERROR_CODES.md                      # Error codes
+├── WEBHOOKS.md                         # Webhook documentation
+├── TESTING_GUIDE.md                    # Testing guide
+├── POSTMAN_COLLECTION_GUIDE.md         # Postman guide
+├── TROUBLESHOOTING.md                  # Troubleshooting
+├── STRIPE_INTEGRATION_ARCHITECTURE.md  # Stripe integration
+├── OBSERVABILITY_TEST_REPORT.md        # Observability report
+├── IMPLEMENTATION_CHECKPOINT.md        # Implementation tracker
+├── archive/                            # Archived documents
+│   ├── PROJECT_PLAN.md                 # Original project plan
+│   ├── PHASE_10_API_DOCUMENTATION_PLAN.md
+│   ├── PHASE_10_REMAINING_PLAN.md
+│   ├── PHASE_12_IMPLEMENTATION_PLAN.md
+│   └── OBSERVABILITY_FIX_PLAN.md
+└── decisions/                          # Architecture Decision Records
+    ├── ADR-001-hexagonal-architecture.md
+    ├── ADR-002-outbox-pattern.md
+    ├── ADR-003-kafka-event-streaming.md
+    └── ADR-004-resilience-patterns.md
+```
 
 ---
 
@@ -146,49 +215,9 @@ All responses follow the `ApiResponse<T>` structure:
 
 ---
 
-## Environment Variables
-
-| Variable | Description | Auto-populated |
-|----------|-------------|----------------|
-| `baseUrl` | API base URL | No |
-| `merchantId` | Current merchant | Yes |
-| `customerId` | Current customer | Yes |
-| `paymentId` | Last payment | Yes |
-| `transactionId` | Last transaction | Yes |
-| `refundId` | Last refund | Yes |
-| `paymentMethodId` | Last payment method | Yes |
-| `idempotencyKey` | Current idempotency key | Yes |
-| `apiKey` | Production API key | No |
-
----
-
-## Testing Checklist
-
-Before deployment, ensure:
-
-- [ ] All health endpoints respond
-- [ ] Merchant registration works
-- [ ] Customer registration works
-- [ ] Payment processing works
-- [ ] Idempotency is enforced
-- [ ] Refunds process correctly
-- [ ] Reconciliation generates reports
-
----
-
-## Support
-
-For questions or issues:
-
-1. Check the relevant documentation guide
-2. Review Postman Console output
-3. Check application logs
-4. Contact the development team
-
----
-
 ## Document Changelog
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-03-22 | 1.1.0 | Reorganized documentation structure, archived completed plans |
 | 2026-03-14 | 1.0.0 | Initial documentation release |
