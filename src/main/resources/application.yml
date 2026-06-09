@@ -83,9 +83,9 @@ management:
         - spanId
         - parentId
         - sampled
-zipkin:
+  zipkin:
     tracing:
-      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
+      endpoint: ${ZIPKIN_BASE_URL:http://localhost:9411}/api/v2/spans
 
 logging:
   level:

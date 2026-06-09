@@ -39,11 +39,14 @@ class CapturePaymentServiceTest {
     @Mock
     private ExternalPaymentProviderPort externalPaymentProviderPort;
 
+    @Mock
+    private com.payment.gateway.domain.outbox.service.OutboxEventDomainService outboxEventService;
+
     private CapturePaymentService capturePaymentService;
 
     @BeforeEach
     void setUp() {
-        capturePaymentService = new CapturePaymentService(paymentQueryPort, externalPaymentProviderPort);
+        capturePaymentService = new CapturePaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService);
     }
 
     @Nested
