@@ -37,22 +37,22 @@ logs: ## View application logs
 	docker-compose logs -f payment-gateway
 
 swagger: ## Open Swagger UI
-	@echo "Opening Swagger UI at http://localhost:8000/swagger-ui.html"
-	@open http://localhost:8000/swagger-ui.html 2>/dev/null || \
-		xdg-open http://localhost:8000/swagger-ui.html 2>/dev/null || \
-		echo "Please open http://localhost:8000/swagger-ui.html in your browser"
+	@echo "Opening Swagger UI at http://localhost:8080/swagger-ui.html"
+	@open http://localhost:8080/swagger-ui.html 2>/dev/null || \
+		xdg-open http://localhost:8080/swagger-ui.html 2>/dev/null || \
+		echo "Please open http://localhost:8080/swagger-ui.html in your browser"
 
 pgadmin: ## Open pgAdmin
-	@echo "Opening pgAdmin at http://localhost:8080"
-	@open http://localhost:8080 2>/dev/null || \
-		xdg-open http://localhost:8080 2>/dev/null || \
-		echo "Please open http://localhost:8080 in your browser"
+	@echo "Opening pgAdmin at http://localhost:8083"
+	@open http://localhost:8083 2>/dev/null || \
+		xdg-open http://localhost:8083 2>/dev/null || \
+		echo "Please open http://localhost:8083 in your browser"
 
 kafka-ui: ## Open Kafka UI
-	@echo "Opening Kafka UI at http://localhost:8081"
-	@open http://localhost:8081 2>/dev/null || \
-		xdg-open http://localhost:8081 2>/dev/null || \
-		echo "Please open http://localhost:8081 in your browser"
+	@echo "Opening Kafka UI at http://localhost:8082"
+	@open http://localhost:8082 2>/dev/null || \
+		xdg-open http://localhost:8082 2>/dev/null || \
+		echo "Please open http://localhost:8082 in your browser"
 
 grafana: ## Open Grafana
 	@echo "Opening Grafana at http://localhost:3000"
@@ -79,7 +79,7 @@ minio: ## Open MinIO Console
 		echo "Please open http://localhost:9001 in your browser"
 
 health: ## Check application health
-	@curl -s http://localhost:8000/actuator/health | jq .
+	@curl -s http://localhost:8080/actuator/health | jq .
 
 generate-openapi: ## Generate OpenAPI documentation
 	mvn springdoc:generate

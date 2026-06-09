@@ -62,7 +62,7 @@ java -jar target/payment-gateway-0.0.1-SNAPSHOT.jar
 |---------|-----|-------------|
 | API | http://localhost:8080 | - |
 | Swagger UI | http://localhost:8080/swagger-ui.html | - |
-| pgAdmin | http://localhost:8080 | admin@admin.com / admin |
+| pgAdmin | http://localhost:8083 | admin@admin.com / admin |
 | Kafka UI | http://localhost:8082 | - |
 | Grafana | http://localhost:3000 | admin / admin |
 | Prometheus | http://localhost:9090 | - |
