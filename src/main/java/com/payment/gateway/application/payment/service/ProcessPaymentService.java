@@ -19,6 +19,9 @@ import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentItem;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentMethod;
+import com.payment.gateway.domain.outbox.model.EventType;
+import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
+import com.payment.gateway.domain.payment.event.PaymentCreatedEvent;
 import com.payment.gateway.application.commons.port.out.MetricsPort;
 import com.payment.gateway.application.commons.port.out.AuditPort;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +53,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
     private final IdGenerator idGenerator;
     private final MetricsPort metricsPort;
     private final AuditPort auditPort;
+    private final OutboxEventDomainService outboxEventService;
 
     @Override
     public PaymentResponse processPayment(ProcessPaymentCommand command) {
@@ -86,6 +90,18 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
 
         // Create transaction
         createTransaction(savedPayment);
+
+        // Outbox event committed atomically with the payment; published by OutboxPollingScheduler
+        outboxEventService.publish(
+                savedPayment.getId(),
+                "PAYMENT",
+                EventType.PAYMENT_CREATED,
+                new PaymentCreatedEvent(
+                        savedPayment.getId(),
+                        savedPayment.getMerchantId(),
+                        String.valueOf(savedPayment.getAmount().getAmountInCents()),
+                        savedPayment.getCurrency(),
+                        savedPayment.getIdempotencyKey()));
 
         log.info("Payment processed successfully: {}", savedPayment.getId());
         metricsPort.recordPaymentApproved();

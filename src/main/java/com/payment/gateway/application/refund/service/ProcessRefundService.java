@@ -6,6 +6,9 @@ import com.payment.gateway.application.refund.port.out.RefundPaymentQueryPort;
 import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
+import com.payment.gateway.domain.outbox.model.EventType;
+import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
+import com.payment.gateway.domain.payment.event.RefundProcessedEvent;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
@@ -33,6 +36,7 @@ public class ProcessRefundService implements ProcessRefundUseCase {
     private final RefundPaymentQueryPort refundPaymentQueryPort;
     private final MetricsPort metricsPort;
     private final AuditPort auditPort;
+    private final OutboxEventDomainService outboxEventService;
 
     @Override
     public RefundResponse processRefund(String paymentId, String merchantId, Long amount,
@@ -82,6 +86,19 @@ public class ProcessRefundService implements ProcessRefundUseCase {
         savedRefund.approve();
         savedRefund.complete();
         savedRefund = refundQueryPort.saveRefund(savedRefund);
+
+        // Outbox event committed atomically with the refund; published by OutboxPollingScheduler
+        outboxEventService.publish(
+                savedRefund.getId(),
+                "REFUND",
+                EventType.REFUND_PROCESSED,
+                new RefundProcessedEvent(
+                        savedRefund.getId(),
+                        savedRefund.getPaymentId(),
+                        savedRefund.getMerchantId(),
+                        String.valueOf(savedRefund.getAmount().getAmountInCents()),
+                        savedRefund.getCurrency(),
+                        savedRefund.getType().name()));
 
         log.info("Refund processed successfully: {}", savedRefund.getId());
         metricsPort.recordRefundApproved();

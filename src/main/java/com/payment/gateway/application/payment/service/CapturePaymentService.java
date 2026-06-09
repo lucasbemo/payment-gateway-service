@@ -5,6 +5,9 @@ import com.payment.gateway.application.payment.port.in.CapturePaymentUseCase;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
+import com.payment.gateway.domain.outbox.model.EventType;
+import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
+import com.payment.gateway.domain.payment.event.PaymentCompletedEvent;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class CapturePaymentService implements CapturePaymentUseCase {
 
     private final PaymentQueryPort paymentQueryPort;
     private final ExternalPaymentProviderPort externalPaymentProviderPort;
+    private final OutboxEventDomainService outboxEventService;
 
     @Override
     public PaymentResponse capturePayment(String paymentId, String merchantId) {
@@ -45,17 +49,29 @@ public class CapturePaymentService implements CapturePaymentUseCase {
         }
 
         // Capture with external provider
-        captureWithProvider(payment);
+        String providerTransactionId = captureWithProvider(payment);
 
         // Update payment status
         payment.capture();
         Payment savedPayment = paymentQueryPort.savePayment(payment);
 
+        // Outbox event committed atomically with the capture; published by OutboxPollingScheduler
+        outboxEventService.publish(
+                savedPayment.getId(),
+                "PAYMENT",
+                EventType.PAYMENT_COMPLETED,
+                new PaymentCompletedEvent(
+                        savedPayment.getId(),
+                        savedPayment.getMerchantId(),
+                        String.valueOf(savedPayment.getAmount().getAmountInCents()),
+                        savedPayment.getCurrency(),
+                        providerTransactionId));
+
         log.info("Payment captured successfully: {}", paymentId);
         return mapToResponse(savedPayment);
     }
 
-    private void captureWithProvider(Payment payment) {
+    private String captureWithProvider(Payment payment) {
         log.debug("Capturing payment {} with external provider", payment.getId());
 
         ExternalPaymentProviderPort.PaymentProviderRequest request =
@@ -75,6 +91,9 @@ public class CapturePaymentService implements CapturePaymentUseCase {
                 log.error("Payment capture failed: {} - {}", result.errorCode(), result.errorMessage());
                 throw new BusinessException("Payment capture failed: " + result.errorMessage());
             }
+            return result.providerTransactionId();
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Payment capture failed with exception: {}", e.getMessage());
             throw new BusinessException("Payment capture failed: " + e.getMessage());

@@ -53,11 +53,14 @@ class ProcessRefundServiceTest {
     @Mock
     private AuditPort auditPort;
 
+    @Mock
+    private com.payment.gateway.domain.outbox.service.OutboxEventDomainService outboxEventService;
+
     private ProcessRefundService processRefundService;
 
     @BeforeEach
     void setUp() {
-        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, metricsPort, auditPort);
+        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, metricsPort, auditPort, outboxEventService);
     }
 
     @Nested
