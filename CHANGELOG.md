@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Phase 11: Production Readiness (in progress)
 - CI/CD Pipeline with GitHub Actions
 - AI Code Review using Alibaba Cloud Coding Plan
+- Spotless code formatting (palantir-java-format), enforced by the CI `Code Quality` job
+  via `spotless:check`. Run `make format` (`./mvnw spotless:apply`) before committing —
+  see [CONTRIBUTING.md](CONTRIBUTING.md#code-formatting-spotless).
+
+### Removed
+- Unused `sonar` Makefile target.
 
 ## [1.0.0] - 2026-03-20
 

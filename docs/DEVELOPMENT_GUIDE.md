@@ -200,7 +200,9 @@ Then connect your IDE to `localhost:5005`.
 
 #### Code Style
 
-Import `intellij-code-style.xml` from `.idea/` if provided.
+Install the **palantir-java-format** plugin and enable *Settings → Tools → Actions on Save
+→ Reformat code* so files are formatted automatically on save, matching the project's
+Spotless configuration (see [Code Style](#code-style) below).
 
 ---
 
@@ -278,6 +280,26 @@ docker exec -it payment-gateway-service-kafka \
 - **Line Length:** 120 characters
 - **Braces:** K&R style
 - **Imports:** Organized, no wildcards
+
+### Automated Formatting (Spotless)
+
+These conventions are enforced automatically with **Spotless** using the
+**[palantir-java-format](https://github.com/palantir/palantir-java-format)** formatter
+(`spotless-maven-plugin` in `pom.xml`). The CI `Code Quality` job runs `spotless:check` and
+**fails if any file is unformatted**, so format before committing:
+
+```bash
+# Format all Java sources (src/main + src/test)
+./mvnw spotless:apply        # or: make format
+
+# Check formatting only — what CI runs
+./mvnw spotless:check        # or: make validate
+```
+
+Spotless also strips unused imports and normalises trailing whitespace and final newlines.
+Treat `spotless:apply` as the source of truth rather than formatting by hand. See
+[CONTRIBUTING.md](../CONTRIBUTING.md#code-formatting-spotless) for the pre-commit hook and
+IDE setup.
 
 ### Architecture Rules
 
