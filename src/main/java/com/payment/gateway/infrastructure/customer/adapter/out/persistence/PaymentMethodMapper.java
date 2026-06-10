@@ -42,8 +42,10 @@ public class PaymentMethodMapper {
         return PaymentMethod.builder()
                 .id(entity.getId())
                 .customerId(entity.getCustomerId())
-                .type(com.payment.gateway.domain.customer.model.PaymentMethodType.valueOf(entity.getType().name()))
-                .status(com.payment.gateway.domain.customer.model.PaymentMethodStatus.valueOf(entity.getStatus().name()))
+                .type(com.payment.gateway.domain.customer.model.PaymentMethodType.valueOf(
+                        entity.getType().name()))
+                .status(com.payment.gateway.domain.customer.model.PaymentMethodStatus.valueOf(
+                        entity.getStatus().name()))
                 .token(entity.getToken())
                 .bankAccountLast4(entity.getLastFour())
                 .isDefault(entity.isDefault())

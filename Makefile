@@ -87,9 +87,6 @@ generate-openapi: ## Generate OpenAPI documentation
 coverage: ## Generate code coverage report
 	mvn clean test jacoco:report
 
-sonar: ## Run SonarQube analysis
-	mvn clean verify sonar:sonar -Dsonar.projectKey=payment-gateway
-
 format: ## Format code
 	mvn spotless:apply
 

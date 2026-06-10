@@ -1,5 +1,9 @@
 package com.payment.gateway.domain.customer.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.payment.gateway.domain.customer.exception.CustomerNotFoundException;
 import com.payment.gateway.domain.customer.exception.DuplicateCustomerException;
 import com.payment.gateway.domain.customer.exception.InvalidPaymentMethodException;
@@ -7,6 +11,8 @@ import com.payment.gateway.domain.customer.model.CardDetails;
 import com.payment.gateway.domain.customer.model.Customer;
 import com.payment.gateway.domain.customer.model.PaymentMethod;
 import com.payment.gateway.domain.customer.port.CustomerRepositoryPort;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,13 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CustomerDomainService Tests")
@@ -73,8 +72,8 @@ class CustomerDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> customerDomainService.createCustomer(MERCHANT_ID, EMAIL, NAME))
-                .isInstanceOf(DuplicateCustomerException.class)
-                .hasMessageContaining(EMAIL);
+                    .isInstanceOf(DuplicateCustomerException.class)
+                    .hasMessageContaining(EMAIL);
 
             verify(repository).existsByEmail(EMAIL);
             verify(repository, never()).save(any(Customer.class));
@@ -126,8 +125,8 @@ class CustomerDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> customerDomainService.getCustomerOrThrow(CUSTOMER_ID))
-                .isInstanceOf(CustomerNotFoundException.class)
-                .hasMessageContaining(CUSTOMER_ID);
+                    .isInstanceOf(CustomerNotFoundException.class)
+                    .hasMessageContaining(CUSTOMER_ID);
         }
 
         @Test
@@ -343,8 +342,8 @@ class CustomerDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> customerDomainService.getPaymentMethod(CUSTOMER_ID, "nonexistent_pm"))
-                .isInstanceOf(InvalidPaymentMethodException.class)
-                .hasMessageContaining("nonexistent_pm");
+                    .isInstanceOf(InvalidPaymentMethodException.class)
+                    .hasMessageContaining("nonexistent_pm");
 
             verify(repository).findById(CUSTOMER_ID);
         }
@@ -382,7 +381,8 @@ class CustomerDomainServiceTest {
             String externalId = "ext_123";
             Customer customer = Customer.create(MERCHANT_ID, EMAIL, NAME);
             customer.updateExternalId(externalId);
-            given(repository.findByMerchantIdAndExternalId(MERCHANT_ID, externalId)).willReturn(Optional.of(customer));
+            given(repository.findByMerchantIdAndExternalId(MERCHANT_ID, externalId))
+                    .willReturn(Optional.of(customer));
 
             // When
             Optional<Customer> result = customerDomainService.getCustomerByExternalId(MERCHANT_ID, externalId);
@@ -397,7 +397,8 @@ class CustomerDomainServiceTest {
         void shouldReturnEmptyWhenCustomerNotFoundByExternalId() {
             // Given
             String externalId = "ext_123";
-            given(repository.findByMerchantIdAndExternalId(MERCHANT_ID, externalId)).willReturn(Optional.empty());
+            given(repository.findByMerchantIdAndExternalId(MERCHANT_ID, externalId))
+                    .willReturn(Optional.empty());
 
             // When
             Optional<Customer> result = customerDomainService.getCustomerByExternalId(MERCHANT_ID, externalId);
@@ -475,13 +476,6 @@ class CustomerDomainServiceTest {
     }
 
     private CardDetails createCardDetails() {
-        return CardDetails.create(
-            "1111",
-            "4111",
-            "VISA",
-            12,
-            2027,
-            "John Doe"
-        );
+        return CardDetails.create("1111", "4111", "VISA", 12, 2027, "John Doe");
     }
 }

@@ -2,10 +2,9 @@ package com.payment.gateway.infrastructure.commons.resilience;
 
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.Duration;
 
 /**
  * Bulkhead configuration for concurrent call isolation.
@@ -31,7 +30,8 @@ public class BulkheadConfig {
 
     @Bean
     public Bulkhead externalServiceBulkhead(BulkheadRegistry registry) {
-        return registry.bulkhead("externalService",
+        return registry.bulkhead(
+                "externalService",
                 io.github.resilience4j.bulkhead.BulkheadConfig.custom()
                         .maxConcurrentCalls(10)
                         .maxWaitDuration(Duration.ofMillis(1000))

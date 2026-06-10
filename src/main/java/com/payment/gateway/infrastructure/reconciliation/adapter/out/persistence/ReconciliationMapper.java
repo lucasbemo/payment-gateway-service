@@ -2,9 +2,8 @@ package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistenc
 
 import com.payment.gateway.domain.reconciliation.model.ReconciliationBatch;
 import com.payment.gateway.domain.reconciliation.model.ReconciliationStatus;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ReconciliationMapper {

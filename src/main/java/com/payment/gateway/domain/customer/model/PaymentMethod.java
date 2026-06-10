@@ -1,12 +1,11 @@
 package com.payment.gateway.domain.customer.model;
 
+import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * PaymentMethod value object representing a customer's payment method.
@@ -71,8 +70,8 @@ public class PaymentMethod {
                 .build();
     }
 
-    public static PaymentMethod createBankAccount(String customerId, String bankAccountLast4,
-                                                   String routingNumberLast4, String token) {
+    public static PaymentMethod createBankAccount(
+            String customerId, String bankAccountLast4, String routingNumberLast4, String token) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())

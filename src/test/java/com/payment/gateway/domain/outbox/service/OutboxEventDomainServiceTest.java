@@ -1,10 +1,17 @@
 package com.payment.gateway.domain.outbox.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import com.payment.gateway.domain.outbox.port.OutboxEventRepositoryPort;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,14 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OutboxEventDomainService Tests")
@@ -74,9 +73,10 @@ class OutboxEventDomainServiceTest {
             given(objectMapper.writeValueAsString(payload)).willThrow(new RuntimeException("Serialization error"));
 
             // When & Then
-            assertThatThrownBy(() -> outboxEventDomainService.publish(AGGREGATE_ID, AGGREGATE_TYPE, EVENT_TYPE, payload))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Failed to serialize");
+            assertThatThrownBy(
+                            () -> outboxEventDomainService.publish(AGGREGATE_ID, AGGREGATE_TYPE, EVENT_TYPE, payload))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Failed to serialize");
 
             verify(objectMapper).writeValueAsString(payload);
             verify(repository, never()).save(any(OutboxEvent.class));
@@ -112,8 +112,8 @@ class OutboxEventDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> outboxEventDomainService.processEvent(EVENT_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Event not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Event not found");
 
             verify(repository).findById(EVENT_ID);
         }
@@ -128,8 +128,8 @@ class OutboxEventDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> outboxEventDomainService.processEvent(EVENT_ID))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Event is not pending");
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Event is not pending");
 
             verify(repository).findById(EVENT_ID);
         }
@@ -164,8 +164,8 @@ class OutboxEventDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> outboxEventDomainService.completeEvent(EVENT_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Event not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Event not found");
         }
     }
 
@@ -227,8 +227,8 @@ class OutboxEventDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> outboxEventDomainService.retryEvent(EVENT_ID))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("cannot be retried");
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("cannot be retried");
         }
 
         @Test
@@ -239,8 +239,8 @@ class OutboxEventDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> outboxEventDomainService.retryEvent(EVENT_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Event not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Event not found");
         }
     }
 

@@ -1,16 +1,6 @@
 package com.payment.gateway.infrastructure.security.encryption;
 
 import com.payment.gateway.commons.exception.DomainException;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +8,15 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Service for encrypting and decrypting sensitive data at rest.
@@ -228,12 +227,16 @@ public class EncryptionService {
     private static class KeyVersion {
         @Getter
         private final String keyId;
+
         @Getter
         private final SecretKey secretKey;
+
         @Getter
         private final Instant createdAt;
+
         @Getter
         private final int version;
+
         @Getter
         private boolean active;
 

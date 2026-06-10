@@ -1,43 +1,5 @@
 package com.payment.gateway.application.payment.service;
 
-import com.payment.gateway.application.payment.dto.PaymentResponse;
-import com.payment.gateway.application.payment.dto.ProcessPaymentCommand;
-import com.payment.gateway.application.payment.port.out.CustomerQueryPort;
-import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
-import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
-import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
-import com.payment.gateway.application.payment.port.out.TokenizationServicePort;
-import com.payment.gateway.application.payment.port.out.TransactionCommandPort;
-import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
-import com.payment.gateway.domain.transaction.model.Transaction;
-import com.payment.gateway.commons.exception.BusinessException;
-import com.payment.gateway.commons.exception.PaymentDeclinedException;
-import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.commons.utils.IdGenerator;
-import com.payment.gateway.domain.customer.model.Customer;
-import com.payment.gateway.domain.merchant.model.Merchant;
-import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
-import com.payment.gateway.domain.merchant.model.MerchantStatus;
-import com.payment.gateway.domain.payment.model.Payment;
-import com.payment.gateway.domain.payment.model.PaymentMetadata;
-import com.payment.gateway.domain.payment.model.PaymentStatus;
-import com.payment.gateway.application.commons.port.out.MetricsPort;
-import com.payment.gateway.application.commons.port.out.AuditPort;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +9,42 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
+
+import com.payment.gateway.application.commons.port.out.AuditPort;
+import com.payment.gateway.application.commons.port.out.MetricsPort;
+import com.payment.gateway.application.payment.dto.PaymentResponse;
+import com.payment.gateway.application.payment.dto.ProcessPaymentCommand;
+import com.payment.gateway.application.payment.port.out.CustomerQueryPort;
+import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
+import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
+import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.payment.port.out.TokenizationServicePort;
+import com.payment.gateway.application.payment.port.out.TransactionCommandPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
+import com.payment.gateway.commons.exception.BusinessException;
+import com.payment.gateway.commons.exception.PaymentDeclinedException;
+import com.payment.gateway.commons.model.Money;
+import com.payment.gateway.commons.utils.IdGenerator;
+import com.payment.gateway.domain.merchant.model.Merchant;
+import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
+import com.payment.gateway.domain.merchant.model.MerchantStatus;
+import com.payment.gateway.domain.payment.model.Payment;
+import com.payment.gateway.domain.payment.model.PaymentMetadata;
+import com.payment.gateway.domain.payment.model.PaymentStatus;
+import com.payment.gateway.domain.transaction.model.Transaction;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @DisplayName("Process Payment Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -100,8 +98,7 @@ class ProcessPaymentServiceTest {
                 idGenerator,
                 metricsPort,
                 auditPort,
-                outboxEventService
-        );
+                outboxEventService);
     }
 
     @Nested
@@ -128,9 +125,9 @@ class ProcessPaymentServiceTest {
                 setId(payment, paymentId);
                 return payment;
             });
-            given(externalPaymentProviderPort.authorize(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "txn_xyz", null, null))
-            );
+            given(externalPaymentProviderPort.authorize(any()))
+                    .willReturn(CompletableFuture.completedFuture(
+                            new ExternalPaymentProviderPort.PaymentProviderResult(true, "txn_xyz", null, null)));
             Transaction transaction = org.mockito.Mockito.mock(Transaction.class);
             given(transaction.getId()).willReturn("txn_abc123");
             given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.of(transaction));
@@ -278,9 +275,9 @@ class ProcessPaymentServiceTest {
                 setId(payment, "pay_123");
                 return payment;
             });
-            given(externalPaymentProviderPort.authorize(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "ERR_001", "Authorization declined"))
-            );
+            given(externalPaymentProviderPort.authorize(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            false, null, "ERR_001", "Authorization declined")));
 
             // When & Then
             assertThatThrownBy(() -> processPaymentService.processPayment(command))
@@ -312,10 +309,9 @@ class ProcessPaymentServiceTest {
                 setId(payment, paymentId);
                 return payment;
             });
-            given(externalPaymentProviderPort.authorize(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
-                            false, null, "card_declined", "Insufficient funds (test decline: amount ends in 99)"))
-            );
+            given(externalPaymentProviderPort.authorize(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            false, null, "card_declined", "Insufficient funds (test decline: amount ends in 99)")));
 
             // When & Then
             assertThatThrownBy(() -> processPaymentService.processPayment(command))
@@ -330,16 +326,19 @@ class ProcessPaymentServiceTest {
             assertThat(paymentCaptor.getValue().getStatus()).isEqualTo(PaymentStatus.FAILED);
 
             // PAYMENT_FAILED outbox event was published
-            then(outboxEventService).should().publish(
-                    eq(paymentId),
-                    eq("PAYMENT"),
-                    eq(com.payment.gateway.domain.outbox.model.EventType.PAYMENT_FAILED),
-                    any(com.payment.gateway.domain.payment.event.PaymentFailedEvent.class));
+            then(outboxEventService)
+                    .should()
+                    .publish(
+                            eq(paymentId),
+                            eq("PAYMENT"),
+                            eq(com.payment.gateway.domain.outbox.model.EventType.PAYMENT_FAILED),
+                            any(com.payment.gateway.domain.payment.event.PaymentFailedEvent.class));
 
             // Metrics and audit recorded
             then(metricsPort).should().recordPaymentFailed();
-            then(auditPort).should().logPaymentOperation(
-                    eq(paymentId), eq(merchantId), eq("AUTHORIZE"), eq("FAILED"), anyLong());
+            then(auditPort)
+                    .should()
+                    .logPaymentOperation(eq(paymentId), eq(merchantId), eq("AUTHORIZE"), eq("FAILED"), anyLong());
 
             // No transaction created, no PAYMENT_CREATED event
             then(transactionCommandPort).should(never()).createTransaction(any());
@@ -357,8 +356,7 @@ class ProcessPaymentServiceTest {
                 "hashed_key",
                 "hashed_secret",
                 "https://webhook.example.com",
-                MerchantConfiguration.empty()
-        );
+                MerchantConfiguration.empty());
         setId(merchant, id);
         setStatus(merchant, MerchantStatus.ACTIVE);
         return merchant;
@@ -374,8 +372,7 @@ class ProcessPaymentServiceTest {
                 "Test payment",
                 PaymentMetadata.empty(),
                 List.of(),
-                null
-        );
+                null);
         setId(payment, id);
         return payment;
     }
@@ -392,17 +389,16 @@ class ProcessPaymentServiceTest {
                 .cardExpiryMonth("12")
                 .cardExpiryYear("25")
                 .cardCvv("123")
-                .items(List.of(
-                        ProcessPaymentCommand.PaymentItemDto.builder()
-                                .description("Test item")
-                                .quantity(1)
-                                .unitPrice(10000L)
-                                .build()
-                ))
+                .items(List.of(ProcessPaymentCommand.PaymentItemDto.builder()
+                        .description("Test item")
+                        .quantity(1)
+                        .unitPrice(10000L)
+                        .build()))
                 .build();
     }
 
-    private ProcessPaymentCommand createPaymentCommandWithCustomer(String merchantId, String customerId, String idempotencyKey) {
+    private ProcessPaymentCommand createPaymentCommandWithCustomer(
+            String merchantId, String customerId, String idempotencyKey) {
         return ProcessPaymentCommand.builder()
                 .merchantId(merchantId)
                 .amount(10000L)

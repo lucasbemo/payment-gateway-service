@@ -1,11 +1,10 @@
 package com.payment.gateway.domain.idempotency.model;
 
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
 
 /**
  * IdempotencyKey aggregate root.
@@ -53,8 +52,8 @@ public class IdempotencyKey {
         return new Builder();
     }
 
-    public static IdempotencyKey create(String idempotencyKey, String merchantId, String operation,
-                                         String requestHash, int ttlSeconds) {
+    public static IdempotencyKey create(
+            String idempotencyKey, String merchantId, String operation, String requestHash, int ttlSeconds) {
         Instant now = Instant.now();
         return new Builder()
                 .id(java.util.UUID.randomUUID().toString())
@@ -115,9 +114,9 @@ public class IdempotencyKey {
     }
 
     public boolean isTerminal() {
-        return this.status == IdempotencyStatus.COMPLETED ||
-               this.status == IdempotencyStatus.FAILED ||
-               this.status == IdempotencyStatus.EXPIRED;
+        return this.status == IdempotencyStatus.COMPLETED
+                || this.status == IdempotencyStatus.FAILED
+                || this.status == IdempotencyStatus.EXPIRED;
     }
 
     public static class Builder {

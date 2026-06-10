@@ -1,11 +1,10 @@
 package com.payment.gateway.test;
 
 import com.payment.gateway.application.payment.port.out.*;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Test configuration providing mock implementations for ports not under test.
@@ -42,17 +41,20 @@ public class MockPortsConfig {
             }
 
             @Override
-            public Optional<com.payment.gateway.domain.customer.model.Customer> findCustomerByIdAndMerchantId(String customerId, String merchantId) {
+            public Optional<com.payment.gateway.domain.customer.model.Customer> findCustomerByIdAndMerchantId(
+                    String customerId, String merchantId) {
                 return Optional.empty();
             }
 
             @Override
-            public Optional<com.payment.gateway.domain.customer.model.PaymentMethod> findPaymentMethodById(String paymentMethodId) {
+            public Optional<com.payment.gateway.domain.customer.model.PaymentMethod> findPaymentMethodById(
+                    String paymentMethodId) {
                 return Optional.empty();
             }
 
             @Override
-            public Optional<com.payment.gateway.domain.customer.model.PaymentMethod> findPaymentMethodByToken(String token) {
+            public Optional<com.payment.gateway.domain.customer.model.PaymentMethod> findPaymentMethodByToken(
+                    String token) {
                 return Optional.empty();
             }
         };

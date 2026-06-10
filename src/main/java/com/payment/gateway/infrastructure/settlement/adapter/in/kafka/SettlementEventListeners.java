@@ -1,6 +1,7 @@
 package com.payment.gateway.infrastructure.settlement.adapter.in.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,8 +9,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Kafka listeners for settlement batch events.
@@ -26,12 +25,12 @@ public class SettlementEventListeners {
     private String settlementBatchTopic;
 
     @KafkaListener(
-        topics = "${kafka.topics.settlement-batch:settlement.batch}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onSettlementBatch(@Payload Map<String, Object> event,
-                                   @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.settlement-batch:settlement.batch}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onSettlementBatch(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received settlement.batch event: {}", event);
         try {
             String batchId = (String) event.get("batchId");
@@ -50,10 +49,15 @@ public class SettlementEventListeners {
         }
     }
 
-    private void handleSettlementBatch(String batchId, String merchantId, String totalAmount,
-                                        String currency, Integer transactionCount) {
-        log.info("Handling settlement batch: batchId={}, merchantId={}, totalAmount={} {}, transactionCount={}",
-                 batchId, merchantId, totalAmount, currency, transactionCount);
+    private void handleSettlementBatch(
+            String batchId, String merchantId, String totalAmount, String currency, Integer transactionCount) {
+        log.info(
+                "Handling settlement batch: batchId={}, merchantId={}, totalAmount={} {}, transactionCount={}",
+                batchId,
+                merchantId,
+                totalAmount,
+                currency,
+                transactionCount);
         // Add business logic here (e.g., initiate bank transfer, update merchant balance, generate reports, etc.)
     }
 }

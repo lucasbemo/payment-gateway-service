@@ -8,16 +8,15 @@ import com.payment.gateway.domain.reconciliation.model.ReconciliationBatch;
 import com.payment.gateway.domain.reconciliation.service.ReconciliationDomainService;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for reconciling transactions.
@@ -36,9 +35,10 @@ public class ReconcileTransactionsService implements ReconcileTransactionsUseCas
     private final ReconciliationDomainService reconciliationDomainService;
     private final TransactionQueryPort transactionQueryPort;
 
-    public ReconcileTransactionsService(ReconciliationBatchPort reconciliationBatchPort,
-                                         ReconciliationDomainService reconciliationDomainService,
-                                         TransactionQueryPort transactionQueryPort) {
+    public ReconcileTransactionsService(
+            ReconciliationBatchPort reconciliationBatchPort,
+            ReconciliationDomainService reconciliationDomainService,
+            TransactionQueryPort transactionQueryPort) {
         this.reconciliationBatchPort = reconciliationBatchPort;
         this.reconciliationDomainService = reconciliationDomainService;
         this.transactionQueryPort = transactionQueryPort;
@@ -59,7 +59,8 @@ public class ReconcileTransactionsService implements ReconcileTransactionsUseCas
 
         // Load the merchant's transactions for the reconciliation date (00:00-24:00 UTC)
         Instant startOfDay = reconciliationDate.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endOfDay = reconciliationDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant endOfDay =
+                reconciliationDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         List<Transaction> transactions =
                 transactionQueryPort.findByMerchantIdAndCreatedAtBetween(merchantId, startOfDay, endOfDay);
 
@@ -75,20 +76,28 @@ public class ReconcileTransactionsService implements ReconcileTransactionsUseCas
         long matchedAmountCents = sumAmountInCents(transactions, t -> MATCHED_STATUSES.contains(t.getStatus()));
 
         // Record real results on the batch (amounts are stored in cents)
-        reconciliationDomainService.recordReconciliationResults(batch.getId(), totalTransactions, matched,
-                discrepancies, BigDecimal.valueOf(totalAmountCents), BigDecimal.valueOf(matchedAmountCents));
+        reconciliationDomainService.recordReconciliationResults(
+                batch.getId(),
+                totalTransactions,
+                matched,
+                discrepancies,
+                BigDecimal.valueOf(totalAmountCents),
+                BigDecimal.valueOf(matchedAmountCents));
 
         // Complete reconciliation
         batch = reconciliationDomainService.completeReconciliation(batch.getId());
 
-        log.info("Reconciliation completed for batch: {} (total={}, matched={}, discrepancies={})",
-                batch.getId(), totalTransactions, matched, discrepancies);
+        log.info(
+                "Reconciliation completed for batch: {} (total={}, matched={}, discrepancies={})",
+                batch.getId(),
+                totalTransactions,
+                matched,
+                discrepancies);
 
         return mapToResponse(batch);
     }
 
-    private long sumAmountInCents(List<Transaction> transactions,
-                                   java.util.function.Predicate<Transaction> filter) {
+    private long sumAmountInCents(List<Transaction> transactions, java.util.function.Predicate<Transaction> filter) {
         return transactions.stream()
                 .filter(filter)
                 .filter(t -> t.getAmount() != null)

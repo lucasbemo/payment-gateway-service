@@ -24,8 +24,7 @@ public class TransactionController implements TransactionApi {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TransactionResponse>> getTransaction(
-            @PathVariable String id,
-            @RequestParam String merchantId) {
+            @PathVariable String id, @RequestParam String merchantId) {
         log.info("Getting transaction: {} for merchant: {}", id, merchantId);
         var response = getTransactionUseCase.getTransactionById(id, merchantId);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -34,8 +33,7 @@ public class TransactionController implements TransactionApi {
     @Override
     @PostMapping("/{id}/capture")
     public ResponseEntity<ApiResponse<TransactionResponse>> captureTransaction(
-            @PathVariable String id,
-            @RequestParam String merchantId) {
+            @PathVariable String id, @RequestParam String merchantId) {
         log.info("Capturing transaction: {} for merchant: {}", id, merchantId);
         var response = captureTransactionUseCase.captureTransaction(id, merchantId);
         return ResponseEntity.ok(ApiResponse.success("Transaction captured successfully", response));
@@ -44,8 +42,7 @@ public class TransactionController implements TransactionApi {
     @Override
     @PostMapping("/{id}/void")
     public ResponseEntity<ApiResponse<TransactionResponse>> voidTransaction(
-            @PathVariable String id,
-            @RequestParam String merchantId) {
+            @PathVariable String id, @RequestParam String merchantId) {
         log.info("Voiding transaction: {} for merchant: {}", id, merchantId);
         var response = voidTransactionUseCase.voidTransaction(id, merchantId);
         return ResponseEntity.ok(ApiResponse.success("Transaction voided successfully", response));

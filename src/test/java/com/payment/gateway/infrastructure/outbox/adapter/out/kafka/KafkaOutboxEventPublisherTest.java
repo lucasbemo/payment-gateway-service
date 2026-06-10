@@ -1,10 +1,17 @@
 package com.payment.gateway.infrastructure.outbox.adapter.out.kafka;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import com.payment.gateway.infrastructure.commons.monitoring.KafkaMetricsBinder;
 import io.micrometer.core.instrument.Timer;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,14 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for KafkaOutboxEventPublisher.
@@ -74,8 +73,7 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should publish event to Kafka successfully")
         void shouldPublishEventSuccessfully() throws Exception {
-            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
-                    .thenReturn(future);
+            when(kafkaTemplate.send(eq("payment.created"), any(), any())).thenReturn(future);
             when(future.get()).thenReturn(sendResult);
             when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
@@ -94,8 +92,7 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should return false when Kafka publish fails")
         void shouldReturnFalseWhenPublishFails() throws Exception {
-            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
-                    .thenReturn(future);
+            when(kafkaTemplate.send(eq("payment.created"), any(), any())).thenReturn(future);
             when(future.get()).thenThrow(new RuntimeException("Kafka broker unavailable"));
             when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
@@ -107,8 +104,7 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should use aggregateId as message key")
         void shouldUseAggregateIdAsKey() throws Exception {
-            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
-                    .thenReturn(future);
+            when(kafkaTemplate.send(eq("payment.created"), any(), any())).thenReturn(future);
             when(future.get()).thenReturn(sendResult);
             when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
@@ -123,8 +119,7 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should publish event payload to Kafka")
         void shouldPublishEventPayload() throws Exception {
-            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
-                    .thenReturn(future);
+            when(kafkaTemplate.send(eq("payment.created"), any(), any())).thenReturn(future);
             when(future.get()).thenReturn(sendResult);
             when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 
@@ -139,8 +134,7 @@ class KafkaOutboxEventPublisherTest {
         @Test
         @DisplayName("Should record metrics on successful publish")
         void shouldRecordMetricsOnSuccess() throws Exception {
-            when(kafkaTemplate.send(eq("payment.created"), any(), any()))
-                    .thenReturn(future);
+            when(kafkaTemplate.send(eq("payment.created"), any(), any())).thenReturn(future);
             when(future.get()).thenReturn(sendResult);
             when(kafkaMetricsBinder.startProducerTimer()).thenReturn(timerSample);
 

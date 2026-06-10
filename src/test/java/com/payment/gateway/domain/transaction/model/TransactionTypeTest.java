@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.transaction.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("TransactionType Enum Tests")
 class TransactionTypeTest {
@@ -82,8 +82,7 @@ class TransactionTypeTest {
         @Test
         @DisplayName("Should throw exception for invalid type")
         void shouldThrowExceptionForInvalidType() {
-            assertThatThrownBy(() -> TransactionType.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> TransactionType.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -96,16 +95,16 @@ class TransactionTypeTest {
         void shouldReturnAllTransactionTypes() {
             TransactionType[] values = TransactionType.values();
             assertThat(values).hasSize(8);
-            assertThat(values).containsExactlyInAnyOrder(
-                TransactionType.PAYMENT,
-                TransactionType.CAPTURE,
-                TransactionType.AUTHORIZATION,
-                TransactionType.REFUND,
-                TransactionType.PARTIAL_REFUND,
-                TransactionType.REVERSAL,
-                TransactionType.CHARGEBACK,
-                TransactionType.ADJUSTMENT
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            TransactionType.PAYMENT,
+                            TransactionType.CAPTURE,
+                            TransactionType.AUTHORIZATION,
+                            TransactionType.REFUND,
+                            TransactionType.PARTIAL_REFUND,
+                            TransactionType.REVERSAL,
+                            TransactionType.CHARGEBACK,
+                            TransactionType.ADJUSTMENT);
         }
     }
 }

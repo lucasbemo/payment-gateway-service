@@ -1,7 +1,6 @@
 package com.payment.gateway.application.reconciliation.port.out;
 
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
-
 import java.util.Optional;
 
 /**

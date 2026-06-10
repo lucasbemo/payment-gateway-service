@@ -2,10 +2,8 @@ package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistenc
 
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 import java.util.Currency;
+import org.springframework.stereotype.Component;
 
 @Component
 public class SettlementReportMapper {
@@ -17,7 +15,10 @@ public class SettlementReportMapper {
                 .gatewayName(report.getGatewayName())
                 .settlementDate(report.getSettlementDate())
                 .gatewayReportId(report.getGatewayReportId())
-                .grossAmount(report.getGrossAmount() != null ? report.getGrossAmount().getAmount() : null)
+                .grossAmount(
+                        report.getGrossAmount() != null
+                                ? report.getGrossAmount().getAmount()
+                                : null)
                 .feeAmount(report.getFeeAmount() != null ? report.getFeeAmount().getAmount() : null)
                 .netAmount(report.getNetAmount() != null ? report.getNetAmount().getAmount() : null)
                 .currency(report.getCurrency())
@@ -33,19 +34,15 @@ public class SettlementReportMapper {
     }
 
     public SettlementReport toDomain(SettlementReportJpaEntity entity) {
-        Currency currency = entity.getCurrency() != null
-                ? Currency.getInstance(entity.getCurrency())
-                : Currency.getInstance("USD");
+        Currency currency =
+                entity.getCurrency() != null ? Currency.getInstance(entity.getCurrency()) : Currency.getInstance("USD");
 
-        Money grossAmount = entity.getGrossAmount() != null
-                ? Money.of(entity.getGrossAmount(), currency)
-                : Money.zero(currency);
-        Money feeAmount = entity.getFeeAmount() != null
-                ? Money.of(entity.getFeeAmount(), currency)
-                : Money.zero(currency);
-        Money netAmount = entity.getNetAmount() != null
-                ? Money.of(entity.getNetAmount(), currency)
-                : Money.zero(currency);
+        Money grossAmount =
+                entity.getGrossAmount() != null ? Money.of(entity.getGrossAmount(), currency) : Money.zero(currency);
+        Money feeAmount =
+                entity.getFeeAmount() != null ? Money.of(entity.getFeeAmount(), currency) : Money.zero(currency);
+        Money netAmount =
+                entity.getNetAmount() != null ? Money.of(entity.getNetAmount(), currency) : Money.zero(currency);
 
         return SettlementReport.builder()
                 .id(entity.getId())

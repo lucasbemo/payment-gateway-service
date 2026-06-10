@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.customer.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("PaymentMethodType Enum Tests")
 class PaymentMethodTypeTest {
@@ -68,8 +68,7 @@ class PaymentMethodTypeTest {
         @Test
         @DisplayName("Should throw exception for invalid type")
         void shouldThrowExceptionForInvalidType() {
-            assertThatThrownBy(() -> PaymentMethodType.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> PaymentMethodType.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -82,14 +81,14 @@ class PaymentMethodTypeTest {
         void shouldReturnAllPaymentMethodTypes() {
             PaymentMethodType[] values = PaymentMethodType.values();
             assertThat(values).hasSize(6);
-            assertThat(values).containsExactlyInAnyOrder(
-                PaymentMethodType.CREDIT_CARD,
-                PaymentMethodType.DEBIT_CARD,
-                PaymentMethodType.BANK_ACCOUNT,
-                PaymentMethodType.DIGITAL_WALLET,
-                PaymentMethodType.CRYPTO,
-                PaymentMethodType.BUY_NOW_PAY_LATER
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            PaymentMethodType.CREDIT_CARD,
+                            PaymentMethodType.DEBIT_CARD,
+                            PaymentMethodType.BANK_ACCOUNT,
+                            PaymentMethodType.DIGITAL_WALLET,
+                            PaymentMethodType.CRYPTO,
+                            PaymentMethodType.BUY_NOW_PAY_LATER);
         }
     }
 }

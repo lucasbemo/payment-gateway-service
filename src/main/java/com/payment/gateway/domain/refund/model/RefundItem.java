@@ -1,12 +1,10 @@
 package com.payment.gateway.domain.refund.model;
 
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * RefundItem value object representing a line item in a refund.

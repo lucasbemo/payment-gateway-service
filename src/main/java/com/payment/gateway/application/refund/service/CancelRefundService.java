@@ -5,7 +5,6 @@ import com.payment.gateway.application.refund.port.in.CancelRefundUseCase;
 import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.refund.model.Refund;
-import com.payment.gateway.domain.refund.model.RefundStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,8 @@ public class CancelRefundService implements CancelRefundUseCase {
     public RefundResponse cancelRefund(String refundId, String merchantId, String reason) {
         log.info("Canceling refund: {} for merchant: {}", refundId, merchantId);
 
-        Refund refund = refundQueryPort.findById(refundId)
+        Refund refund = refundQueryPort
+                .findById(refundId)
                 .orElseThrow(() -> new BusinessException("Refund not found: " + refundId));
 
         // Validate merchant ownership

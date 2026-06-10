@@ -145,6 +145,9 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
 
+      - name: Check formatting (Spotless)
+        run: ./mvnw spotless:check
+
       - name: Run Checkstyle
         run: ./mvnw checkstyle:check || true
 

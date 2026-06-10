@@ -6,13 +6,12 @@ import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.payment.model.Payment;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Application service for getting payment information.
@@ -30,7 +29,8 @@ public class GetPaymentService implements GetPaymentUseCase {
     public PaymentResponse getPaymentById(String paymentId, String merchantId) {
         log.info("Getting payment by id: {} for merchant: {}", paymentId, merchantId);
 
-        Payment payment = paymentQueryPort.findById(paymentId)
+        Payment payment = paymentQueryPort
+                .findById(paymentId)
                 .orElseThrow(() -> new BusinessException("Payment not found: " + paymentId));
 
         // Validate ownership
@@ -45,9 +45,7 @@ public class GetPaymentService implements GetPaymentUseCase {
     public List<PaymentResponse> getPaymentsByMerchantId(String merchantId) {
         log.info("Getting payments for merchant: {}", merchantId);
         List<Payment> payments = paymentQueryPort.findByMerchantId(merchantId);
-        return payments.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return payments.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     private PaymentResponse mapToResponse(Payment payment) {
@@ -56,20 +54,26 @@ public class GetPaymentService implements GetPaymentUseCase {
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
                 .paymentMethodId(payment.getPaymentMethodId())
-                .transactionId(transactionQueryPort.findLatestByPaymentId(payment.getId()).map(t -> t.getId()).orElse(null))
+                .transactionId(transactionQueryPort
+                        .findLatestByPaymentId(payment.getId())
+                        .map(t -> t.getId())
+                        .orElse(null))
                 .amount(payment.getAmount().getAmountInCents())
                 .currency(payment.getCurrency())
                 .status(payment.getStatus().name())
                 .idempotencyKey(payment.getIdempotencyKey())
                 .description(payment.getDescription())
-                .items(payment.getItems() != null ? payment.getItems().stream()
-                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
-                                .description(item.getDescription())
-                                .quantity(item.getQuantity())
-                                .unitPrice(item.getUnitPrice().getAmountInCents())
-                                .total(item.getTotal().getAmountInCents())
-                                .build())
-                        .collect(Collectors.toList()) : List.of())
+                .items(
+                        payment.getItems() != null
+                                ? payment.getItems().stream()
+                                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
+                                                .description(item.getDescription())
+                                                .quantity(item.getQuantity())
+                                                .unitPrice(item.getUnitPrice().getAmountInCents())
+                                                .total(item.getTotal().getAmountInCents())
+                                                .build())
+                                        .collect(Collectors.toList())
+                                : List.of())
                 .createdAt(payment.getCreatedAt())
                 .updatedAt(payment.getUpdatedAt())
                 .build();

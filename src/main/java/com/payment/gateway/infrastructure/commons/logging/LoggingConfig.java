@@ -18,7 +18,6 @@ public class LoggingConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(correlationIdInterceptor())
-                .addPathPatterns("/api/**");
+        registry.addInterceptor(correlationIdInterceptor()).addPathPatterns("/api/**");
     }
 }

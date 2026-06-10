@@ -3,13 +3,12 @@ package com.payment.gateway.infrastructure.outbox.adapter.out.kafka;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import com.payment.gateway.infrastructure.commons.monitoring.KafkaMetricsBinder;
 import io.micrometer.core.instrument.Timer;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
@@ -35,7 +34,8 @@ public class KafkaOutboxEventPublisher {
             return true;
         } catch (Exception ex) {
             log.error("Failed to publish outbox event: {} type: {}", event.getId(), event.getEventType(), ex);
-            kafkaMetricsBinder.recordMessageProducedFailed(outboxEventsTopic, ex.getClass().getSimpleName());
+            kafkaMetricsBinder.recordMessageProducedFailed(
+                    outboxEventsTopic, ex.getClass().getSimpleName());
             return false;
         }
     }

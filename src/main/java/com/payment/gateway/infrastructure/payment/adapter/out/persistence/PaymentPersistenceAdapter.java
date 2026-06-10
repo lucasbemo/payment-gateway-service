@@ -3,10 +3,9 @@ package com.payment.gateway.infrastructure.payment.adapter.out.persistence;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.port.PaymentRepositoryPort;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Persistence adapter for Payment repository.
@@ -48,8 +47,7 @@ public class PaymentPersistenceAdapter implements PaymentRepositoryPort, Payment
 
     @Override
     public java.util.List<Payment> findByMerchantId(String merchantId) {
-        return paymentJpaRepository.findByMerchantId(merchantId)
-                .stream()
+        return paymentJpaRepository.findByMerchantId(merchantId).stream()
                 .map(paymentMapper::toDomain)
                 .collect(java.util.stream.Collectors.toList());
     }

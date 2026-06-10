@@ -1,5 +1,10 @@
 package com.payment.gateway.application.refund.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
@@ -7,6 +12,9 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,15 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Get Refund Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -109,8 +108,7 @@ class GetRefundServiceTest {
                 Money.of(5000L, Currency.getInstance("USD")),
                 "USD",
                 "idem-key-refund",
-                "Customer requested refund"
-        );
+                "Customer requested refund");
         setId(refund, id);
         setStatus(refund, RefundStatus.COMPLETED);
         return refund;

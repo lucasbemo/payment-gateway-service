@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.payment.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("PaymentStatus Enum Tests")
 class PaymentStatusTest {
@@ -16,106 +16,136 @@ class PaymentStatusTest {
         @Test
         @DisplayName("PENDING can transition to AUTHORIZED")
         void pendingCanTransitionToAuthorized() {
-            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.AUTHORIZED)).isTrue();
+            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.AUTHORIZED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to CAPTURED")
         void pendingCanTransitionToCaptured() {
-            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.CAPTURED)).isTrue();
+            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.CAPTURED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to FAILED")
         void pendingCanTransitionToFailed() {
-            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.FAILED)).isTrue();
+            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to CANCELLED")
         void pendingCanTransitionToCancelled() {
-            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.CANCELLED)).isTrue();
+            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.CANCELLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING cannot transition to REFUNDED")
         void pendingCannotTransitionToRefunded() {
-            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.REFUNDED)).isFalse();
+            assertThat(PaymentStatus.PENDING.canTransitionTo(PaymentStatus.REFUNDED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("AUTHORIZED can transition to CAPTURED")
         void authorizedCanTransitionToCaptured() {
-            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.CAPTURED)).isTrue();
+            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.CAPTURED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED can transition to CANCELLED")
         void authorizedCanTransitionToCancelled() {
-            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.CANCELLED)).isTrue();
+            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.CANCELLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED can transition to FAILED")
         void authorizedCanTransitionToFailed() {
-            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.FAILED)).isTrue();
+            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED cannot transition to PENDING")
         void authorizedCannotTransitionToPending() {
-            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.PENDING)).isFalse();
+            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.PENDING))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("AUTHORIZED cannot transition to REFUNDED")
         void authorizedCannotTransitionToRefunded() {
-            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.REFUNDED)).isFalse();
+            assertThat(PaymentStatus.AUTHORIZED.canTransitionTo(PaymentStatus.REFUNDED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("CAPTURED can transition to REFUNDED")
         void capturedCanTransitionToRefunded() {
-            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.REFUNDED)).isTrue();
+            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.REFUNDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("CAPTURED cannot transition to other statuses")
         void capturedCannotTransitionToOtherStatuses() {
-            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.PENDING)).isFalse();
-            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.AUTHORIZED)).isFalse();
-            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.FAILED)).isFalse();
-            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.CANCELLED)).isFalse();
+            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.PENDING))
+                    .isFalse();
+            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.AUTHORIZED))
+                    .isFalse();
+            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.FAILED))
+                    .isFalse();
+            assertThat(PaymentStatus.CAPTURED.canTransitionTo(PaymentStatus.CANCELLED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("FAILED cannot transition to any status")
         void failedCannotTransitionToAnyStatus() {
-            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.PENDING)).isFalse();
-            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.AUTHORIZED)).isFalse();
-            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.CAPTURED)).isFalse();
-            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.CANCELLED)).isFalse();
-            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.REFUNDED)).isFalse();
+            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.PENDING))
+                    .isFalse();
+            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.AUTHORIZED))
+                    .isFalse();
+            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.CAPTURED))
+                    .isFalse();
+            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.CANCELLED))
+                    .isFalse();
+            assertThat(PaymentStatus.FAILED.canTransitionTo(PaymentStatus.REFUNDED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("CANCELLED cannot transition to any status")
         void cancelledCannotTransitionToAnyStatus() {
-            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.PENDING)).isFalse();
-            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.AUTHORIZED)).isFalse();
-            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.CAPTURED)).isFalse();
-            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.FAILED)).isFalse();
-            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.REFUNDED)).isFalse();
+            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.PENDING))
+                    .isFalse();
+            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.AUTHORIZED))
+                    .isFalse();
+            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.CAPTURED))
+                    .isFalse();
+            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.FAILED))
+                    .isFalse();
+            assertThat(PaymentStatus.CANCELLED.canTransitionTo(PaymentStatus.REFUNDED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("REFUNDED cannot transition to any status")
         void refundedCannotTransitionToAnyStatus() {
-            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.PENDING)).isFalse();
-            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.AUTHORIZED)).isFalse();
-            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.CAPTURED)).isFalse();
-            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.FAILED)).isFalse();
-            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.CANCELLED)).isFalse();
+            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.PENDING))
+                    .isFalse();
+            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.AUTHORIZED))
+                    .isFalse();
+            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.CAPTURED))
+                    .isFalse();
+            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.FAILED))
+                    .isFalse();
+            assertThat(PaymentStatus.REFUNDED.canTransitionTo(PaymentStatus.CANCELLED))
+                    .isFalse();
         }
     }
 
@@ -239,22 +269,20 @@ class PaymentStatusTest {
         @DisplayName("Should throw exception for invalid status")
         void shouldThrowExceptionForInvalidStatus() {
             assertThatThrownBy(() -> PaymentStatus.fromString("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid payment status: INVALID");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Invalid payment status: INVALID");
         }
 
         @Test
         @DisplayName("Should throw exception for null status")
         void shouldThrowExceptionForNullStatus() {
-            assertThatThrownBy(() -> PaymentStatus.fromString(null))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> PaymentStatus.fromString(null)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("Should throw exception for empty status")
         void shouldThrowExceptionForEmptyStatus() {
-            assertThatThrownBy(() -> PaymentStatus.fromString(""))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> PaymentStatus.fromString("")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

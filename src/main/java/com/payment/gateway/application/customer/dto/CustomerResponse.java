@@ -1,10 +1,9 @@
 package com.payment.gateway.application.customer.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -30,16 +29,16 @@ public class CustomerResponse {
     private final String externalId;
 
     @Schema(
-        description = "Customer account status",
-        example = "ACTIVE",
-        allowableValues = {"ACTIVE", "SUSPENDED", "INACTIVE"}
-    )
+            description = "Customer account status",
+            example = "ACTIVE",
+            allowableValues = {"ACTIVE", "SUSPENDED", "INACTIVE"})
     private final String status;
 
     @Schema(description = "Account creation timestamp", example = "2026-03-20T10:00:00Z")
     private final Instant createdAt;
 
-    @Schema(description = "Id of the payment method just added (only set on add-payment-method responses)",
+    @Schema(
+            description = "Id of the payment method just added (only set on add-payment-method responses)",
             example = "pm_abc123")
     private final String paymentMethodId;
 }

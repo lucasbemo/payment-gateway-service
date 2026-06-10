@@ -10,15 +10,10 @@ public class StripeExceptionMapper {
     public ExternalPaymentProviderPort.PaymentProviderResult mapException(StripeException e, String paymentId) {
         String errorCode = mapErrorCode(e);
         String errorMessage = mapErrorMessage(e);
-        
+
         log.error("Stripe error: code={}, message={}", errorCode, errorMessage, e);
-        
-        return new ExternalPaymentProviderPort.PaymentProviderResult(
-            false,
-            paymentId,
-            errorCode,
-            errorMessage
-        );
+
+        return new ExternalPaymentProviderPort.PaymentProviderResult(false, paymentId, errorCode, errorMessage);
     }
 
     private String mapErrorCode(StripeException e) {

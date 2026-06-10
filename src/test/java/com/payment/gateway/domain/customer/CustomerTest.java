@@ -1,14 +1,12 @@
 package com.payment.gateway.domain.customer;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.domain.customer.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for Customer aggregate.
@@ -237,25 +235,29 @@ class CustomerTest {
         @Test
         @DisplayName("Should allow ACTIVE to INACTIVE transition")
         void shouldAllowActiveToInactive() {
-            assertTrue(com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE.canTransitionTo(com.payment.gateway.domain.customer.model.CustomerStatus.INACTIVE));
+            assertTrue(com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE.canTransitionTo(
+                    com.payment.gateway.domain.customer.model.CustomerStatus.INACTIVE));
         }
 
         @Test
         @DisplayName("Should allow ACTIVE to SUSPENDED transition")
         void shouldAllowActiveToSuspended() {
-            assertTrue(com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE.canTransitionTo(com.payment.gateway.domain.customer.model.CustomerStatus.SUSPENDED));
+            assertTrue(com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE.canTransitionTo(
+                    com.payment.gateway.domain.customer.model.CustomerStatus.SUSPENDED));
         }
 
         @Test
         @DisplayName("Should allow INACTIVE to ACTIVE transition")
         void shouldAllowInactiveToActive() {
-            assertTrue(com.payment.gateway.domain.customer.model.CustomerStatus.INACTIVE.canTransitionTo(com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE));
+            assertTrue(com.payment.gateway.domain.customer.model.CustomerStatus.INACTIVE.canTransitionTo(
+                    com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE));
         }
 
         @Test
         @DisplayName("Should not allow BLOCKED to ACTIVE transition")
         void shouldNotAllowBlockedToActive() {
-            assertFalse(com.payment.gateway.domain.customer.model.CustomerStatus.BLOCKED.canTransitionTo(com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE));
+            assertFalse(com.payment.gateway.domain.customer.model.CustomerStatus.BLOCKED.canTransitionTo(
+                    com.payment.gateway.domain.customer.model.CustomerStatus.ACTIVE));
         }
     }
 
@@ -285,13 +287,14 @@ class CustomerTest {
         @Test
         @DisplayName("Should detect expired card")
         void shouldDetectExpiredCard() {
-            com.payment.gateway.domain.customer.model.CardDetails expiredCard = com.payment.gateway.domain.customer.model.CardDetails.builder()
-                    .cardNumberLast4("1234")
-                    .cardNumberBin("411111")
-                    .cardBrand("VISA")
-                    .expiryMonth(1)
-                    .expiryYear(20) // Past year
-                    .build();
+            com.payment.gateway.domain.customer.model.CardDetails expiredCard =
+                    com.payment.gateway.domain.customer.model.CardDetails.builder()
+                            .cardNumberLast4("1234")
+                            .cardNumberBin("411111")
+                            .cardBrand("VISA")
+                            .expiryMonth(1)
+                            .expiryYear(20) // Past year
+                            .build();
 
             assertTrue(expiredCard.isExpired());
         }
@@ -299,13 +302,14 @@ class CustomerTest {
         @Test
         @DisplayName("Should detect non-expired card")
         void shouldDetectNonExpiredCard() {
-            com.payment.gateway.domain.customer.model.CardDetails validCard = com.payment.gateway.domain.customer.model.CardDetails.builder()
-                    .cardNumberLast4("1234")
-                    .cardNumberBin("411111")
-                    .cardBrand("VISA")
-                    .expiryMonth(12)
-                    .expiryYear(2030) // Future year
-                    .build();
+            com.payment.gateway.domain.customer.model.CardDetails validCard =
+                    com.payment.gateway.domain.customer.model.CardDetails.builder()
+                            .cardNumberLast4("1234")
+                            .cardNumberBin("411111")
+                            .cardBrand("VISA")
+                            .expiryMonth(12)
+                            .expiryYear(2030) // Future year
+                            .build();
 
             assertFalse(validCard.isExpired());
         }
@@ -324,25 +328,28 @@ class CustomerTest {
         @Test
         @DisplayName("Should reject invalid card number last 4")
         void shouldRejectInvalidCardNumberLast4() {
-            assertThrows(IllegalArgumentException.class, () ->
-                com.payment.gateway.domain.customer.model.CardDetails.create("123", "411111", "VISA", 12, 2025, "John Doe")
-            );
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> com.payment.gateway.domain.customer.model.CardDetails.create(
+                            "123", "411111", "VISA", 12, 2025, "John Doe"));
         }
 
         @Test
         @DisplayName("Should reject non-digit card number last 4")
         void shouldRejectNonDigitCardNumberLast4() {
-            assertThrows(IllegalArgumentException.class, () ->
-                com.payment.gateway.domain.customer.model.CardDetails.create("123a", "411111", "VISA", 12, 2025, "John Doe")
-            );
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> com.payment.gateway.domain.customer.model.CardDetails.create(
+                            "123a", "411111", "VISA", 12, 2025, "John Doe"));
         }
 
         @Test
         @DisplayName("Should reject invalid expiry month")
         void shouldRejectInvalidExpiryMonth() {
-            assertThrows(IllegalArgumentException.class, () ->
-                com.payment.gateway.domain.customer.model.CardDetails.create("1234", "411111", "VISA", 13, 2025, "John Doe")
-            );
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> com.payment.gateway.domain.customer.model.CardDetails.create(
+                            "1234", "411111", "VISA", 13, 2025, "John Doe"));
         }
     }
 
@@ -357,7 +364,8 @@ class CustomerTest {
             PaymentMethod pm = PaymentMethod.createCard("cust_123", cardDetails, "token_abc");
 
             assertEquals(com.payment.gateway.domain.customer.model.PaymentMethodType.CREDIT_CARD, pm.getType());
-            assertEquals(com.payment.gateway.domain.customer.model.PaymentMethodStatus.PENDING_VERIFICATION, pm.getStatus());
+            assertEquals(
+                    com.payment.gateway.domain.customer.model.PaymentMethodStatus.PENDING_VERIFICATION, pm.getStatus());
             assertEquals(cardDetails, pm.getCardDetails());
         }
 
@@ -400,7 +408,8 @@ class CustomerTest {
 
             pm.failVerification();
 
-            assertEquals(com.payment.gateway.domain.customer.model.PaymentMethodStatus.FAILED_VERIFICATION, pm.getStatus());
+            assertEquals(
+                    com.payment.gateway.domain.customer.model.PaymentMethodStatus.FAILED_VERIFICATION, pm.getStatus());
         }
 
         @Test

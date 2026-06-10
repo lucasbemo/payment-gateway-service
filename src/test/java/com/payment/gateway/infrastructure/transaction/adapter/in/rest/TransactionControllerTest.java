@@ -1,10 +1,15 @@
 package com.payment.gateway.infrastructure.transaction.adapter.in.rest;
 
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.payment.gateway.application.transaction.dto.TransactionResponse;
 import com.payment.gateway.application.transaction.port.in.CaptureTransactionUseCase;
 import com.payment.gateway.application.transaction.port.in.GetTransactionUseCase;
 import com.payment.gateway.application.transaction.port.in.VoidTransactionUseCase;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +18,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.Instant;
-
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("TransactionController Tests")
 @WebMvcTest(TransactionController.class)

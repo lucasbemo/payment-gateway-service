@@ -1,15 +1,24 @@
 package com.payment.gateway.application.reconciliation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.reconciliation.dto.SettlementReportDTO;
 import com.payment.gateway.application.reconciliation.port.out.ReportGeneratorPort;
 import com.payment.gateway.application.reconciliation.port.out.SettlementReportPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.domain.reconciliation.model.SettlementReport;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
+import java.time.Instant;
+import java.util.Currency;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,18 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Currency;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Generate Settlement Report Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -47,8 +44,8 @@ class GenerateSettlementReportServiceTest {
 
     @BeforeEach
     void setUp() {
-        generateSettlementReportService = new GenerateSettlementReportService(
-                reportGeneratorPort, settlementReportPort, transactionQueryPort);
+        generateSettlementReportService =
+                new GenerateSettlementReportService(reportGeneratorPort, settlementReportPort, transactionQueryPort);
     }
 
     @Nested
@@ -66,15 +63,14 @@ class GenerateSettlementReportServiceTest {
             String filePath = "/reports/settlement-123.pdf";
 
             given(transactionQueryPort.findByMerchantIdAndCreatedAtBetween(eq(merchantId), any(), any()))
-                    .willReturn(List.of(
-                            createTransaction(merchantId, 1000L),
-                            createTransaction(merchantId, 2500L)));
-            given(reportGeneratorPort.generateReport(merchantId, startDate, endDate, format)).willReturn(filePath);
+                    .willReturn(List.of(createTransaction(merchantId, 1000L), createTransaction(merchantId, 2500L)));
+            given(reportGeneratorPort.generateReport(merchantId, startDate, endDate, format))
+                    .willReturn(filePath);
             given(settlementReportPort.saveReport(any())).willAnswer(invocation -> invocation.getArgument(0));
 
             // When
-            SettlementReportDTO response = generateSettlementReportService.generateSettlementReport(
-                    merchantId, startDate, endDate, format);
+            SettlementReportDTO response =
+                    generateSettlementReportService.generateSettlementReport(merchantId, startDate, endDate, format);
 
             // Then
             assertThat(response).isNotNull();
@@ -116,7 +112,7 @@ class GenerateSettlementReportServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> generateSettlementReportService.generateSettlementReport(
-                    merchantId, startDate, endDate, "PDF"))
+                            merchantId, startDate, endDate, "PDF"))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Start date must be before end date");
         }
@@ -131,7 +127,7 @@ class GenerateSettlementReportServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> generateSettlementReportService.generateSettlementReport(
-                    merchantId, startDate, endDate, "PDF"))
+                            merchantId, startDate, endDate, "PDF"))
                     .isInstanceOf(Exception.class);
         }
     }

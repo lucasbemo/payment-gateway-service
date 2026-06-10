@@ -1,7 +1,6 @@
 package com.payment.gateway.application.customer.port.out;
 
 import com.payment.gateway.domain.customer.model.Customer;
-
 import java.util.Optional;
 
 /**

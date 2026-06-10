@@ -1,12 +1,9 @@
 package com.payment.gateway.domain.merchant.model;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * Value Object representing merchant configuration.

@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.refund.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("RefundStatus Enum Tests")
 class RefundStatusTest {
@@ -16,37 +16,43 @@ class RefundStatusTest {
         @Test
         @DisplayName("PENDING can transition to PROCESSING")
         void pendingCanTransitionToProcessing() {
-            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.PROCESSING)).isTrue();
+            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.PROCESSING))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to APPROVED")
         void pendingCanTransitionToApproved() {
-            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.APPROVED)).isTrue();
+            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.APPROVED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to REJECTED")
         void pendingCanTransitionToRejected() {
-            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.REJECTED)).isTrue();
+            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.REJECTED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to FAILED")
         void pendingCanTransitionToFailed() {
-            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.FAILED)).isTrue();
+            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to CANCELLED")
         void pendingCanTransitionToCancelled() {
-            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.CANCELLED)).isTrue();
+            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.CANCELLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING cannot transition to COMPLETED")
         void pendingCannotTransitionToCompleted() {
-            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.COMPLETED)).isFalse();
+            assertThat(RefundStatus.PENDING.canTransitionTo(RefundStatus.COMPLETED))
+                    .isFalse();
         }
     }
 
@@ -57,37 +63,43 @@ class RefundStatusTest {
         @Test
         @DisplayName("PROCESSING can transition to APPROVED")
         void processingCanTransitionToApproved() {
-            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.APPROVED)).isTrue();
+            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.APPROVED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING can transition to COMPLETED")
         void processingCanTransitionToCompleted() {
-            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.COMPLETED)).isTrue();
+            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.COMPLETED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING can transition to FAILED")
         void processingCanTransitionToFailed() {
-            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.FAILED)).isTrue();
+            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING cannot transition to PENDING")
         void processingCannotTransitionToPending() {
-            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.PENDING)).isFalse();
+            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.PENDING))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("PROCESSING cannot transition to REJECTED")
         void processingCannotTransitionToRejected() {
-            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.REJECTED)).isFalse();
+            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.REJECTED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("PROCESSING cannot transition to CANCELLED")
         void processingCannotTransitionToCancelled() {
-            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.CANCELLED)).isFalse();
+            assertThat(RefundStatus.PROCESSING.canTransitionTo(RefundStatus.CANCELLED))
+                    .isFalse();
         }
     }
 
@@ -98,37 +110,43 @@ class RefundStatusTest {
         @Test
         @DisplayName("APPROVED can transition to COMPLETED")
         void approvedCanTransitionToCompleted() {
-            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.COMPLETED)).isTrue();
+            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.COMPLETED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("APPROVED can transition to FAILED")
         void approvedCanTransitionToFailed() {
-            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.FAILED)).isTrue();
+            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("APPROVED can transition to CANCELLED")
         void approvedCanTransitionToCancelled() {
-            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.CANCELLED)).isTrue();
+            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.CANCELLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("APPROVED cannot transition to PENDING")
         void approvedCannotTransitionToPending() {
-            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.PENDING)).isFalse();
+            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.PENDING))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("APPROVED cannot transition to PROCESSING")
         void approvedCannotTransitionToProcessing() {
-            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.PROCESSING)).isFalse();
+            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.PROCESSING))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("APPROVED cannot transition to REJECTED")
         void approvedCannotTransitionToRejected() {
-            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.REJECTED)).isFalse();
+            assertThat(RefundStatus.APPROVED.canTransitionTo(RefundStatus.REJECTED))
+                    .isFalse();
         }
     }
 
@@ -139,12 +157,18 @@ class RefundStatusTest {
         @Test
         @DisplayName("REJECTED cannot transition to any status (terminal)")
         void rejectedCannotTransitionToAnyStatus() {
-            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.PENDING)).isFalse();
-            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.PROCESSING)).isFalse();
-            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.APPROVED)).isFalse();
-            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.COMPLETED)).isFalse();
-            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.FAILED)).isFalse();
-            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.CANCELLED)).isFalse();
+            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.PENDING))
+                    .isFalse();
+            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.PROCESSING))
+                    .isFalse();
+            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.APPROVED))
+                    .isFalse();
+            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.COMPLETED))
+                    .isFalse();
+            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.FAILED))
+                    .isFalse();
+            assertThat(RefundStatus.REJECTED.canTransitionTo(RefundStatus.CANCELLED))
+                    .isFalse();
         }
     }
 
@@ -155,12 +179,18 @@ class RefundStatusTest {
         @Test
         @DisplayName("COMPLETED cannot transition to any status (terminal)")
         void completedCannotTransitionToAnyStatus() {
-            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.PENDING)).isFalse();
-            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.PROCESSING)).isFalse();
-            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.APPROVED)).isFalse();
-            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.REJECTED)).isFalse();
-            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.FAILED)).isFalse();
-            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.CANCELLED)).isFalse();
+            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.PENDING))
+                    .isFalse();
+            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.PROCESSING))
+                    .isFalse();
+            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.APPROVED))
+                    .isFalse();
+            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.REJECTED))
+                    .isFalse();
+            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.FAILED))
+                    .isFalse();
+            assertThat(RefundStatus.COMPLETED.canTransitionTo(RefundStatus.CANCELLED))
+                    .isFalse();
         }
     }
 
@@ -171,17 +201,23 @@ class RefundStatusTest {
         @Test
         @DisplayName("FAILED can transition to PENDING (can retry)")
         void failedCanTransitionToPending() {
-            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.PENDING)).isTrue();
+            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.PENDING))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("FAILED cannot transition to other statuses")
         void failedCannotTransitionToOtherStatuses() {
-            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.PROCESSING)).isFalse();
-            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.APPROVED)).isFalse();
-            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.COMPLETED)).isFalse();
-            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.REJECTED)).isFalse();
-            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.CANCELLED)).isFalse();
+            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.PROCESSING))
+                    .isFalse();
+            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.APPROVED))
+                    .isFalse();
+            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.COMPLETED))
+                    .isFalse();
+            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.REJECTED))
+                    .isFalse();
+            assertThat(RefundStatus.FAILED.canTransitionTo(RefundStatus.CANCELLED))
+                    .isFalse();
         }
     }
 
@@ -192,12 +228,18 @@ class RefundStatusTest {
         @Test
         @DisplayName("CANCELLED cannot transition to any status (terminal)")
         void cancelledCannotTransitionToAnyStatus() {
-            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.PENDING)).isFalse();
-            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.PROCESSING)).isFalse();
-            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.APPROVED)).isFalse();
-            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.COMPLETED)).isFalse();
-            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.REJECTED)).isFalse();
-            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.FAILED)).isFalse();
+            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.PENDING))
+                    .isFalse();
+            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.PROCESSING))
+                    .isFalse();
+            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.APPROVED))
+                    .isFalse();
+            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.COMPLETED))
+                    .isFalse();
+            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.REJECTED))
+                    .isFalse();
+            assertThat(RefundStatus.CANCELLED.canTransitionTo(RefundStatus.FAILED))
+                    .isFalse();
         }
     }
 

@@ -3,13 +3,12 @@ package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistenc
 import com.payment.gateway.application.reconciliation.port.out.SettlementReportPort;
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
 import com.payment.gateway.domain.reconciliation.port.SettlementReportRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -32,7 +31,9 @@ public class SettlementReportPersistenceAdapter implements SettlementReportPort,
 
     @Override
     public Optional<SettlementReport> findByGatewayReportId(String gatewayReportId) {
-        return settlementReportJpaRepository.findByGatewayReportId(gatewayReportId).map(settlementReportMapper::toDomain);
+        return settlementReportJpaRepository
+                .findByGatewayReportId(gatewayReportId)
+                .map(settlementReportMapper::toDomain);
     }
 
     @Override

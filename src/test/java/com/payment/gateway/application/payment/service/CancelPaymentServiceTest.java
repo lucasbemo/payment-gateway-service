@@ -1,5 +1,11 @@
 package com.payment.gateway.application.payment.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
@@ -8,6 +14,11 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,18 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Cancel Payment Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +44,8 @@ class CancelPaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        cancelPaymentService = new CancelPaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService);
+        cancelPaymentService =
+                new CancelPaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService);
     }
 
     @Nested
@@ -61,9 +61,9 @@ class CancelPaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId, PaymentStatus.PENDING);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
-            given(externalPaymentProviderPort.cancel(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "cancel_txn", null, null))
-            );
+            given(externalPaymentProviderPort.cancel(any()))
+                    .willReturn(CompletableFuture.completedFuture(
+                            new ExternalPaymentProviderPort.PaymentProviderResult(true, "cancel_txn", null, null)));
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
 
             // When
@@ -88,9 +88,9 @@ class CancelPaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId, PaymentStatus.PENDING);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
-            given(externalPaymentProviderPort.cancel(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "ERR_CANCEL", "Provider cancel failed"))
-            );
+            given(externalPaymentProviderPort.cancel(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            false, null, "ERR_CANCEL", "Provider cancel failed")));
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
 
             // When
@@ -198,8 +198,7 @@ class CancelPaymentServiceTest {
                 "Test payment",
                 PaymentMetadata.empty(),
                 List.of(),
-                null
-        );
+                null);
         setId(payment, id);
         setStatus(payment, status);
         return payment;

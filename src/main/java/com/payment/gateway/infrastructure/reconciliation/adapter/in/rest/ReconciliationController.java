@@ -23,8 +23,7 @@ public class ReconciliationController implements ReconciliationApi {
     @Override
     @PostMapping("/reconcile")
     public ResponseEntity<ApiResponse<ReconciliationResponse>> reconcileTransactions(
-            @RequestParam String merchantId,
-            @RequestParam String date) {
+            @RequestParam String merchantId, @RequestParam String date) {
         log.info("Reconciling transactions for merchant: {} date: {}", merchantId, date);
         var response = reconcileTransactionsUseCase.reconcileTransactions(merchantId, date);
         return ResponseEntity.ok(ApiResponse.success("Reconciliation completed", response));

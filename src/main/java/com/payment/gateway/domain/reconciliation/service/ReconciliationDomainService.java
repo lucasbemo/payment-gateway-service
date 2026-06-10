@@ -4,14 +4,13 @@ import com.payment.gateway.domain.reconciliation.model.*;
 import com.payment.gateway.domain.reconciliation.port.DiscrepancyRepositoryPort;
 import com.payment.gateway.domain.reconciliation.port.ReconciliationBatchRepositoryPort;
 import com.payment.gateway.domain.reconciliation.port.SettlementReportRepositoryPort;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 /**
  * Reconciliation domain service.
@@ -27,12 +26,16 @@ public class ReconciliationDomainService {
     private final DiscrepancyRepositoryPort discrepancyRepository;
     private final SettlementReportRepositoryPort settlementReportRepository;
 
-    public ReconciliationBatch createReconciliationBatch(String merchantId, LocalDate reconciliationDate,
-                                                          String gatewayName, String initiatedBy) {
-        log.info("Creating reconciliation batch for merchant {} on date {} with gateway {}",
-                merchantId, reconciliationDate, gatewayName);
+    public ReconciliationBatch createReconciliationBatch(
+            String merchantId, LocalDate reconciliationDate, String gatewayName, String initiatedBy) {
+        log.info(
+                "Creating reconciliation batch for merchant {} on date {} with gateway {}",
+                merchantId,
+                reconciliationDate,
+                gatewayName);
 
-        ReconciliationBatch batch = ReconciliationBatch.create(merchantId, reconciliationDate, gatewayName, initiatedBy);
+        ReconciliationBatch batch =
+                ReconciliationBatch.create(merchantId, reconciliationDate, gatewayName, initiatedBy);
         return batchRepository.save(batch);
     }
 
@@ -45,18 +48,33 @@ public class ReconciliationDomainService {
     }
 
     public ReconciliationBatch updateReconciliationProgress(String batchId, int total, int matched, int unmatched) {
-        log.info("Updating reconciliation progress for batch {}: total={}, matched={}, unmatched={}",
-                batchId, total, matched, unmatched);
+        log.info(
+                "Updating reconciliation progress for batch {}: total={}, matched={}, unmatched={}",
+                batchId,
+                total,
+                matched,
+                unmatched);
 
         ReconciliationBatch batch = getBatchOrThrow(batchId);
         batch.updateCounts(total, matched, unmatched);
         return batchRepository.save(batch);
     }
 
-    public ReconciliationBatch recordReconciliationResults(String batchId, int total, int matched, int discrepancies,
-                                                            BigDecimal totalAmount, BigDecimal matchedAmount) {
-        log.info("Recording reconciliation results for batch {}: total={}, matched={}, discrepancies={}, totalAmount={}, matchedAmount={}",
-                batchId, total, matched, discrepancies, totalAmount, matchedAmount);
+    public ReconciliationBatch recordReconciliationResults(
+            String batchId,
+            int total,
+            int matched,
+            int discrepancies,
+            BigDecimal totalAmount,
+            BigDecimal matchedAmount) {
+        log.info(
+                "Recording reconciliation results for batch {}: total={}, matched={}, discrepancies={}, totalAmount={}, matchedAmount={}",
+                batchId,
+                total,
+                matched,
+                discrepancies,
+                totalAmount,
+                matchedAmount);
 
         ReconciliationBatch batch = getBatchOrThrow(batchId);
         batch.updateCounts(total, matched, total - matched);
@@ -65,8 +83,8 @@ public class ReconciliationDomainService {
         return batchRepository.save(batch);
     }
 
-    public Discrepancy createDiscrepancy(String batchId, String merchantId, DiscrepancyType type,
-                                          String transactionId, String description) {
+    public Discrepancy createDiscrepancy(
+            String batchId, String merchantId, DiscrepancyType type, String transactionId, String description) {
         log.info("Creating discrepancy for batch {} transaction {}: {}", batchId, transactionId, type);
 
         Discrepancy discrepancy = Discrepancy.create(batchId, merchantId, type, transactionId, description);
@@ -103,14 +121,23 @@ public class ReconciliationDomainService {
         return batchRepository.save(batch);
     }
 
-    public SettlementReport createSettlementReport(String merchantId, String gatewayName, LocalDate settlementDate,
-                                                    String gatewayReportId, com.payment.gateway.commons.model.Money grossAmount,
-                                                    com.payment.gateway.commons.model.Money feeAmount,
-                                                    com.payment.gateway.commons.model.Money netAmount, String currency) {
-        log.info("Creating settlement report for merchant {} gateway {} date {}", merchantId, gatewayName, settlementDate);
+    public SettlementReport createSettlementReport(
+            String merchantId,
+            String gatewayName,
+            LocalDate settlementDate,
+            String gatewayReportId,
+            com.payment.gateway.commons.model.Money grossAmount,
+            com.payment.gateway.commons.model.Money feeAmount,
+            com.payment.gateway.commons.model.Money netAmount,
+            String currency) {
+        log.info(
+                "Creating settlement report for merchant {} gateway {} date {}",
+                merchantId,
+                gatewayName,
+                settlementDate);
 
-        SettlementReport report = SettlementReport.create(merchantId, gatewayName, settlementDate, gatewayReportId,
-                                                           grossAmount, feeAmount, netAmount, currency);
+        SettlementReport report = SettlementReport.create(
+                merchantId, gatewayName, settlementDate, gatewayReportId, grossAmount, feeAmount, netAmount, currency);
         return settlementReportRepository.save(report);
     }
 
@@ -123,17 +150,20 @@ public class ReconciliationDomainService {
     }
 
     public ReconciliationBatch getBatchOrThrow(String batchId) {
-        return batchRepository.findById(batchId)
+        return batchRepository
+                .findById(batchId)
                 .orElseThrow(() -> new IllegalArgumentException("Reconciliation batch not found: " + batchId));
     }
 
     public Discrepancy getDiscrepancyOrThrow(String discrepancyId) {
-        return discrepancyRepository.findById(discrepancyId)
+        return discrepancyRepository
+                .findById(discrepancyId)
                 .orElseThrow(() -> new IllegalArgumentException("Discrepancy not found: " + discrepancyId));
     }
 
     public SettlementReport getSettlementReportOrThrow(String reportId) {
-        return settlementReportRepository.findById(reportId)
+        return settlementReportRepository
+                .findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Settlement report not found: " + reportId));
     }
 

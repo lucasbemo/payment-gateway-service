@@ -40,22 +40,26 @@ public class Resilience4jMetricsBinder implements MeterBinder {
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.failure.rate", circuitBreaker, cb -> cb.getMetrics().getFailureRate())
+            Gauge.builder("resilience4j.circuitbreaker.failure.rate", circuitBreaker, cb -> cb.getMetrics()
+                            .getFailureRate())
                     .description("Failure rate percentage")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.slow.call.rate", circuitBreaker, cb -> cb.getMetrics().getSlowCallRate())
+            Gauge.builder("resilience4j.circuitbreaker.slow.call.rate", circuitBreaker, cb -> cb.getMetrics()
+                            .getSlowCallRate())
                     .description("Slow call rate percentage")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.buffered.calls", circuitBreaker, cb -> cb.getMetrics().getNumberOfBufferedCalls())
+            Gauge.builder("resilience4j.circuitbreaker.buffered.calls", circuitBreaker, cb -> cb.getMetrics()
+                            .getNumberOfBufferedCalls())
                     .description("Number of buffered calls")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.failed.calls", circuitBreaker, cb -> cb.getMetrics().getNumberOfFailedCalls())
+            Gauge.builder("resilience4j.circuitbreaker.failed.calls", circuitBreaker, cb -> cb.getMetrics()
+                            .getNumberOfFailedCalls())
                     .description("Number of failed calls")
                     .tag("name", name)
                     .register(registry);
@@ -68,9 +72,9 @@ public class Resilience4jMetricsBinder implements MeterBinder {
 
             // Retry doesn't expose metrics in the same way, use retry count events
             Gauge.builder("resilience4j.retry.requests", retry, r -> {
-                // Return a placeholder value since Retry.Metrics has limited API
-                return 0.0;
-            })
+                        // Return a placeholder value since Retry.Metrics has limited API
+                        return 0.0;
+                    })
                     .description("Retry requests")
                     .tag("name", name)
                     .register(registry);
@@ -81,12 +85,14 @@ public class Resilience4jMetricsBinder implements MeterBinder {
         for (RateLimiter rateLimiter : rateLimiterRegistry.getAllRateLimiters()) {
             String name = rateLimiter.getName();
 
-            Gauge.builder("resilience4j.ratelimiter.available.permissions", rateLimiter, rl -> (double) rl.getMetrics().getAvailablePermissions())
+            Gauge.builder("resilience4j.ratelimiter.available.permissions", rateLimiter, rl ->
+                            (double) rl.getMetrics().getAvailablePermissions())
                     .description("Number of available permissions")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.ratelimiter.waiting.threads", rateLimiter, rl -> (double) rl.getMetrics().getNumberOfWaitingThreads())
+            Gauge.builder("resilience4j.ratelimiter.waiting.threads", rateLimiter, rl ->
+                            (double) rl.getMetrics().getNumberOfWaitingThreads())
                     .description("Number of waiting threads")
                     .tag("name", name)
                     .register(registry);
@@ -95,12 +101,18 @@ public class Resilience4jMetricsBinder implements MeterBinder {
 
     private double getStateMetric(CircuitBreaker cb) {
         switch (cb.getState()) {
-            case CLOSED: return 0;
-            case OPEN: return 1;
-            case HALF_OPEN: return 2;
-            case DISABLED: return 3;
-            case FORCED_OPEN: return 4;
-            default: return -1;
+            case CLOSED:
+                return 0;
+            case OPEN:
+                return 1;
+            case HALF_OPEN:
+                return 2;
+            case DISABLED:
+                return 3;
+            case FORCED_OPEN:
+                return 4;
+            default:
+                return -1;
         }
     }
 }

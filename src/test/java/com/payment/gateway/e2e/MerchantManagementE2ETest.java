@@ -1,14 +1,13 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for merchant management.
@@ -30,11 +29,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
         var merchantData = TestDataFactory.MerchantData.create();
 
         // When: Registering the merchant
-        var response = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var response = getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
         // Then: Merchant is created successfully
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -60,13 +55,11 @@ class MerchantManagementE2ETest extends E2ETestBase {
     void testGetMerchantById() {
         // Given: A registered merchant
         var merchantData = TestDataFactory.MerchantData.create();
-        var registerResponse = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var registerResponse =
+                getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
-        Map<String, Object> merchant = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> merchant =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String merchantId = (String) merchant.get("id");
 
         // When: Getting the merchant by ID
@@ -75,7 +68,8 @@ class MerchantManagementE2ETest extends E2ETestBase {
         // Then: Merchant is retrieved successfully
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Map<String, Object> retrievedMerchant = (Map<String, Object>) getResponse.getBody().get("data");
+        Map<String, Object> retrievedMerchant =
+                (Map<String, Object>) getResponse.getBody().get("data");
         assertThat(retrievedMerchant.get("id")).isEqualTo(merchantId);
         assertThat(retrievedMerchant.get("name")).isEqualTo(merchantData.name);
         assertThat(retrievedMerchant.get("email")).isEqualTo(merchantData.email);
@@ -86,38 +80,30 @@ class MerchantManagementE2ETest extends E2ETestBase {
     void testUpdateMerchant() {
         // Given: A registered merchant
         var merchantData = TestDataFactory.MerchantData.create();
-        var registerResponse = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var registerResponse =
+                getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
-        Map<String, Object> merchant = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> merchant =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String merchantId = (String) merchant.get("id");
 
         // When: Updating the merchant
         String newName = "Updated Merchant Name";
         String newEmail = "updated@example.com";
-        var updateResponse = getApiClient().updateMerchant(
-            merchantId,
-            newName,
-            newEmail,
-            "https://webhook.site/updated"
-        );
+        var updateResponse =
+                getApiClient().updateMerchant(merchantId, newName, newEmail, "https://webhook.site/updated");
 
         // Then: Merchant is updated
         assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Map<String, Object> updatedMerchant = (Map<String, Object>) updateResponse.getBody().get("data");
+        Map<String, Object> updatedMerchant =
+                (Map<String, Object>) updateResponse.getBody().get("data");
         assertThat(updatedMerchant.get("name")).isEqualTo(newName);
         assertThat(updatedMerchant.get("email")).isEqualTo(newEmail);
 
         // Verify in database
-        String dbEmail = jdbcTemplate.queryForObject(
-            "SELECT email FROM merchants WHERE id = ?",
-            String.class,
-            merchantId
-        );
+        String dbEmail =
+                jdbcTemplate.queryForObject("SELECT email FROM merchants WHERE id = ?", String.class, merchantId);
         assertThat(dbEmail).isEqualTo(newEmail);
     }
 
@@ -126,13 +112,11 @@ class MerchantManagementE2ETest extends E2ETestBase {
     void testSuspendMerchant() {
         // Given: An active merchant
         var merchantData = TestDataFactory.MerchantData.create();
-        var registerResponse = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var registerResponse =
+                getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
-        Map<String, Object> merchant = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> merchant =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String merchantId = (String) merchant.get("id");
 
         // When: Suspending the merchant
@@ -141,15 +125,13 @@ class MerchantManagementE2ETest extends E2ETestBase {
         // Then: Merchant is suspended
         assertThat(suspendResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Map<String, Object> suspendedMerchant = (Map<String, Object>) suspendResponse.getBody().get("data");
+        Map<String, Object> suspendedMerchant =
+                (Map<String, Object>) suspendResponse.getBody().get("data");
         assertThat(suspendedMerchant.get("status")).isEqualTo("SUSPENDED");
 
         // Verify in database
-        String dbStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM merchants WHERE id = ?",
-            String.class,
-            merchantId
-        );
+        String dbStatus =
+                jdbcTemplate.queryForObject("SELECT status FROM merchants WHERE id = ?", String.class, merchantId);
         assertThat(dbStatus).isEqualTo("SUSPENDED");
     }
 
@@ -158,13 +140,11 @@ class MerchantManagementE2ETest extends E2ETestBase {
     void testActivateMerchant() {
         // Given: A registered merchant (status PENDING)
         var merchantData = TestDataFactory.MerchantData.create();
-        var registerResponse = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var registerResponse =
+                getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
-        Map<String, Object> merchant = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> merchant =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String merchantId = (String) merchant.get("id");
         assertThat(merchant.get("status")).isEqualTo("PENDING");
 
@@ -174,15 +154,13 @@ class MerchantManagementE2ETest extends E2ETestBase {
         // Then: Merchant is activated
         assertThat(activateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Map<String, Object> activatedMerchant = (Map<String, Object>) activateResponse.getBody().get("data");
+        Map<String, Object> activatedMerchant =
+                (Map<String, Object>) activateResponse.getBody().get("data");
         assertThat(activatedMerchant.get("status")).isEqualTo("ACTIVE");
 
         // Verify in database
-        String dbStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM merchants WHERE id = ?",
-            String.class,
-            merchantId
-        );
+        String dbStatus =
+                jdbcTemplate.queryForObject("SELECT status FROM merchants WHERE id = ?", String.class, merchantId);
         assertThat(dbStatus).isEqualTo("ACTIVE");
     }
 
@@ -193,11 +171,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
         var merchantData = TestDataFactory.MerchantData.create();
 
         // When: Registering the merchant
-        var response = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var response = getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
         // Then: API key is generated
         Map<String, Object> merchant = (Map<String, Object>) response.getBody().get("data");
@@ -209,10 +183,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
         // Verify API key hash exists in database
         String apiKeyHash = jdbcTemplate.queryForObject(
-            "SELECT api_key_hash FROM merchants WHERE id = ?",
-            String.class,
-            (String) merchant.get("id")
-        );
+                "SELECT api_key_hash FROM merchants WHERE id = ?", String.class, (String) merchant.get("id"));
         assertThat(apiKeyHash).isNotNull();
     }
 
@@ -223,21 +194,14 @@ class MerchantManagementE2ETest extends E2ETestBase {
         var merchantData = TestDataFactory.MerchantData.create();
 
         // When: Registering the merchant
-        var response = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var response = getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
         // Then: Webhook secret is generated
         Map<String, Object> merchant = (Map<String, Object>) response.getBody().get("data");
         String merchantId = (String) merchant.get("id");
 
         String webhookSecret = jdbcTemplate.queryForObject(
-            "SELECT webhook_secret FROM merchants WHERE id = ?",
-            String.class,
-            merchantId
-        );
+                "SELECT webhook_secret FROM merchants WHERE id = ?", String.class, merchantId);
 
         assertThat(webhookSecret).isNotNull();
         assertThat(webhookSecret).startsWith("whsec_");
@@ -248,13 +212,11 @@ class MerchantManagementE2ETest extends E2ETestBase {
     void testMerchantStatusTransitions() {
         // Given: A new merchant
         var merchantData = TestDataFactory.MerchantData.create();
-        var registerResponse = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var registerResponse =
+                getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
-        Map<String, Object> merchant = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> merchant =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String merchantId = (String) merchant.get("id");
 
         // Initial status is PENDING
@@ -274,21 +236,14 @@ class MerchantManagementE2ETest extends E2ETestBase {
         var merchantData = TestDataFactory.MerchantData.create();
 
         // When: Registering the merchant
-        var response = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var response = getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
         // Then: Created timestamp is set
         Map<String, Object> merchant = (Map<String, Object>) response.getBody().get("data");
         String merchantId = (String) merchant.get("id");
 
-        String createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM merchants WHERE id = ?",
-            String.class,
-            merchantId
-        );
+        String createdAt =
+                jdbcTemplate.queryForObject("SELECT created_at FROM merchants WHERE id = ?", String.class, merchantId);
 
         assertThat(createdAt).isNotNull();
     }
@@ -300,11 +255,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
         var merchantData = TestDataFactory.MerchantData.create();
 
         // When: Registering the merchant
-        var response = getApiClient().registerMerchant(
-            merchantData.name,
-            merchantData.email,
-            merchantData.webhookUrl
-        );
+        var response = getApiClient().registerMerchant(merchantData.name, merchantData.email, merchantData.webhookUrl);
 
         // Then: Merchant configuration exists
         Map<String, Object> merchant = (Map<String, Object>) response.getBody().get("data");
@@ -312,9 +263,9 @@ class MerchantManagementE2ETest extends E2ETestBase {
 
         // Verify configuration table or column exists
         boolean configExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'merchants' AND column_name = 'configuration'",
-            Integer.class
-        ) > 0;
+                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'merchants' AND column_name = 'configuration'",
+                        Integer.class)
+                > 0;
 
         assertThat(configExists).isTrue();
     }
@@ -324,11 +275,7 @@ class MerchantManagementE2ETest extends E2ETestBase {
     void testCreateMerchant_MissingFields() {
         // Given: Invalid merchant data (missing name)
         // When: Registering with missing required fields
-        var response = getApiClient().registerMerchant(
-            null,
-            "test@example.com",
-            null
-        );
+        var response = getApiClient().registerMerchant(null, "test@example.com", null);
 
         // Then: Request is rejected
         assertThat(response.getStatusCode()).isIn(HttpStatus.BAD_REQUEST, HttpStatus.UNPROCESSABLE_ENTITY);

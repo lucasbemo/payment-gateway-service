@@ -5,13 +5,12 @@ import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import com.payment.gateway.domain.outbox.port.OutboxEventRepositoryPort;
+import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.List;
 
 /**
  * Outbox domain service.
@@ -42,7 +41,8 @@ public class OutboxEventDomainService {
     public OutboxEvent processEvent(String eventId) {
         log.info("Processing outbox event {}", eventId);
 
-        OutboxEvent event = repository.findById(eventId)
+        OutboxEvent event = repository
+                .findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
 
         if (!event.isPending()) {
@@ -56,7 +56,8 @@ public class OutboxEventDomainService {
     public OutboxEvent completeEvent(String eventId) {
         log.info("Completing outbox event {}", eventId);
 
-        OutboxEvent event = repository.findById(eventId)
+        OutboxEvent event = repository
+                .findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
 
         event.markAsPublished();
@@ -66,7 +67,8 @@ public class OutboxEventDomainService {
     public OutboxEvent failEvent(String eventId, String errorMessage) {
         log.error("Failing outbox event {}: {}", eventId, errorMessage);
 
-        OutboxEvent event = repository.findById(eventId)
+        OutboxEvent event = repository
+                .findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
 
         event.markAsFailed(errorMessage);
@@ -76,7 +78,8 @@ public class OutboxEventDomainService {
     public OutboxEvent retryEvent(String eventId) {
         log.info("Retrying outbox event {}", eventId);
 
-        OutboxEvent event = repository.findById(eventId)
+        OutboxEvent event = repository
+                .findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
 
         if (!event.canRetry()) {

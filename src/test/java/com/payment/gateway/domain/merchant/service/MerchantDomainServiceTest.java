@@ -1,11 +1,16 @@
 package com.payment.gateway.domain.merchant.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.payment.gateway.domain.merchant.exception.MerchantNotFoundException;
 import com.payment.gateway.domain.merchant.model.ApiCredentials;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
-import com.payment.gateway.domain.merchant.model.MerchantStatus;
 import com.payment.gateway.domain.merchant.port.MerchantRepositoryPort;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,13 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MerchantDomainService Tests")
@@ -52,27 +50,14 @@ class MerchantDomainServiceTest {
             // Given
             MerchantConfiguration config = MerchantConfiguration.empty();
             Merchant merchant = Merchant.register(
-                MERCHANT_NAME,
-                MERCHANT_EMAIL,
-                "test-api-key",
-                "hashed_key",
-                "hashed_secret",
-                WEBHOOK_URL,
-                config
-            );
+                    MERCHANT_NAME, MERCHANT_EMAIL, "test-api-key", "hashed_key", "hashed_secret", WEBHOOK_URL, config);
 
             given(merchantRepository.existsByEmail(MERCHANT_EMAIL)).willReturn(false);
             given(merchantRepository.save(any(Merchant.class))).willReturn(merchant);
 
             // When
             Merchant result = merchantDomainService.registerMerchant(
-                MERCHANT_NAME,
-                MERCHANT_EMAIL,
-                API_KEY,
-                API_SECRET,
-                WEBHOOK_URL,
-                config
-            );
+                    MERCHANT_NAME, MERCHANT_EMAIL, API_KEY, API_SECRET, WEBHOOK_URL, config);
 
             // Then
             assertThat(result).isNotNull();
@@ -89,15 +74,9 @@ class MerchantDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> merchantDomainService.registerMerchant(
-                MERCHANT_NAME,
-                MERCHANT_EMAIL,
-                API_KEY,
-                API_SECRET,
-                WEBHOOK_URL,
-                config
-            ))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("already exists");
+                            MERCHANT_NAME, MERCHANT_EMAIL, API_KEY, API_SECRET, WEBHOOK_URL, config))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("already exists");
 
             verify(merchantRepository).existsByEmail(MERCHANT_EMAIL);
             verify(merchantRepository, never()).save(any(Merchant.class));
@@ -131,8 +110,8 @@ class MerchantDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> merchantDomainService.getMerchant(MERCHANT_ID))
-                .isInstanceOf(MerchantNotFoundException.class)
-                .hasMessageContaining(MERCHANT_ID);
+                    .isInstanceOf(MerchantNotFoundException.class)
+                    .hasMessageContaining(MERCHANT_ID);
 
             verify(merchantRepository).findById(MERCHANT_ID);
         }
@@ -309,7 +288,7 @@ class MerchantDomainServiceTest {
 
             // When & Then
             assertThatCode(() -> merchantDomainService.validateMerchantCanProcess(MERCHANT_ID))
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -317,47 +296,44 @@ class MerchantDomainServiceTest {
         void shouldThrowWhenMerchantCannotProcess() {
             // Given
             Merchant merchant = Merchant.register(
+                    MERCHANT_NAME,
+                    MERCHANT_EMAIL,
+                    "test-api-key",
+                    "hashed_key",
+                    "hashed_secret",
+                    WEBHOOK_URL,
+                    MerchantConfiguration.empty());
+            merchant.suspend();
+            given(merchantRepository.findById(MERCHANT_ID)).willReturn(Optional.of(merchant));
+
+            // When & Then
+            assertThatThrownBy(() -> merchantDomainService.validateMerchantCanProcess(MERCHANT_ID))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("cannot process payments");
+        }
+    }
+
+    private Merchant createActiveMerchant() {
+        Merchant merchant = Merchant.register(
                 MERCHANT_NAME,
                 MERCHANT_EMAIL,
                 "test-api-key",
                 "hashed_key",
                 "hashed_secret",
                 WEBHOOK_URL,
-                MerchantConfiguration.empty()
-            );
-            merchant.suspend();
-            given(merchantRepository.findById(MERCHANT_ID)).willReturn(Optional.of(merchant));
-
-            // When & Then
-            assertThatThrownBy(() -> merchantDomainService.validateMerchantCanProcess(MERCHANT_ID))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("cannot process payments");
-        }
-    }
-
-    private Merchant createActiveMerchant() {
-        Merchant merchant = Merchant.register(
-            MERCHANT_NAME,
-            MERCHANT_EMAIL,
-            "test-api-key",
-            "hashed_key",
-            "hashed_secret",
-            WEBHOOK_URL,
-            MerchantConfiguration.empty()
-        );
+                MerchantConfiguration.empty());
         merchant.activate(); // Activate the merchant
         return merchant;
     }
 
     private Merchant createPendingMerchant() {
         return Merchant.register(
-            MERCHANT_NAME,
-            MERCHANT_EMAIL,
-            "test-api-key",
-            "hashed_key",
-            "hashed_secret",
-            WEBHOOK_URL,
-            MerchantConfiguration.empty()
-        );
+                MERCHANT_NAME,
+                MERCHANT_EMAIL,
+                "test-api-key",
+                "hashed_key",
+                "hashed_secret",
+                WEBHOOK_URL,
+                MerchantConfiguration.empty());
     }
 }

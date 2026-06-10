@@ -16,7 +16,6 @@ public class MetricsConfig {
         return registry -> registry.config()
                 .commonTags(
                         "application", "payment-gateway",
-                        "framework", "spring-boot"
-                );
+                        "framework", "spring-boot");
     }
 }

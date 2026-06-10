@@ -1,15 +1,13 @@
 package com.payment.gateway.e2e.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * REST client helper for E2E tests.
@@ -27,7 +25,7 @@ public class PaymentGatewayClient {
     }
 
     private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE_REF =
-        new ParameterizedTypeReference<Map<String, Object>>() {};
+            new ParameterizedTypeReference<Map<String, Object>>() {};
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
@@ -59,12 +57,12 @@ public class PaymentGatewayClient {
      * Update merchant.
      * PUT /api/v1/merchants/{id}
      */
-    public ResponseEntity<Map<String, Object>> updateMerchant(String merchantId, String name, String email, String webhookUrl) {
+    public ResponseEntity<Map<String, Object>> updateMerchant(
+            String merchantId, String name, String email, String webhookUrl) {
         Map<String, Object> body = Map.of(
-            "name", name,
-            "email", email,
-            "webhookUrl", webhookUrl != null ? webhookUrl : ""
-        );
+                "name", name,
+                "email", email,
+                "webhookUrl", webhookUrl != null ? webhookUrl : "");
         return put("/api/v1/merchants/" + merchantId, body);
     }
 
@@ -90,15 +88,14 @@ public class PaymentGatewayClient {
      * Register a new customer.
      * POST /api/v1/customers
      */
-    public ResponseEntity<Map<String, Object>> registerCustomer(String merchantId, String email, String name,
-                                                                String phone, String externalId) {
+    public ResponseEntity<Map<String, Object>> registerCustomer(
+            String merchantId, String email, String name, String phone, String externalId) {
         Map<String, Object> body = Map.of(
-            "merchantId", merchantId,
-            "email", email,
-            "name", name,
-            "phone", phone != null ? phone : "",
-            "externalId", externalId != null ? externalId : ""
-        );
+                "merchantId", merchantId,
+                "email", email,
+                "name", name,
+                "phone", phone != null ? phone : "",
+                "externalId", externalId != null ? externalId : "");
         return post("/api/v1/customers", body);
     }
 
@@ -116,19 +113,23 @@ public class PaymentGatewayClient {
      * Add payment method to customer.
      * POST /api/v1/customers/{id}/payment-methods
      */
-    public ResponseEntity<Map<String, Object>> addPaymentMethod(String customerId, String merchantId,
-                                                                String cardNumber, String expiryMonth,
-                                                                String expiryYear, String cvv,
-                                                                String cardholderName, Boolean isDefault) {
+    public ResponseEntity<Map<String, Object>> addPaymentMethod(
+            String customerId,
+            String merchantId,
+            String cardNumber,
+            String expiryMonth,
+            String expiryYear,
+            String cvv,
+            String cardholderName,
+            Boolean isDefault) {
         Map<String, Object> body = Map.of(
-            "merchantId", merchantId,
-            "cardNumber", cardNumber,
-            "cardExpiryMonth", expiryMonth,
-            "cardExpiryYear", expiryYear,
-            "cardCvv", cvv,
-            "cardholderName", cardholderName != null ? cardholderName : "",
-            "isDefault", isDefault != null ? isDefault : false
-        );
+                "merchantId", merchantId,
+                "cardNumber", cardNumber,
+                "cardExpiryMonth", expiryMonth,
+                "cardExpiryYear", expiryYear,
+                "cardCvv", cvv,
+                "cardholderName", cardholderName != null ? cardholderName : "",
+                "isDefault", isDefault != null ? isDefault : false);
         return post("/api/v1/customers/" + customerId + "/payment-methods", body);
     }
 
@@ -146,11 +147,16 @@ public class PaymentGatewayClient {
      * Process a payment.
      * POST /api/v1/payments
      */
-    public ResponseEntity<Map<String, Object>> processPayment(String merchantId, Long amountInCents, String currency,
-                                                              String idempotencyKey, String description,
-                                                              String customerId, List<Map<String, Object>> items) {
-        Map<String, Object> body = createPaymentBody(merchantId, amountInCents, currency,
-                                                      idempotencyKey, description, customerId, items);
+    public ResponseEntity<Map<String, Object>> processPayment(
+            String merchantId,
+            Long amountInCents,
+            String currency,
+            String idempotencyKey,
+            String description,
+            String customerId,
+            List<Map<String, Object>> items) {
+        Map<String, Object> body =
+                createPaymentBody(merchantId, amountInCents, currency, idempotencyKey, description, customerId, items);
         HttpHeaders headers = createAuthHeaders();
         headers.set("X-Idempotency-Key", idempotencyKey);
         return post("/api/v1/payments", body, headers);
@@ -159,8 +165,8 @@ public class PaymentGatewayClient {
     /**
      * Process a payment with default headers.
      */
-    public ResponseEntity<Map<String, Object>> processPayment(String merchantId, Long amountInCents, String currency,
-                                                              String idempotencyKey) {
+    public ResponseEntity<Map<String, Object>> processPayment(
+            String merchantId, Long amountInCents, String currency, String idempotencyKey) {
         return processPayment(merchantId, amountInCents, currency, idempotencyKey, "Test payment", null, null);
     }
 
@@ -210,16 +216,14 @@ public class PaymentGatewayClient {
      * Process a refund.
      * POST /api/v1/refunds
      */
-    public ResponseEntity<Map<String, Object>> processRefund(String paymentId, String merchantId,
-                                                             Long amountInCents, String idempotencyKey,
-                                                             String reason) {
+    public ResponseEntity<Map<String, Object>> processRefund(
+            String paymentId, String merchantId, Long amountInCents, String idempotencyKey, String reason) {
         Map<String, Object> body = Map.of(
-            "paymentId", paymentId,
-            "merchantId", merchantId,
-            "amount", amountInCents,
-            "idempotencyKey", idempotencyKey,
-            "reason", reason != null ? reason : ""
-        );
+                "paymentId", paymentId,
+                "merchantId", merchantId,
+                "amount", amountInCents,
+                "idempotencyKey", idempotencyKey,
+                "reason", reason != null ? reason : "");
         return post("/api/v1/refunds", body);
     }
 
@@ -270,9 +274,14 @@ public class PaymentGatewayClient {
 
     // ==================== HELPER METHODS ====================
 
-    private Map<String, Object> createPaymentBody(String merchantId, Long amountInCents, String currency,
-                                                   String idempotencyKey, String description,
-                                                   String customerId, List<Map<String, Object>> items) {
+    private Map<String, Object> createPaymentBody(
+            String merchantId,
+            Long amountInCents,
+            String currency,
+            String idempotencyKey,
+            String description,
+            String customerId,
+            List<Map<String, Object>> items) {
         Map<String, Object> body = new java.util.HashMap<>();
         body.put("merchantId", merchantId);
         body.put("amountInCents", amountInCents);
@@ -310,18 +319,17 @@ public class PaymentGatewayClient {
         return post(path, body, new LinkedMultiValueMap<>());
     }
 
-    private ResponseEntity<Map<String, Object>> post(String path, Map<String, Object> body,
-                                                      MultiValueMap<String, String> params) {
+    private ResponseEntity<Map<String, Object>> post(
+            String path, Map<String, Object> body, MultiValueMap<String, String> params) {
         return post(path, body, createAuthHeaders(), params);
     }
 
-    private ResponseEntity<Map<String, Object>> post(String path, Map<String, Object> body,
-                                                      HttpHeaders headers) {
+    private ResponseEntity<Map<String, Object>> post(String path, Map<String, Object> body, HttpHeaders headers) {
         return post(path, body, headers, new LinkedMultiValueMap<>());
     }
 
-    private ResponseEntity<Map<String, Object>> post(String path, Map<String, Object> body,
-                                                      HttpHeaders headers, MultiValueMap<String, String> params) {
+    private ResponseEntity<Map<String, Object>> post(
+            String path, Map<String, Object> body, HttpHeaders headers, MultiValueMap<String, String> params) {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
         return restTemplate.exchange(path + buildQueryString(params), HttpMethod.POST, entity, MAP_TYPE_REF);
     }

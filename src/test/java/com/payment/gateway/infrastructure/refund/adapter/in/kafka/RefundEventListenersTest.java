@@ -1,14 +1,13 @@
 package com.payment.gateway.infrastructure.refund.adapter.in.kafka;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for RefundEventListeners.
@@ -40,8 +39,7 @@ class RefundEventListenersTest {
                     "merchantId", "merchant_123",
                     "refundAmount", "50.00",
                     "currency", "USD",
-                    "refundType", "FULL"
-            );
+                    "refundType", "FULL");
 
             listeners.onRefundProcessed(event, null);
 
@@ -57,8 +55,7 @@ class RefundEventListenersTest {
                     "merchantId", "merchant_456",
                     "refundAmount", "25.00",
                     "currency", "USD",
-                    "refundType", "PARTIAL"
-            );
+                    "refundType", "PARTIAL");
 
             listeners.onRefundProcessed(event, null);
 
@@ -77,8 +74,7 @@ class RefundEventListenersTest {
                     "refundId", "ref_failed",
                     "paymentId", "pay_123",
                     "errorCode", "REFUND_ERR_001",
-                    "errorMessage", "Insufficient funds for refund"
-            );
+                    "errorMessage", "Insufficient funds for refund");
 
             listeners.onRefundFailed(event, null);
 
@@ -92,8 +88,7 @@ class RefundEventListenersTest {
                     "refundId", "ref_timeout",
                     "paymentId", "pay_789",
                     "errorCode", "TIMEOUT",
-                    "errorMessage", "Provider timeout"
-            );
+                    "errorMessage", "Provider timeout");
 
             listeners.onRefundFailed(event, null);
 

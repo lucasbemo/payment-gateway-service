@@ -2,14 +2,13 @@ package com.payment.gateway.infrastructure.commons.monitoring;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import java.util.Optional;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import java.util.Optional;
 
 /**
  * Custom health indicators for monitoring subsystem health.
@@ -22,10 +21,11 @@ public class HealthIndicatorConfig {
     private final RateLimiterRegistry rateLimiterRegistry;
     private final Optional<KafkaTemplate<String, Object>> kafkaTemplate;
 
-    public HealthIndicatorConfig(RedisConnectionFactory redisConnectionFactory,
-                                  CircuitBreakerRegistry circuitBreakerRegistry,
-                                  RateLimiterRegistry rateLimiterRegistry,
-                                  Optional<KafkaTemplate<String, Object>> kafkaTemplate) {
+    public HealthIndicatorConfig(
+            RedisConnectionFactory redisConnectionFactory,
+            CircuitBreakerRegistry circuitBreakerRegistry,
+            RateLimiterRegistry rateLimiterRegistry,
+            Optional<KafkaTemplate<String, Object>> kafkaTemplate) {
         this.redisConnectionFactory = redisConnectionFactory;
         this.circuitBreakerRegistry = circuitBreakerRegistry;
         this.rateLimiterRegistry = rateLimiterRegistry;
@@ -96,7 +96,8 @@ public class HealthIndicatorConfig {
                     cbDetails.put("state", cb.getState().name());
                     cbDetails.put("failureRate", metrics.getFailureRate());
                     cbDetails.put("slowCallRate", metrics.getSlowCallRate());
-                    if (cb.getState().name().equals("CLOSED") || cb.getState().name().equals("HALF_OPEN")) {
+                    if (cb.getState().name().equals("CLOSED")
+                            || cb.getState().name().equals("HALF_OPEN")) {
                         healthyCount++;
                     }
                     details.put(cb.getName(), cbDetails);

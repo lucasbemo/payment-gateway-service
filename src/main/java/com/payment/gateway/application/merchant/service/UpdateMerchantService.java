@@ -27,7 +27,8 @@ public class UpdateMerchantService implements UpdateMerchantUseCase {
     public MerchantResponse updateMerchant(String merchantId, String name, String email, String webhookUrl) {
         log.info("Updating merchant: {}", merchantId);
 
-        Merchant merchant = merchantCommandPort.findById(merchantId)
+        Merchant merchant = merchantCommandPort
+                .findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
 
         // Update fields
@@ -91,7 +92,6 @@ public class UpdateMerchantService implements UpdateMerchantUseCase {
                 .status(merchant.getStatus().name())
                 .webhookUrl(merchant.getWebhookUrl())
                 .createdAt(merchant.getCreatedAt())
-                
                 .build();
     }
 }

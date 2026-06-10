@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.reconciliation.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("DiscrepancyStatus Enum Tests")
 class DiscrepancyStatusTest {
@@ -61,8 +61,7 @@ class DiscrepancyStatusTest {
         @Test
         @DisplayName("Should throw exception for invalid status")
         void shouldThrowExceptionForInvalidStatus() {
-            assertThatThrownBy(() -> DiscrepancyStatus.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> DiscrepancyStatus.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -75,13 +74,13 @@ class DiscrepancyStatusTest {
         void shouldReturnAllDiscrepancyStatuses() {
             DiscrepancyStatus[] values = DiscrepancyStatus.values();
             assertThat(values).hasSize(5);
-            assertThat(values).containsExactlyInAnyOrder(
-                DiscrepancyStatus.OPEN,
-                DiscrepancyStatus.UNDER_REVIEW,
-                DiscrepancyStatus.RESOLVED,
-                DiscrepancyStatus.ESCALATED,
-                DiscrepancyStatus.CLOSED
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            DiscrepancyStatus.OPEN,
+                            DiscrepancyStatus.UNDER_REVIEW,
+                            DiscrepancyStatus.RESOLVED,
+                            DiscrepancyStatus.ESCALATED,
+                            DiscrepancyStatus.CLOSED);
         }
     }
 }

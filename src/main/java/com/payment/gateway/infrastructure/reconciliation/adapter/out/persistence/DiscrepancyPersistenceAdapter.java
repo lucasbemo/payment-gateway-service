@@ -3,13 +3,12 @@ package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistenc
 import com.payment.gateway.domain.reconciliation.model.Discrepancy;
 import com.payment.gateway.domain.reconciliation.model.DiscrepancyStatus;
 import com.payment.gateway.domain.reconciliation.port.DiscrepancyRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -27,14 +26,12 @@ public class DiscrepancyPersistenceAdapter implements DiscrepancyRepositoryPort 
 
     @Override
     public Optional<Discrepancy> findById(String id) {
-        return discrepancyJpaRepository.findById(id)
-                .map(discrepancyMapper::toDomain);
+        return discrepancyJpaRepository.findById(id).map(discrepancyMapper::toDomain);
     }
 
     @Override
     public List<Discrepancy> findByBatchId(String batchId) {
-        return discrepancyJpaRepository.findByReconciliationBatchId(batchId)
-                .stream()
+        return discrepancyJpaRepository.findByReconciliationBatchId(batchId).stream()
                 .map(discrepancyMapper::toDomain)
                 .collect(Collectors.toList());
     }
@@ -47,16 +44,14 @@ public class DiscrepancyPersistenceAdapter implements DiscrepancyRepositoryPort 
 
     @Override
     public List<Discrepancy> findByStatus(DiscrepancyStatus status) {
-        return discrepancyJpaRepository.findByResolutionStatus(status.name())
-                .stream()
+        return discrepancyJpaRepository.findByResolutionStatus(status.name()).stream()
                 .map(discrepancyMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Discrepancy> findByTransactionId(String transactionId) {
-        return discrepancyJpaRepository.findByTransactionId(transactionId)
-                .stream()
+        return discrepancyJpaRepository.findByTransactionId(transactionId).stream()
                 .map(discrepancyMapper::toDomain)
                 .collect(Collectors.toList());
     }

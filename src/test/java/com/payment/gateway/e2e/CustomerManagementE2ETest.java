@@ -1,14 +1,13 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for customer management.
@@ -23,14 +22,13 @@ class CustomerManagementE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant first
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -43,13 +41,13 @@ class CustomerManagementE2ETest extends E2ETestBase {
         var customerData = TestDataFactory.CustomerData.create(merchantId);
 
         // When: Registering the customer
-        var response = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var response = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
         // Then: Customer is created successfully
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -74,15 +72,16 @@ class CustomerManagementE2ETest extends E2ETestBase {
     void testGetCustomerById() {
         // Given: A registered customer
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var registerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var registerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // When: Getting the customer by ID
@@ -91,7 +90,8 @@ class CustomerManagementE2ETest extends E2ETestBase {
         // Then: Customer is retrieved successfully
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Map<String, Object> retrievedCustomer = (Map<String, Object>) getResponse.getBody().get("data");
+        Map<String, Object> retrievedCustomer =
+                (Map<String, Object>) getResponse.getBody().get("data");
         assertThat(retrievedCustomer.get("id")).isEqualTo(customerId);
         assertThat(retrievedCustomer.get("email")).isEqualTo(customerData.email);
     }
@@ -101,41 +101,41 @@ class CustomerManagementE2ETest extends E2ETestBase {
     void testAddPaymentMethod() {
         // Given: A registered customer
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var registerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var registerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // When: Adding a payment method
-        var pmResponse = getApiClient().addPaymentMethod(
-            customerId,
-            merchantId,
-            TestDataFactory.getTestCardNumber(),
-            TestDataFactory.getTestExpiryMonth(),
-            TestDataFactory.getTestExpiryYear(),
-            TestDataFactory.getTestCvv(),
-            TestDataFactory.getTestCardholderName(),
-            true
-        );
+        var pmResponse = getApiClient()
+                .addPaymentMethod(
+                        customerId,
+                        merchantId,
+                        TestDataFactory.getTestCardNumber(),
+                        TestDataFactory.getTestExpiryMonth(),
+                        TestDataFactory.getTestExpiryYear(),
+                        TestDataFactory.getTestCvv(),
+                        TestDataFactory.getTestCardholderName(),
+                        true);
 
         // Then: Payment method is added
         assertThat(pmResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> updatedCustomer = (Map<String, Object>) pmResponse.getBody().get("data");
+        Map<String, Object> updatedCustomer =
+                (Map<String, Object>) pmResponse.getBody().get("data");
         assertThat(updatedCustomer).isNotNull();
 
         // Verify payment method exists in database
         boolean pmExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ?",
-            Integer.class,
-            customerId
-        ) > 0;
+                        "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ?", Integer.class, customerId)
+                > 0;
         assertThat(pmExists).isTrue();
     }
 
@@ -144,37 +144,36 @@ class CustomerManagementE2ETest extends E2ETestBase {
     void testRemovePaymentMethod() {
         // Given: A customer with a payment method
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var registerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var registerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // Add payment method
-        var pmResponse = getApiClient().addPaymentMethod(
-            customerId,
-            merchantId,
-            TestDataFactory.getTestCardNumber(),
-            TestDataFactory.getTestExpiryMonth(),
-            TestDataFactory.getTestExpiryYear(),
-            TestDataFactory.getTestCvv(),
-            TestDataFactory.getTestCardholderName(),
-            true
-        );
+        var pmResponse = getApiClient()
+                .addPaymentMethod(
+                        customerId,
+                        merchantId,
+                        TestDataFactory.getTestCardNumber(),
+                        TestDataFactory.getTestExpiryMonth(),
+                        TestDataFactory.getTestExpiryYear(),
+                        TestDataFactory.getTestCvv(),
+                        TestDataFactory.getTestCardholderName(),
+                        true);
 
-        Map<String, Object> updatedCustomer = (Map<String, Object>) pmResponse.getBody().get("data");
+        Map<String, Object> updatedCustomer =
+                (Map<String, Object>) pmResponse.getBody().get("data");
 
         // Get payment method ID from database
         String paymentMethodId = jdbcTemplate.queryForObject(
-            "SELECT id FROM payment_methods WHERE customer_id = ? LIMIT 1",
-            String.class,
-            customerId
-        );
+                "SELECT id FROM payment_methods WHERE customer_id = ? LIMIT 1", String.class, customerId);
 
         // When: Removing the payment method
         var removeResponse = getApiClient().removePaymentMethod(customerId, paymentMethodId);
@@ -185,10 +184,9 @@ class CustomerManagementE2ETest extends E2ETestBase {
         // Verify payment method is soft-deleted (status = INACTIVE).
         // status is a VARCHAR enum name since V17 (was a SMALLINT ordinal before).
         Integer pmCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ? AND status = 'INACTIVE'",
-            Integer.class,
-            customerId
-        );
+                "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ? AND status = 'INACTIVE'",
+                Integer.class,
+                customerId);
         // The removed method is retained as a soft-deleted (INACTIVE) row.
         assertThat(pmCount).isGreaterThanOrEqualTo(1);
     }
@@ -198,35 +196,33 @@ class CustomerManagementE2ETest extends E2ETestBase {
     void testCustomerCardTokenization() {
         // Given: A customer adding a payment method
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var registerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var registerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // When: Adding a payment method (card should be tokenized)
-        var pmResponse = getApiClient().addPaymentMethod(
-            customerId,
-            merchantId,
-            TestDataFactory.getTestCardNumber(),
-            TestDataFactory.getTestExpiryMonth(),
-            TestDataFactory.getTestExpiryYear(),
-            TestDataFactory.getTestCvv(),
-            TestDataFactory.getTestCardholderName(),
-            true
-        );
+        var pmResponse = getApiClient()
+                .addPaymentMethod(
+                        customerId,
+                        merchantId,
+                        TestDataFactory.getTestCardNumber(),
+                        TestDataFactory.getTestExpiryMonth(),
+                        TestDataFactory.getTestExpiryYear(),
+                        TestDataFactory.getTestCvv(),
+                        TestDataFactory.getTestCardholderName(),
+                        true);
 
         // Then: Card is tokenized (token stored)
         String token = jdbcTemplate.queryForObject(
-            "SELECT token FROM payment_methods WHERE customer_id = ? LIMIT 1",
-            String.class,
-            customerId
-        );
+                "SELECT token FROM payment_methods WHERE customer_id = ? LIMIT 1", String.class, customerId);
 
         assertThat(token).isNotNull();
         assertThat(token).startsWith("tok_");
@@ -237,37 +233,35 @@ class CustomerManagementE2ETest extends E2ETestBase {
     void testCustomerWithMultiplePaymentMethods() {
         // Given: A registered customer
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var registerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var registerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // When: Adding multiple payment methods
         for (int i = 0; i < 3; i++) {
-            getApiClient().addPaymentMethod(
-                customerId,
-                merchantId,
-                TestDataFactory.getTestCardNumber(),
-                TestDataFactory.getTestExpiryMonth(),
-                TestDataFactory.getTestExpiryYear(),
-                TestDataFactory.getTestCvv(),
-                TestDataFactory.getTestCardholderName(),
-                i == 0
-            );
+            getApiClient()
+                    .addPaymentMethod(
+                            customerId,
+                            merchantId,
+                            TestDataFactory.getTestCardNumber(),
+                            TestDataFactory.getTestExpiryMonth(),
+                            TestDataFactory.getTestExpiryYear(),
+                            TestDataFactory.getTestCvv(),
+                            TestDataFactory.getTestCardholderName(),
+                            i == 0);
         }
 
         // Then: All payment methods are stored
         Integer pmCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ?",
-            Integer.class,
-            customerId
-        );
+                "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ?", Integer.class, customerId);
         assertThat(pmCount).isEqualTo(3);
     }
 
@@ -276,28 +270,29 @@ class CustomerManagementE2ETest extends E2ETestBase {
     void testGetCustomerWithPaymentMethods() {
         // Given: A customer with payment methods
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var registerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var registerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) registerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) registerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // Add payment method
-        getApiClient().addPaymentMethod(
-            customerId,
-            merchantId,
-            TestDataFactory.getTestCardNumber(),
-            TestDataFactory.getTestExpiryMonth(),
-            TestDataFactory.getTestExpiryYear(),
-            TestDataFactory.getTestCvv(),
-            TestDataFactory.getTestCardholderName(),
-            true
-        );
+        getApiClient()
+                .addPaymentMethod(
+                        customerId,
+                        merchantId,
+                        TestDataFactory.getTestCardNumber(),
+                        TestDataFactory.getTestExpiryMonth(),
+                        TestDataFactory.getTestExpiryYear(),
+                        TestDataFactory.getTestCvv(),
+                        TestDataFactory.getTestCardholderName(),
+                        true);
 
         // When: Getting the customer
         var getResponse = getApiClient().getCustomer(customerId, merchantId);
@@ -314,13 +309,13 @@ class CustomerManagementE2ETest extends E2ETestBase {
         var customerData = TestDataFactory.CustomerData.create(merchantId);
 
         // When: Registering the customer
-        var response = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var response = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
         // Then: External ID is stored
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -328,11 +323,8 @@ class CustomerManagementE2ETest extends E2ETestBase {
         Map<String, Object> customer = (Map<String, Object>) response.getBody().get("data");
         String customerId = (String) customer.get("id");
 
-        String dbExternalId = jdbcTemplate.queryForObject(
-            "SELECT external_id FROM customers WHERE id = ?",
-            String.class,
-            customerId
-        );
+        String dbExternalId =
+                jdbcTemplate.queryForObject("SELECT external_id FROM customers WHERE id = ?", String.class, customerId);
         assertThat(dbExternalId).isEqualTo(customerData.externalId);
     }
 
@@ -343,23 +335,20 @@ class CustomerManagementE2ETest extends E2ETestBase {
         var customerData = TestDataFactory.CustomerData.create(merchantId);
 
         // When: Registering the customer
-        var response = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var response = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
         // Then: Created timestamp is set
         Map<String, Object> customer = (Map<String, Object>) response.getBody().get("data");
         String customerId = (String) customer.get("id");
 
-        String createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM customers WHERE id = ?",
-            String.class,
-            customerId
-        );
+        String createdAt =
+                jdbcTemplate.queryForObject("SELECT created_at FROM customers WHERE id = ?", String.class, customerId);
 
         assertThat(createdAt).isNotNull();
     }
@@ -373,13 +362,13 @@ class CustomerManagementE2ETest extends E2ETestBase {
         var customerData = TestDataFactory.CustomerData.create(merchantId);
 
         // When: Registering customer without authentication
-        var response = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var response = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
         // Then: Request is rejected with 401
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

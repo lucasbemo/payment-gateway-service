@@ -1,11 +1,10 @@
 package com.payment.gateway.domain.merchant.model;
 
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * Value Object representing API credentials.
@@ -21,8 +20,7 @@ public class ApiCredentials {
     private final Instant expiresAt;
 
     @Builder
-    public ApiCredentials(String apiKey, String apiSecret, String apiKeyHash,
-                          String apiSecretHash, Instant expiresAt) {
+    public ApiCredentials(String apiKey, String apiSecret, String apiKeyHash, String apiSecretHash, Instant expiresAt) {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         this.apiKeyHash = apiKeyHash;

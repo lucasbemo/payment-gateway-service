@@ -1,10 +1,9 @@
 package com.payment.gateway.application.reconciliation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -15,10 +14,9 @@ public class ReconciliationResponse {
     private final String batchId;
 
     @Schema(
-        description = "Reconciliation status",
-        example = "COMPLETED",
-        allowableValues = {"PENDING", "IN_PROGRESS", "COMPLETED", "FAILED"}
-    )
+            description = "Reconciliation status",
+            example = "COMPLETED",
+            allowableValues = {"PENDING", "IN_PROGRESS", "COMPLETED", "FAILED"})
     private final String status;
 
     @Schema(description = "Total number of transactions reconciled", example = "150")

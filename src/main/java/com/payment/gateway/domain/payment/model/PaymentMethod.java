@@ -6,7 +6,6 @@ import java.util.Arrays;
  * Enum representing the payment method type.
  */
 public enum PaymentMethod {
-
     CREDIT_CARD,
     DEBIT_CARD,
     PIX,
@@ -19,7 +18,6 @@ public enum PaymentMethod {
         return Arrays.stream(values())
                 .filter(m -> m.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Invalid payment method: " + value));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid payment method: " + value));
     }
 }

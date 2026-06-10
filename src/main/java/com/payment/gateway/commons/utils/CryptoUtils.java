@@ -41,9 +41,10 @@ public final class CryptoUtils {
     public static String generateApiKey(String prefix) {
         byte[] randomBytes = new byte[24];
         RANDOM.nextBytes(randomBytes);
-        String randomPart = Base64.getUrlEncoder().withoutPadding()
-            .encodeToString(randomBytes)
-            .replace("-", "");
+        String randomPart = Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(randomBytes)
+                .replace("-", "");
         return prefix + "_" + randomPart.substring(0, Math.min(32, randomPart.length()));
     }
 
@@ -53,9 +54,11 @@ public final class CryptoUtils {
     public static String generateWebhookSecret() {
         byte[] randomBytes = new byte[32];
         RANDOM.nextBytes(randomBytes);
-        return "whsec_" + Base64.getUrlEncoder().withoutPadding()
-            .encodeToString(randomBytes)
-            .replace("-", "");
+        return "whsec_"
+                + Base64.getUrlEncoder()
+                        .withoutPadding()
+                        .encodeToString(randomBytes)
+                        .replace("-", "");
     }
 
     /**
@@ -92,9 +95,10 @@ public final class CryptoUtils {
     public static String generateRandomString(int length) {
         byte[] randomBytes = new byte[length];
         RANDOM.nextBytes(randomBytes);
-        return Base64.getUrlEncoder().withoutPadding()
-            .encodeToString(randomBytes)
-            .substring(0, length);
+        return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(randomBytes)
+                .substring(0, length);
     }
 
     /**

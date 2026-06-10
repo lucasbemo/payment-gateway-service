@@ -7,6 +7,8 @@ import com.payment.gateway.domain.transaction.model.Transaction;
  */
 public interface TransactionEventPublisherPort {
     void publishTransactionCreated(Transaction transaction);
+
     void publishTransactionCompleted(Transaction transaction);
+
     void publishTransactionFailed(Transaction transaction);
 }

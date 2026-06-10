@@ -1,13 +1,12 @@
 package com.payment.gateway.domain.transaction.model;
 
 import com.payment.gateway.commons.model.Money;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * Transaction aggregate root.
@@ -55,13 +54,13 @@ public class Transaction {
         return new Builder();
     }
 
-    public static Transaction create(String paymentId, String merchantId, TransactionType type,
-                                      Money amount, String currency) {
+    public static Transaction create(
+            String paymentId, String merchantId, TransactionType type, Money amount, String currency) {
         return create(paymentId, merchantId, type, amount, currency, TransactionStatus.PENDING.name());
     }
 
-    public static Transaction create(String paymentId, String merchantId, TransactionType type,
-                                      Money amount, String currency, String status) {
+    public static Transaction create(
+            String paymentId, String merchantId, TransactionType type, Money amount, String currency, String status) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())
@@ -148,8 +147,7 @@ public class Transaction {
     private void validateStatusTransition(TransactionStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
             throw new IllegalStateException(
-                String.format("Cannot transition transaction from %s to %s", this.status, newStatus)
-            );
+                    String.format("Cannot transition transaction from %s to %s", this.status, newStatus));
         }
     }
 

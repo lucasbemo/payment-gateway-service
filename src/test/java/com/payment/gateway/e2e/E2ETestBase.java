@@ -2,6 +2,7 @@ package com.payment.gateway.e2e;
 
 import com.payment.gateway.e2e.client.PaymentGatewayClient;
 import com.payment.gateway.test.ContainerConfig;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,8 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.transaction.TestTransaction;
 
-import javax.sql.DataSource;
-
 /**
  * Base class for E2E tests with full Spring context.
  * Provides shared test infrastructure including REST client, Kafka, and database access.
@@ -23,26 +22,26 @@ import javax.sql.DataSource;
  * Individual test methods should manage their own transactions if needed.
  */
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = {
-        com.payment.gateway.PaymentGatewayApplication.class,
-        com.payment.gateway.test.TestSecurityConfig.class
-    },
-    properties = {
-        "spring.profiles.active=e2e",
-        "spring.main.allow-bean-definition-override=true",
-        "spring.jpa.hibernate.ddl-auto=validate",
-        "spring.jpa.show-sql=false",
-        "logging.level.org.hibernate.SQL=warn",
-        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=warn"
-    }
-)
-@TestPropertySource(properties = {
-    "spring.kafka.consumer.auto-offset-reset=earliest",
-    "spring.kafka.consumer.group-id=test-e2e-group",
-    "spring.kafka.listener.ack-mode=manual",
-    "payment.gateway.idempotency.enabled=true"
-})
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = {
+            com.payment.gateway.PaymentGatewayApplication.class,
+            com.payment.gateway.test.TestSecurityConfig.class
+        },
+        properties = {
+            "spring.profiles.active=e2e",
+            "spring.main.allow-bean-definition-override=true",
+            "spring.jpa.hibernate.ddl-auto=validate",
+            "spring.jpa.show-sql=false",
+            "logging.level.org.hibernate.SQL=warn",
+            "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=warn"
+        })
+@TestPropertySource(
+        properties = {
+            "spring.kafka.consumer.auto-offset-reset=earliest",
+            "spring.kafka.consumer.group-id=test-e2e-group",
+            "spring.kafka.listener.ack-mode=manual",
+            "payment.gateway.idempotency.enabled=true"
+        })
 @ActiveProfiles("e2e")
 public abstract class E2ETestBase extends ContainerConfig {
 
@@ -71,7 +70,8 @@ public abstract class E2ETestBase extends ContainerConfig {
     protected com.payment.gateway.infrastructure.refund.adapter.in.rest.RefundController refundController;
 
     @Autowired
-    protected com.payment.gateway.infrastructure.transaction.adapter.in.rest.TransactionController transactionController;
+    protected com.payment.gateway.infrastructure.transaction.adapter.in.rest.TransactionController
+            transactionController;
 
     protected PaymentGatewayClient apiClient;
 
@@ -155,10 +155,7 @@ public abstract class E2ETestBase extends ContainerConfig {
      */
     protected boolean exists(String tableName, String idColumn, String id) {
         Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM " + tableName + " WHERE " + idColumn + " = ?",
-            Integer.class,
-            id
-        );
+                "SELECT COUNT(*) FROM " + tableName + " WHERE " + idColumn + " = ?", Integer.class, id);
         return count != null && count > 0;
     }
 }

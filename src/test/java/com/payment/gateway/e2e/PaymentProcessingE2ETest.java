@@ -1,16 +1,14 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 /**
  * E2E tests for payment processing flow.
@@ -25,14 +23,13 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant first
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -42,16 +39,17 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
         // Register a customer
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var customerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var customerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
         assertThat(customerResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> customerDataMap = (Map<String, Object>) customerResponse.getBody().get("data");
+        Map<String, Object> customerDataMap =
+                (Map<String, Object>) customerResponse.getBody().get("data");
         customerId = (String) customerDataMap.get("id");
     }
 
@@ -63,15 +61,15 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         var paymentData = TestDataFactory.PaymentData.createWithCustomer(merchantId, customerId);
 
         // When: Processing the payment
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey,
-            paymentData.description,
-            paymentData.customerId,
-            null
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId,
+                        paymentData.amountInCents,
+                        paymentData.currency,
+                        idempotencyKey,
+                        paymentData.description,
+                        paymentData.customerId,
+                        null);
 
         // Then: Payment is successfully processed
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -98,19 +96,13 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
         // When: Processing the same payment twice
-        var response1 = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response1 = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
-        var response2 = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response2 = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         // Then: Second request returns the same payment (idempotency)
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -123,9 +115,8 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
         // Verify only one payment exists in database
         String paymentId = (String) payment1.get("id");
-        Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payments WHERE id = ?", Integer.class, paymentId
-        );
+        Integer count =
+                jdbcTemplate.queryForObject("SELECT COUNT(*) FROM payments WHERE id = ?", Integer.class, paymentId);
         assertThat(count).isEqualTo(1);
     }
 
@@ -139,12 +130,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing payment with invalid API key
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         // Then: Request is rejected with 401
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -160,12 +148,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing payment without authentication
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         // Then: Request is rejected with 401
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -180,12 +165,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
         // Process initial payment
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
@@ -205,12 +187,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
@@ -230,15 +209,13 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-        var processResponse = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var processResponse = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         assertThat(processResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Map<String, Object> payment = (Map<String, Object>) processResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) processResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // When: Getting the payment by ID
@@ -256,12 +233,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
             var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-            getApiClient().processPayment(
-                paymentData.merchantId,
-                paymentData.amountInCents,
-                paymentData.currency,
-                idempotencyKey
-            );
+            getApiClient()
+                    .processPayment(
+                            paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
         }
 
         // When: Getting all payments for the merchant
@@ -278,20 +252,12 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         List<Map<String, Object>> items = List.of(
-            Map.of("description", "Widget A", "quantity", 2, "unitPriceInCents", 2500L),
-            Map.of("description", "Widget B", "quantity", 1, "unitPriceInCents", 5000L)
-        );
+                Map.of("description", "Widget A", "quantity", 2, "unitPriceInCents", 2500L),
+                Map.of("description", "Widget B", "quantity", 1, "unitPriceInCents", 5000L));
 
         // When: Processing the payment with items
-        var response = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey,
-            "Payment with items",
-            customerId,
-            items
-        );
+        var response = getApiClient()
+                .processPayment(merchantId, 10000L, "USD", idempotencyKey, "Payment with items", customerId, items);
 
         // Then: Payment is processed successfully
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -307,28 +273,22 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing the payment with amount ending in 99
-        var response = getApiClient().processPayment(
-            merchantId,
-            1099L,
-            "USD",
-            idempotencyKey
-        );
+        var response = getApiClient().processPayment(merchantId, 1099L, "USD", idempotencyKey);
 
         // Then: The request is rejected with 400
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
         // And: The FAILED payment was persisted (no rollback for declines)
-        Map<String, Object> paymentRow = jdbcTemplate.queryForMap(
-            "SELECT id, status FROM payments WHERE idempotency_key = ?", idempotencyKey
-        );
+        Map<String, Object> paymentRow =
+                jdbcTemplate.queryForMap("SELECT id, status FROM payments WHERE idempotency_key = ?", idempotencyKey);
         assertThat(paymentRow.get("status")).isEqualTo("FAILED");
 
         // And: A PAYMENT_FAILED outbox event was written for the payment
         String paymentId = (String) paymentRow.get("id");
         Integer failedEvents = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_events WHERE aggregate_id = ? AND event_type = 'PAYMENT_FAILED'",
-            Integer.class, paymentId
-        );
+                "SELECT COUNT(*) FROM outbox_events WHERE aggregate_id = ? AND event_type = 'PAYMENT_FAILED'",
+                Integer.class,
+                paymentId);
         assertThat(failedEvents).isEqualTo(1);
     }
 
@@ -339,12 +299,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
         String paymentId = (String) payment.get("id");
@@ -353,9 +310,8 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         assertThat(payment.get("status")).isIn("AUTHORIZED", "PENDING", "COMPLETED");
 
         // Verify status in database
-        String dbStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM payments WHERE id = ?", String.class, paymentId
-        );
+        String dbStatus =
+                jdbcTemplate.queryForObject("SELECT status FROM payments WHERE id = ?", String.class, paymentId);
         assertThat(dbStatus).isIn("AUTHORIZED", "PENDING", "COMPLETED");
     }
 }

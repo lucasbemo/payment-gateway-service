@@ -1,18 +1,17 @@
 package com.payment.gateway.infrastructure.payment.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Currency;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 class PaymentMapperTest {
 
@@ -46,8 +45,7 @@ class PaymentMapperTest {
                     "Test payment",
                     PaymentMetadata.empty(),
                     List.of(item),
-                    "customer-456"
-            );
+                    "customer-456");
 
             // when
             PaymentJpaEntity entity = mapper.toEntity(payment);
@@ -87,8 +85,7 @@ class PaymentMapperTest {
                     "No items",
                     PaymentMetadata.empty(),
                     null,
-                    null
-            );
+                    null);
 
             PaymentJpaEntity entity = mapper.toEntity(payment);
 
@@ -197,8 +194,7 @@ class PaymentMapperTest {
                     "Round trip test",
                     PaymentMetadata.empty(),
                     null,
-                    "cust-rt"
-            );
+                    "cust-rt");
 
             PaymentJpaEntity entity = mapper.toEntity(original);
             Payment restored = mapper.toDomain(entity);

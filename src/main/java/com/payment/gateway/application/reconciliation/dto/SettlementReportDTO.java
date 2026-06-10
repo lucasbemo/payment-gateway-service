@@ -1,10 +1,9 @@
 package com.payment.gateway.application.reconciliation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -50,10 +49,15 @@ public class SettlementReportDTO {
     @Schema(description = "Number of chargebacks", example = "0")
     private final Integer chargebackCount;
 
-    @Schema(description = "File path for downloaded report", example = "/reports/2026-03-20/settlement_merch_abc123.json")
+    @Schema(
+            description = "File path for downloaded report",
+            example = "/reports/2026-03-20/settlement_merch_abc123.json")
     private final String filePath;
 
-    @Schema(description = "Report format", example = "JSON", allowableValues = {"JSON", "CSV", "PDF"})
+    @Schema(
+            description = "Report format",
+            example = "JSON",
+            allowableValues = {"JSON", "CSV", "PDF"})
     private final String format;
 
     @Schema(description = "Report generation timestamp", example = "2026-03-20T10:00:00Z")

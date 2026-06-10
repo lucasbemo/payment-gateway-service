@@ -16,8 +16,12 @@ public class StubTransactionCommandPort implements TransactionCommandPort {
 
     @Override
     public String createTransaction(CreateTransactionCommand command) {
-        log.info("StubTransactionCommandPort.createTransaction: paymentId={}, merchantId={}, type={}, amount={}",
-                command.paymentId(), command.merchantId(), command.type(), command.amount());
+        log.info(
+                "StubTransactionCommandPort.createTransaction: paymentId={}, merchantId={}, type={}, amount={}",
+                command.paymentId(),
+                command.merchantId(),
+                command.type(),
+                command.amount());
         return "txn-stub-" + command.paymentId();
     }
 }

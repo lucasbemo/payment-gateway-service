@@ -1,10 +1,9 @@
 package com.payment.gateway.domain.payment.event;
 
 import com.payment.gateway.commons.event.IntegrationEvent;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.Map;
+import lombok.Getter;
 
 /**
  * Event published when a payment is created.
@@ -20,8 +19,8 @@ public class PaymentCreatedEvent extends IntegrationEvent {
     private final String currency;
     private final String idempotencyKey;
 
-    public PaymentCreatedEvent(String aggregateId, String merchantId, String amount,
-                               String currency, String idempotencyKey) {
+    public PaymentCreatedEvent(
+            String aggregateId, String merchantId, String amount, String currency, String idempotencyKey) {
         super(aggregateId, CURRENT_SCHEMA_VERSION, "PAYMENT_CREATED");
         this.merchantId = merchantId;
         this.amount = amount;
@@ -29,9 +28,15 @@ public class PaymentCreatedEvent extends IntegrationEvent {
         this.idempotencyKey = idempotencyKey;
     }
 
-    public PaymentCreatedEvent(String id, Instant occurredOn, String aggregateId,
-                                String merchantId, String amount, String currency,
-                                String idempotencyKey, String schemaVersion) {
+    public PaymentCreatedEvent(
+            String id,
+            Instant occurredOn,
+            String aggregateId,
+            String merchantId,
+            String amount,
+            String currency,
+            String idempotencyKey,
+            String schemaVersion) {
         super(id, occurredOn, aggregateId, schemaVersion, "PAYMENT_CREATED");
         this.merchantId = merchantId;
         this.amount = amount;
@@ -55,15 +60,14 @@ public class PaymentCreatedEvent extends IntegrationEvent {
         }
 
         PaymentCreatedEvent event = new PaymentCreatedEvent(
-            (String) map.get("id"),
-            (Instant) map.get("occurredOn"),
-            (String) map.get("aggregateId"),
-            (String) map.get("merchantId"),
-            (String) map.get("amount"),
-            (String) map.get("currency"),
-            (String) map.get("idempotencyKey"),
-            schemaVersion
-        );
+                (String) map.get("id"),
+                (Instant) map.get("occurredOn"),
+                (String) map.get("aggregateId"),
+                (String) map.get("merchantId"),
+                (String) map.get("amount"),
+                (String) map.get("currency"),
+                (String) map.get("idempotencyKey"),
+                schemaVersion);
 
         // Migrate if needed
         if (!CURRENT_SCHEMA_VERSION.equals(schemaVersion)) {

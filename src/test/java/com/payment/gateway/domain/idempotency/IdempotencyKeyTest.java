@@ -1,15 +1,14 @@
 package com.payment.gateway.domain.idempotency;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.domain.idempotency.model.IdempotencyKey;
 import com.payment.gateway.domain.idempotency.model.IdempotencyStatus;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
-
-import java.time.Instant;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for IdempotencyKey aggregate.

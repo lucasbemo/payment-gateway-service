@@ -1,13 +1,12 @@
 package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistence;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "reconciliation_batches")
@@ -65,22 +64,69 @@ public class ReconciliationBatchJpaEntity {
     private Instant updatedAt;
 
     // Getters
-    public String getId() { return id; }
-    public String getMerchantId() { return merchantId; }
-    public LocalDate getReconciliationDate() { return reconciliationDate; }
-    public String getGatewayName() { return gatewayName; }
-    public String getStatus() { return status; }
-    public Integer getTotalTransactions() { return totalTransactions; }
-    public Integer getMatchedTransactions() { return matchedTransactions; }
-    public Integer getUnmatchedTransactions() { return unmatchedTransactions; }
-    public BigDecimal getTotalAmount() { return totalAmount; }
-    public BigDecimal getMatchedAmount() { return matchedAmount; }
-    public Integer getDiscrepancyCount() { return discrepancyCount; }
-    public String getInitiatedBy() { return initiatedBy; }
-    public Instant getStartedAt() { return startedAt; }
-    public Instant getCompletedAt() { return completedAt; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+    public String getId() {
+        return id;
+    }
+
+    public String getMerchantId() {
+        return merchantId;
+    }
+
+    public LocalDate getReconciliationDate() {
+        return reconciliationDate;
+    }
+
+    public String getGatewayName() {
+        return gatewayName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Integer getTotalTransactions() {
+        return totalTransactions;
+    }
+
+    public Integer getMatchedTransactions() {
+        return matchedTransactions;
+    }
+
+    public Integer getUnmatchedTransactions() {
+        return unmatchedTransactions;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public BigDecimal getMatchedAmount() {
+        return matchedAmount;
+    }
+
+    public Integer getDiscrepancyCount() {
+        return discrepancyCount;
+    }
+
+    public String getInitiatedBy() {
+        return initiatedBy;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public Instant getCompletedAt() {
+        return completedAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 
     private ReconciliationBatchJpaEntity(Builder builder) {
         this.id = builder.id;
@@ -123,22 +169,85 @@ public class ReconciliationBatchJpaEntity {
         private Instant createdAt;
         private Instant updatedAt;
 
-        public Builder id(String id) { this.id = id; return this; }
-        public Builder merchantId(String merchantId) { this.merchantId = merchantId; return this; }
-        public Builder reconciliationDate(LocalDate reconciliationDate) { this.reconciliationDate = reconciliationDate; return this; }
-        public Builder gatewayName(String gatewayName) { this.gatewayName = gatewayName; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder totalTransactions(Integer totalTransactions) { this.totalTransactions = totalTransactions; return this; }
-        public Builder matchedTransactions(Integer matchedTransactions) { this.matchedTransactions = matchedTransactions; return this; }
-        public Builder unmatchedTransactions(Integer unmatchedTransactions) { this.unmatchedTransactions = unmatchedTransactions; return this; }
-        public Builder totalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; return this; }
-        public Builder matchedAmount(BigDecimal matchedAmount) { this.matchedAmount = matchedAmount; return this; }
-        public Builder discrepancyCount(Integer discrepancyCount) { this.discrepancyCount = discrepancyCount; return this; }
-        public Builder initiatedBy(String initiatedBy) { this.initiatedBy = initiatedBy; return this; }
-        public Builder startedAt(Instant startedAt) { this.startedAt = startedAt; return this; }
-        public Builder completedAt(Instant completedAt) { this.completedAt = completedAt; return this; }
-        public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
-        public Builder updatedAt(Instant updatedAt) { this.updatedAt = updatedAt; return this; }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder merchantId(String merchantId) {
+            this.merchantId = merchantId;
+            return this;
+        }
+
+        public Builder reconciliationDate(LocalDate reconciliationDate) {
+            this.reconciliationDate = reconciliationDate;
+            return this;
+        }
+
+        public Builder gatewayName(String gatewayName) {
+            this.gatewayName = gatewayName;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder totalTransactions(Integer totalTransactions) {
+            this.totalTransactions = totalTransactions;
+            return this;
+        }
+
+        public Builder matchedTransactions(Integer matchedTransactions) {
+            this.matchedTransactions = matchedTransactions;
+            return this;
+        }
+
+        public Builder unmatchedTransactions(Integer unmatchedTransactions) {
+            this.unmatchedTransactions = unmatchedTransactions;
+            return this;
+        }
+
+        public Builder totalAmount(BigDecimal totalAmount) {
+            this.totalAmount = totalAmount;
+            return this;
+        }
+
+        public Builder matchedAmount(BigDecimal matchedAmount) {
+            this.matchedAmount = matchedAmount;
+            return this;
+        }
+
+        public Builder discrepancyCount(Integer discrepancyCount) {
+            this.discrepancyCount = discrepancyCount;
+            return this;
+        }
+
+        public Builder initiatedBy(String initiatedBy) {
+            this.initiatedBy = initiatedBy;
+            return this;
+        }
+
+        public Builder startedAt(Instant startedAt) {
+            this.startedAt = startedAt;
+            return this;
+        }
+
+        public Builder completedAt(Instant completedAt) {
+            this.completedAt = completedAt;
+            return this;
+        }
+
+        public Builder createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder updatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
 
         public ReconciliationBatchJpaEntity build() {
             return new ReconciliationBatchJpaEntity(this);

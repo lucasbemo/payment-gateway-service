@@ -1,5 +1,11 @@
 package com.payment.gateway.application.transaction.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.transaction.dto.TransactionResponse;
 import com.payment.gateway.application.transaction.port.out.ExternalTransactionProviderPort;
 import com.payment.gateway.application.transaction.port.out.TransactionCommandPort;
@@ -9,6 +15,9 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,16 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Capture Transaction Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +43,8 @@ class CaptureTransactionServiceTest {
 
     @BeforeEach
     void setUp() {
-        captureTransactionService = new CaptureTransactionService(transactionQueryPort, transactionCommandPort, externalTransactionProviderPort);
+        captureTransactionService = new CaptureTransactionService(
+                transactionQueryPort, transactionCommandPort, externalTransactionProviderPort);
     }
 
     @Nested
@@ -59,10 +59,10 @@ class CaptureTransactionServiceTest {
             String merchantId = "merchant-123";
             Transaction transaction = createTransaction(transactionId, merchantId, TransactionStatus.AUTHORIZED);
 
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)).willReturn(Optional.of(transaction));
-            given(externalTransactionProviderPort.capture(any())).willReturn(
-                    new ExternalTransactionProviderPort.CaptureResult(true, "gateway_txn_123", null, null)
-            );
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId))
+                    .willReturn(Optional.of(transaction));
+            given(externalTransactionProviderPort.capture(any()))
+                    .willReturn(new ExternalTransactionProviderPort.CaptureResult(true, "gateway_txn_123", null, null));
             given(transactionCommandPort.updateTransaction(any())).willAnswer(invocation -> invocation.getArgument(0));
 
             // When
@@ -86,10 +86,11 @@ class CaptureTransactionServiceTest {
             String merchantId = "merchant-123";
             Transaction transaction = createTransaction(transactionId, merchantId, TransactionStatus.AUTHORIZED);
 
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)).willReturn(Optional.of(transaction));
-            given(externalTransactionProviderPort.capture(any())).willReturn(
-                    new ExternalTransactionProviderPort.CaptureResult(false, null, "ERR_CAPTURE", "Capture failed")
-            );
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId))
+                    .willReturn(Optional.of(transaction));
+            given(externalTransactionProviderPort.capture(any()))
+                    .willReturn(new ExternalTransactionProviderPort.CaptureResult(
+                            false, null, "ERR_CAPTURE", "Capture failed"));
 
             // When & Then
             assertThatThrownBy(() -> captureTransactionService.captureTransaction(transactionId, merchantId))
@@ -107,7 +108,8 @@ class CaptureTransactionServiceTest {
         void shouldThrowExceptionWhenTransactionNotFound() {
             // Given
             String transactionId = "invalid-txn";
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, "merchant-123")).willReturn(Optional.empty());
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, "merchant-123"))
+                    .willReturn(Optional.empty());
 
             // When & Then
             assertThatThrownBy(() -> captureTransactionService.captureTransaction(transactionId, "merchant-123"))
@@ -123,7 +125,8 @@ class CaptureTransactionServiceTest {
             String merchantId = "merchant-123";
             Transaction transaction = createTransaction(transactionId, merchantId, TransactionStatus.CAPTURED);
 
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)).willReturn(Optional.of(transaction));
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId))
+                    .willReturn(Optional.of(transaction));
 
             // When & Then
             assertThatThrownBy(() -> captureTransactionService.captureTransaction(transactionId, merchantId))
@@ -138,8 +141,7 @@ class CaptureTransactionServiceTest {
                 merchantId,
                 TransactionType.PAYMENT,
                 Money.of(10000L, Currency.getInstance("USD")),
-                "USD"
-        );
+                "USD");
         setId(transaction, id);
         setStatus(transaction, status);
         return transaction;

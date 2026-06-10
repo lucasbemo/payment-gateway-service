@@ -1,10 +1,9 @@
 package com.payment.gateway.application.transaction.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -21,10 +20,18 @@ public class TransactionResponse {
     private final String merchantId;
 
     @Schema(
-        description = "Transaction type",
-        example = "PAYMENT",
-        allowableValues = {"PAYMENT", "CAPTURE", "AUTHORIZATION", "REFUND", "PARTIAL_REFUND", "REVERSAL", "CHARGEBACK", "ADJUSTMENT"}
-    )
+            description = "Transaction type",
+            example = "PAYMENT",
+            allowableValues = {
+                "PAYMENT",
+                "CAPTURE",
+                "AUTHORIZATION",
+                "REFUND",
+                "PARTIAL_REFUND",
+                "REVERSAL",
+                "CHARGEBACK",
+                "ADJUSTMENT"
+            })
     private final String type;
 
     @Schema(description = "Transaction amount in cents", example = "10000")
@@ -34,10 +41,19 @@ public class TransactionResponse {
     private final String currency;
 
     @Schema(
-        description = "Transaction status",
-        example = "AUTHORIZED",
-        allowableValues = {"PENDING", "PROCESSING", "AUTHORIZED", "CAPTURED", "SETTLED", "REVERSED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"}
-    )
+            description = "Transaction status",
+            example = "AUTHORIZED",
+            allowableValues = {
+                "PENDING",
+                "PROCESSING",
+                "AUTHORIZED",
+                "CAPTURED",
+                "SETTLED",
+                "REVERSED",
+                "FAILED",
+                "REFUNDED",
+                "PARTIALLY_REFUNDED"
+            })
     private final String status;
 
     @Schema(description = "Payment gateway transaction ID", example = "ch_stripe_abc123")

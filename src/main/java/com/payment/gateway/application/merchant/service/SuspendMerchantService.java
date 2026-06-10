@@ -27,7 +27,8 @@ public class SuspendMerchantService implements SuspendMerchantUseCase {
     public MerchantResponse suspendMerchant(String merchantId) {
         log.info("Suspending merchant: {}", merchantId);
 
-        Merchant merchant = merchantCommandPort.findById(merchantId)
+        Merchant merchant = merchantCommandPort
+                .findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
 
         // Suspend the merchant
@@ -47,7 +48,6 @@ public class SuspendMerchantService implements SuspendMerchantUseCase {
                 .status(merchant.getStatus().name())
                 .webhookUrl(merchant.getWebhookUrl())
                 .createdAt(merchant.getCreatedAt())
-                
                 .build();
     }
 }

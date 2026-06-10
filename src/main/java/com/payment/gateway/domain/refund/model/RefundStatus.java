@@ -16,7 +16,8 @@ public enum RefundStatus {
 
     public boolean canTransitionTo(RefundStatus newStatus) {
         return switch (this) {
-            case PENDING -> Set.of(PROCESSING, APPROVED, REJECTED, FAILED, CANCELLED).contains(newStatus);
+            case PENDING -> Set.of(PROCESSING, APPROVED, REJECTED, FAILED, CANCELLED)
+                    .contains(newStatus);
             case PROCESSING -> Set.of(APPROVED, COMPLETED, FAILED).contains(newStatus);
             case APPROVED -> Set.of(COMPLETED, FAILED, CANCELLED).contains(newStatus);
             case REJECTED -> false;

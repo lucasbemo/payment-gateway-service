@@ -1,10 +1,9 @@
 package com.payment.gateway.infrastructure.commons.logging;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Structured logger utility that enriches log messages with contextual metadata.

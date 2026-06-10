@@ -1,17 +1,16 @@
 package com.payment.gateway.domain.reconciliation;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.reconciliation.model.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Nested;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for Reconciliation domain aggregates.
@@ -127,8 +126,7 @@ class ReconciliationTest {
         @DisplayName("Should create discrepancy with OPEN status")
         void shouldCreateDiscrepancyWithOpenStatus() {
             Discrepancy discrepancy = Discrepancy.create(
-                batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs by $10"
-            );
+                    batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs by $10");
 
             assertNotNull(discrepancy.getId());
             assertEquals(DiscrepancyStatus.OPEN, discrepancy.getStatus());
@@ -139,8 +137,7 @@ class ReconciliationTest {
         @DisplayName("Should set amounts on discrepancy")
         void shouldSetAmountsOnDiscrepancy() {
             Discrepancy discrepancy = Discrepancy.create(
-                batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs"
-            );
+                    batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs");
             Money systemAmount = Money.of(BigDecimal.valueOf(100.00), Currency.getInstance("USD"));
             Money gatewayAmount = Money.of(BigDecimal.valueOf(90.00), Currency.getInstance("USD"));
 
@@ -154,8 +151,7 @@ class ReconciliationTest {
         @DisplayName("Should mark discrepancy under review")
         void shouldMarkDiscrepancyUnderReview() {
             Discrepancy discrepancy = Discrepancy.create(
-                batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs"
-            );
+                    batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs");
 
             discrepancy.markUnderReview();
 
@@ -166,8 +162,7 @@ class ReconciliationTest {
         @DisplayName("Should resolve discrepancy")
         void shouldResolveDiscrepancy() {
             Discrepancy discrepancy = Discrepancy.create(
-                batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs"
-            );
+                    batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs");
 
             discrepancy.resolve("Gateway fee adjustment", "admin");
 
@@ -180,8 +175,7 @@ class ReconciliationTest {
         @DisplayName("Should escalate discrepancy")
         void shouldEscalateDiscrepancy() {
             Discrepancy discrepancy = Discrepancy.create(
-                batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs"
-            );
+                    batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs");
 
             discrepancy.escalate();
 
@@ -192,8 +186,7 @@ class ReconciliationTest {
         @DisplayName("Should close discrepancy")
         void shouldCloseDiscrepancy() {
             Discrepancy discrepancy = Discrepancy.create(
-                batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs"
-            );
+                    batch.getId(), MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, "txn_123", "Amount differs");
 
             discrepancy.close();
 
@@ -213,9 +206,14 @@ class ReconciliationTest {
             Money netAmount = Money.of(BigDecimal.valueOf(9710.00), Currency.getInstance("USD"));
 
             SettlementReport report = SettlementReport.create(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, "report_123",
-                grossAmount, feeAmount, netAmount, "USD"
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    "report_123",
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    "USD");
 
             assertNotNull(report.getId());
             assertEquals("PENDING", report.getStatus());
@@ -232,9 +230,14 @@ class ReconciliationTest {
             Money netAmount = Money.of(BigDecimal.valueOf(9710.00), Currency.getInstance("USD"));
 
             SettlementReport report = SettlementReport.create(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, "report_123",
-                grossAmount, feeAmount, netAmount, "USD"
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    "report_123",
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    "USD");
 
             report.markSettled();
 
@@ -250,9 +253,14 @@ class ReconciliationTest {
             Money netAmount = Money.of(BigDecimal.valueOf(9710.00), Currency.getInstance("USD"));
 
             SettlementReport report = SettlementReport.create(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, "report_123",
-                grossAmount, feeAmount, netAmount, "USD"
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    "report_123",
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    "USD");
 
             report.linkToReconciliation("batch_456");
 
@@ -267,9 +275,14 @@ class ReconciliationTest {
             Money netAmount = Money.of(BigDecimal.valueOf(9710.00), Currency.getInstance("USD"));
 
             SettlementReport report = SettlementReport.create(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, "report_123",
-                grossAmount, feeAmount, netAmount, "USD"
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    "report_123",
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    "USD");
 
             report.updateFilePath("s3://bucket/reports/report_123.pdf");
 

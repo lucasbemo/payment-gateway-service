@@ -53,18 +53,12 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic paymentEventsTopic() {
-        return TopicBuilder.name(paymentEventsTopic)
-                .partitions(6)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(paymentEventsTopic).partitions(6).replicas(1).build();
     }
 
     @Bean
     public NewTopic paymentCreatedTopic() {
-        return TopicBuilder.name(paymentCreatedTopic)
-                .partitions(6)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(paymentCreatedTopic).partitions(6).replicas(1).build();
     }
 
     @Bean
@@ -77,10 +71,7 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic paymentFailedTopic() {
-        return TopicBuilder.name(paymentFailedTopic)
-                .partitions(6)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(paymentFailedTopic).partitions(6).replicas(1).build();
     }
 
     @Bean
@@ -101,42 +92,27 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic refundEventsTopic() {
-        return TopicBuilder.name(refundEventsTopic)
-                .partitions(6)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(refundEventsTopic).partitions(6).replicas(1).build();
     }
 
     @Bean
     public NewTopic refundProcessedTopic() {
-        return TopicBuilder.name(refundProcessedTopic)
-                .partitions(3)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(refundProcessedTopic).partitions(3).replicas(1).build();
     }
 
     @Bean
     public NewTopic refundFailedTopic() {
-        return TopicBuilder.name(refundFailedTopic)
-                .partitions(3)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(refundFailedTopic).partitions(3).replicas(1).build();
     }
 
     @Bean
     public NewTopic outboxEventsTopic() {
-        return TopicBuilder.name(outboxEventsTopic)
-                .partitions(6)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(outboxEventsTopic).partitions(6).replicas(1).build();
     }
 
     @Bean
     public NewTopic settlementBatchTopic() {
-        return TopicBuilder.name(settlementBatchTopic)
-                .partitions(3)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(settlementBatchTopic).partitions(3).replicas(1).build();
     }
 
     @Bean
@@ -149,9 +125,6 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic auditLogsTopic() {
-        return TopicBuilder.name(auditLogsTopic)
-                .partitions(3)
-                .replicas(1)
-                .build();
+        return TopicBuilder.name(auditLogsTopic).partitions(3).replicas(1).build();
     }
 }

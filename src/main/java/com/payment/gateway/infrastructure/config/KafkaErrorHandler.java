@@ -1,8 +1,6 @@
 package com.payment.gateway.infrastructure.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.CommonErrorHandler;
@@ -24,20 +22,18 @@ public class KafkaErrorHandler {
     public CommonErrorHandler kafkaCommonErrorHandler() {
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(
                 (record, exception) -> {
-                    log.error("Kafka message processing failed after {} retries. Topic: {}, Partition: {}, Offset: {}, Error: {}",
+                    log.error(
+                            "Kafka message processing failed after {} retries. Topic: {}, Partition: {}, Offset: {}, Error: {}",
                             MAX_RETRIES,
                             record.topic(),
                             record.partition(),
                             record.offset(),
                             exception.getMessage());
                 },
-                new FixedBackOff(RETRY_INTERVAL_MS, MAX_RETRIES)
-        );
+                new FixedBackOff(RETRY_INTERVAL_MS, MAX_RETRIES));
 
         errorHandler.addNotRetryableExceptions(
-                IllegalArgumentException.class,
-                com.payment.gateway.commons.exception.ValidationException.class
-        );
+                IllegalArgumentException.class, com.payment.gateway.commons.exception.ValidationException.class);
 
         return errorHandler;
     }

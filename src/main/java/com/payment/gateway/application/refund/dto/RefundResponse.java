@@ -1,10 +1,9 @@
 package com.payment.gateway.application.refund.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -30,17 +29,15 @@ public class RefundResponse {
     private final String currency;
 
     @Schema(
-        description = "Refund status",
-        example = "COMPLETED",
-        allowableValues = {"PENDING", "PROCESSING", "APPROVED", "REJECTED", "COMPLETED", "FAILED", "CANCELLED"}
-    )
+            description = "Refund status",
+            example = "COMPLETED",
+            allowableValues = {"PENDING", "PROCESSING", "APPROVED", "REJECTED", "COMPLETED", "FAILED", "CANCELLED"})
     private final String status;
 
     @Schema(
-        description = "Refund type",
-        example = "PARTIAL",
-        allowableValues = {"FULL", "PARTIAL", "MULTIPLE", "CHARGEBACK", "CANCELLATION"}
-    )
+            description = "Refund type",
+            example = "PARTIAL",
+            allowableValues = {"FULL", "PARTIAL", "MULTIPLE", "CHARGEBACK", "CANCELLATION"})
     private final String type;
 
     @Schema(description = "Reason for the refund", example = "Customer requested")

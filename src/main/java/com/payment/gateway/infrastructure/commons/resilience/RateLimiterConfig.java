@@ -2,10 +2,9 @@ package com.payment.gateway.infrastructure.commons.resilience;
 
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.Duration;
 
 /**
  * Rate limiter configuration for API throttling.
@@ -32,7 +31,8 @@ public class RateLimiterConfig {
 
     @Bean
     public RateLimiter paymentRateLimiter(RateLimiterRegistry registry) {
-        return registry.rateLimiter("payment",
+        return registry.rateLimiter(
+                "payment",
                 io.github.resilience4j.ratelimiter.RateLimiterConfig.custom()
                         .limitForPeriod(50)
                         .limitRefreshPeriod(Duration.ofSeconds(1))

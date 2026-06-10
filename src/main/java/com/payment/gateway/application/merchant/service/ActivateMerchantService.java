@@ -28,7 +28,8 @@ public class ActivateMerchantService implements ActivateMerchantUseCase {
     public MerchantResponse activateMerchant(String merchantId) {
         log.info("Activating merchant: {}", merchantId);
 
-        Merchant merchant = merchantCommandPort.findById(merchantId)
+        Merchant merchant = merchantCommandPort
+                .findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
 
         // Activate the merchant (reactivate when coming from suspension)
@@ -52,7 +53,6 @@ public class ActivateMerchantService implements ActivateMerchantUseCase {
                 .status(merchant.getStatus().name())
                 .webhookUrl(merchant.getWebhookUrl())
                 .createdAt(merchant.getCreatedAt())
-
                 .build();
     }
 }

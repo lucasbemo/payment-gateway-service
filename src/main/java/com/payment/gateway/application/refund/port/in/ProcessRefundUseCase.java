@@ -7,5 +7,6 @@ import com.payment.gateway.application.refund.dto.RefundResponse;
  */
 public interface ProcessRefundUseCase {
 
-    RefundResponse processRefund(String paymentId, String merchantId, Long amount, String refundIdempotencyKey, String reason);
+    RefundResponse processRefund(
+            String paymentId, String merchantId, Long amount, String refundIdempotencyKey, String reason);
 }

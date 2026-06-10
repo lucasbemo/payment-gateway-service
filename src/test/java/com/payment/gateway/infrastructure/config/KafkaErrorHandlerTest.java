@@ -1,12 +1,12 @@
 package com.payment.gateway.infrastructure.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.DefaultErrorHandler;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class KafkaErrorHandlerTest {
 

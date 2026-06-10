@@ -28,16 +28,14 @@ public class PaymentProviderConfig {
     @Bean
     @ConditionalOnProperty(name = "payment.provider", havingValue = "stripe")
     @Primary
-    public ExternalRefundProviderPort stripeRefundProvider(
-            @Value("${stripe.api-key}") String apiKey) {
+    public ExternalRefundProviderPort stripeRefundProvider(@Value("${stripe.api-key}") String apiKey) {
         return new StripeRefundProviderAdapter(apiKey);
     }
 
     @Bean
     @ConditionalOnProperty(name = "payment.provider", havingValue = "stripe")
     @Primary
-    public WebhookProcessingPort stripeWebhookHandler(
-            @Value("${stripe.webhook-secret:}") String webhookSecret) {
+    public WebhookProcessingPort stripeWebhookHandler(@Value("${stripe.webhook-secret:}") String webhookSecret) {
         return new StripeWebhookHandler(webhookSecret);
     }
 
