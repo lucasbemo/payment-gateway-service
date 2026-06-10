@@ -1,12 +1,12 @@
 package com.payment.gateway.infrastructure.commons.security;
 
 import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
+import com.payment.gateway.commons.utils.CryptoUtils;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.model.MerchantStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class ApiKeyAuthService {
 
     private final MerchantQueryPort merchantQueryPort;
-    private final PasswordEncoder passwordEncoder;
 
     /**
      * Validates the API key and secret for a merchant.
@@ -44,8 +43,9 @@ public class ApiKeyAuthService {
                 return ApiKeyValidationResult.failure("Invalid API key");
             }
 
-            // Validate API secret
-            if (!passwordEncoder.matches(apiSecret, merchant.getApiSecretHash())) {
+            // Validate API secret. The secret is stored as a SHA-256 hash
+            // (CryptoUtils.hash) at registration, so verify with the same algorithm.
+            if (!CryptoUtils.verifyHash(apiSecret, merchant.getApiSecretHash())) {
                 log.warn("Invalid API secret for merchant: {}", merchant.getId());
                 return ApiKeyValidationResult.failure("Invalid API secret");
             }

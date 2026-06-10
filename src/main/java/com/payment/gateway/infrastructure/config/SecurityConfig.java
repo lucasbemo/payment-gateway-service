@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -55,7 +57,7 @@ public class SecurityConfig {
      * Security filter chain for default profile (restricted access).
      */
     @Bean
-    @Profile("!e2e & !local & !dev & !production")
+    @Profile("!e2e & !local & !dev & !prod")
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -82,9 +84,12 @@ public class SecurityConfig {
 
     /**
      * Security filter chain for production with API key and JWT authentication.
+     * Activated by the {@code prod} profile — the same profile used by
+     * application-prod.yml and docker-compose.prod.yml. Unauthenticated requests to
+     * protected endpoints receive 401 (not 403) so API clients can react correctly.
      */
     @Configuration
-    @Profile("production")
+    @Profile("prod")
     @RequiredArgsConstructor
     static class ProductionSecurityConfig {
 
@@ -92,9 +97,29 @@ public class SecurityConfig {
         private final JwtTokenProvider jwtTokenProvider;
 
         @Bean
-        @Profile("production")
-        public SecurityFilterChain productionSecurityFilterChain(HttpSecurity http) throws Exception {
-            http.addFilterBefore(
+        public SecurityFilterChain productionSecurityFilterChain(
+                HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+            http.csrf(AbstractHttpConfigurer::disable)
+                    .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
+                            .permitAll()
+                            .requestMatchers(
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html",
+                                    "/v3/api-docs/**",
+                                    "/swagger-resources/**",
+                                    "/webjars/**")
+                            .permitAll()
+                            .requestMatchers("/api/v1/auth/**")
+                            .permitAll()
+                            .requestMatchers("/api/v1/health/**")
+                            .permitAll()
+                            .anyRequest()
+                            .authenticated())
+                    .exceptionHandling(
+                            ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                    .addFilterBefore(
                             new ApiKeyAuthenticationFilter(apiKeyAuthService),
                             UsernamePasswordAuthenticationFilter.class)
                     .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), ApiKeyAuthenticationFilter.class);
