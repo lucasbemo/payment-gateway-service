@@ -39,6 +39,27 @@ public class ReconciliationDomainService {
         return batchRepository.save(batch);
     }
 
+    /**
+     * Returns the existing reconciliation batch for a merchant/gateway/date, or creates one if none
+     * exists. Reconciliation is unique per merchant per date (constraint
+     * {@code uk_reconciliation_batches_merchant_date}), so re-running for the same day reuses the
+     * existing batch and recomputes its results instead of failing on a duplicate insert.
+     */
+    public ReconciliationBatch findOrCreateReconciliationBatch(
+            String merchantId, LocalDate reconciliationDate, String gatewayName, String initiatedBy) {
+        return batchRepository
+                .findByMerchantIdAndGatewayNameAndDate(merchantId, gatewayName, reconciliationDate)
+                .map(existing -> {
+                    log.info(
+                            "Reusing existing reconciliation batch {} for merchant {} on date {} (re-run)",
+                            existing.getId(),
+                            merchantId,
+                            reconciliationDate);
+                    return existing;
+                })
+                .orElseGet(() -> createReconciliationBatch(merchantId, reconciliationDate, gatewayName, initiatedBy));
+    }
+
     public ReconciliationBatch startReconciliation(String batchId) {
         log.info("Starting reconciliation for batch {}", batchId);
 

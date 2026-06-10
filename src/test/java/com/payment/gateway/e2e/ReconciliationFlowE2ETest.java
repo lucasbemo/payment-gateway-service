@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.payment.gateway.e2e.testdata.TestDataFactory;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +35,36 @@ class ReconciliationFlowE2ETest extends E2ETestBase {
         merchantId = (String) merchantData.get("id");
         apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
+    }
+
+    @Test
+    @DisplayName("E2E: Reconciliation is idempotent for the same merchant and date (re-run does not fail)")
+    @SuppressWarnings("unchecked")
+    void testReconciliationIsIdempotentOnRerun() {
+        String date = LocalDate.now().toString();
+        String url = "/api/v1/reconciliation/reconcile?merchantId=" + merchantId + "&date=" + date;
+
+        // First reconciliation creates the batch
+        var first = restTemplate.postForEntity(url, null, Map.class);
+        assertThat(first.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Map<String, Object> firstData = (Map<String, Object>) first.getBody().get("data");
+        String firstBatchId = (String) firstData.get("batchId");
+        assertThat(firstBatchId).isNotNull();
+
+        // Re-running for the SAME merchant + date must succeed by reusing the batch — it must
+        // not fail on the uk_reconciliation_batches_merchant_date unique constraint.
+        var second = restTemplate.postForEntity(url, null, Map.class);
+        assertThat(second.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Map<String, Object> secondData = (Map<String, Object>) second.getBody().get("data");
+        assertThat(secondData.get("batchId")).isEqualTo(firstBatchId);
+
+        // Exactly one batch row exists for this merchant + date
+        Integer batchCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM reconciliation_batches WHERE merchant_id = ? AND batch_date = ?::date",
+                Integer.class,
+                merchantId,
+                date);
+        assertThat(batchCount).isEqualTo(1);
     }
 
     @Test

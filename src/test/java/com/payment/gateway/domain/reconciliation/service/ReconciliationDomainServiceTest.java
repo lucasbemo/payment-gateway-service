@@ -76,6 +76,48 @@ class ReconciliationDomainServiceTest {
     }
 
     @Nested
+    @DisplayName("Find Or Create Reconciliation Batch")
+    class FindOrCreateReconciliationBatchTests {
+
+        @Test
+        @DisplayName("Should reuse the existing batch when one exists for the merchant and date (re-run)")
+        void shouldReuseExistingBatchOnRerun() {
+            // Given
+            ReconciliationBatch existing =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            given(batchRepository.findByMerchantIdAndGatewayNameAndDate(MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE))
+                    .willReturn(Optional.of(existing));
+
+            // When
+            ReconciliationBatch result = reconciliationDomainService.findOrCreateReconciliationBatch(
+                    MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+
+            // Then: the existing batch is reused, no new batch is inserted
+            assertThat(result).isSameAs(existing);
+            verify(batchRepository, never()).save(any(ReconciliationBatch.class));
+        }
+
+        @Test
+        @DisplayName("Should create a new batch when none exists for the merchant and date")
+        void shouldCreateWhenNoneExists() {
+            // Given
+            given(batchRepository.findByMerchantIdAndGatewayNameAndDate(MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE))
+                    .willReturn(Optional.empty());
+            given(batchRepository.save(any(ReconciliationBatch.class)))
+                    .willAnswer(invocation -> invocation.getArgument(0));
+
+            // When
+            ReconciliationBatch result = reconciliationDomainService.findOrCreateReconciliationBatch(
+                    MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getMerchantId()).isEqualTo(MERCHANT_ID);
+            verify(batchRepository).save(any(ReconciliationBatch.class));
+        }
+    }
+
+    @Nested
     @DisplayName("Start Reconciliation")
     class StartReconciliationTests {
 
