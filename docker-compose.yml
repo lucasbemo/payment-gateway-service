@@ -146,6 +146,16 @@ services:
     networks:
       - payment-network
 
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    container_name: payment-gateway-service-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./docker/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - payment-network
+
   grafana:
     image: grafana/grafana:10.1.0
     container_name: payment-gateway-service-grafana

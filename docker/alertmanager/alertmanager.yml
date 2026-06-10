@@ -1,0 +1,12 @@
+# Minimal Alertmanager config for local development.
+# Alerts are grouped and visible in the Alertmanager UI/API (http://localhost:9093).
+# Wire a real notification channel (Slack/PagerDuty/email) per environment in production.
+route:
+  receiver: default
+  group_by: ['alertname', 'severity']
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+
+receivers:
+  - name: default

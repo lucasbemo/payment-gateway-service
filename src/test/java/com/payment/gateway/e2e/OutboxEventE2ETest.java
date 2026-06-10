@@ -199,15 +199,16 @@ class OutboxEventE2ETest extends E2ETestBase {
             "PUBLISHED"
         );
 
-        // When: Querying by status
+        // When: Querying by status (scoped to this test's seeded events — payment
+        // processing in other tests legitimately writes its own outbox rows)
         Integer pendingCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_events WHERE status = ?",
+            "SELECT COUNT(*) FROM outbox_events WHERE status = ? AND event_type LIKE 'TEST_EVENT%'",
             Integer.class,
             "PENDING"
         );
 
         Integer publishedCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_events WHERE status = ?",
+            "SELECT COUNT(*) FROM outbox_events WHERE status = ? AND event_type LIKE 'TEST_EVENT%'",
             Integer.class,
             "PUBLISHED"
         );

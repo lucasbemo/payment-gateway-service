@@ -212,7 +212,7 @@
       "type": "stat",
       "targets": [
         {
-          "expr": "rate(payment_gateway_payments_processing_duration_sum[5m]) / rate(payment_gateway_payments_processing_duration_count[5m]) * 1000",
+          "expr": "rate(payment_gateway_payments_processing_duration_seconds_sum[5m]) / rate(payment_gateway_payments_processing_duration_seconds_count[5m]) * 1000",
           "legendFormat": "Avg Time"
         }
       ]
@@ -359,12 +359,12 @@
         "y": 12
       },
       "id": 7,
-      "title": "Payment Amount Distribution",
-      "type": "histogram",
+      "title": "Avg Payment Amount",
+      "type": "stat",
       "targets": [
         {
-          "expr": "payment_gateway_payments_amount",
-          "legendFormat": "Amount"
+          "expr": "rate(payment_gateway_payments_amount_cents_sum[5m]) / rate(payment_gateway_payments_amount_cents_count[5m])",
+          "legendFormat": "Avg Amount (cents)"
         }
       ]
     },
