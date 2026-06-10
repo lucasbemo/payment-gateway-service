@@ -48,7 +48,8 @@ public class TransactionPersistenceAdapter implements TransactionQueryPort, Tran
                 command.paymentId(),
                 command.merchantId(),
                 TransactionType.valueOf(command.type()),
-                com.payment.gateway.commons.model.Money.of(BigDecimal.valueOf(command.amount()), currency),
+                // command.amount() is in cents — use the long overload, not the unit-based BigDecimal one
+                com.payment.gateway.commons.model.Money.of(command.amount().longValue(), currency),
                 command.currency(),
                 command.status() != null ? command.status() : "PENDING"
         );

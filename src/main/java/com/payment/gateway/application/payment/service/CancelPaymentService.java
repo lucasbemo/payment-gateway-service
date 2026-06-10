@@ -5,6 +5,9 @@ import com.payment.gateway.application.payment.port.in.CancelPaymentUseCase;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
+import com.payment.gateway.domain.outbox.model.EventType;
+import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
+import com.payment.gateway.domain.payment.event.PaymentCancelledEvent;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class CancelPaymentService implements CancelPaymentUseCase {
 
     private final PaymentQueryPort paymentQueryPort;
     private final ExternalPaymentProviderPort externalPaymentProviderPort;
+    private final OutboxEventDomainService outboxEventService;
 
     @Override
     public PaymentResponse cancelPayment(String paymentId, String merchantId) {
@@ -50,6 +54,16 @@ public class CancelPaymentService implements CancelPaymentUseCase {
         // Update payment status
         payment.cancel();
         Payment savedPayment = paymentQueryPort.savePayment(payment);
+
+        // Outbox event committed atomically with the cancellation; published by OutboxPollingScheduler
+        outboxEventService.publish(
+                savedPayment.getId(),
+                "PAYMENT",
+                EventType.PAYMENT_CANCELLED,
+                new PaymentCancelledEvent(
+                        savedPayment.getId(),
+                        savedPayment.getMerchantId(),
+                        "Cancelled by merchant request"));
 
         log.info("Payment canceled successfully: {}", paymentId);
         return mapToResponse(savedPayment);

@@ -19,6 +19,7 @@ public class CustomerMapper {
                 .email(customer.getEmail())
                 .name(customer.getName())
                 .phone(customer.getPhone())
+                .externalId(customer.getExternalId())
                 .status(CustomerStatus.valueOf(customer.getStatus().name()))
                 .createdAt(customer.getCreatedAt())
                 .updatedAt(customer.getUpdatedAt())
@@ -40,6 +41,10 @@ public class CustomerMapper {
             java.lang.reflect.Field phoneField = Customer.class.getDeclaredField("phone");
             phoneField.setAccessible(true);
             phoneField.set(customer, entity.getPhone());
+
+            java.lang.reflect.Field externalIdField = Customer.class.getDeclaredField("externalId");
+            externalIdField.setAccessible(true);
+            externalIdField.set(customer, entity.getExternalId());
 
             java.lang.reflect.Field statusField = Customer.class.getDeclaredField("status");
             statusField.setAccessible(true);

@@ -3,6 +3,7 @@ package com.payment.gateway.infrastructure.payment.adapter.in.rest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +44,7 @@ public class CreatePaymentRequest {
         requiredMode = Schema.RequiredMode.REQUIRED
     )
     @NotBlank(message = "Currency is required")
+    @Pattern(regexp = "USD|EUR|GBP", message = "Currency must be one of: USD, EUR, GBP")
     private String currency;
 
     @Schema(

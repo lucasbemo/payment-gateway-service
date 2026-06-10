@@ -141,8 +141,8 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
 
     @Override
     public Optional<Customer> findByMerchantIdAndExternalId(String merchantId, String externalId) {
-        // external_id column doesn't exist in DB schema; return empty
-        return Optional.empty();
+        return customerJpaRepository.findByMerchantIdAndExternalId(merchantId, externalId)
+                .map(customerMapper::toDomain);
     }
 
     @Override
