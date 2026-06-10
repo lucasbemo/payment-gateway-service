@@ -1,20 +1,19 @@
 package com.payment.gateway.infrastructure.refund.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Currency;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 class RefundMapperTest {
 
@@ -206,10 +205,14 @@ class RefundMapperTest {
         void shouldPreserveDataThroughRoundTrip() {
             Currency usd = Currency.getInstance("USD");
             Refund original = Refund.create(
-                    "pay-rt", "txn-rt", "merchant-rt",
-                    RefundType.FULL, Money.of(new BigDecimal("100.00"), usd),
-                    "USD", "idem-rt", "Round trip reason"
-            );
+                    "pay-rt",
+                    "txn-rt",
+                    "merchant-rt",
+                    RefundType.FULL,
+                    Money.of(new BigDecimal("100.00"), usd),
+                    "USD",
+                    "idem-rt",
+                    "Round trip reason");
 
             RefundJpaEntity entity = mapper.toEntity(original);
             Refund restored = mapper.toDomain(entity);

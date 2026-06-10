@@ -5,14 +5,13 @@ import com.payment.gateway.domain.merchant.model.ApiCredentials;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
 import com.payment.gateway.domain.merchant.port.MerchantRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Domain service for Merchant operations.
@@ -27,12 +26,13 @@ public class MerchantDomainService {
     /**
      * Register a new merchant.
      */
-    public Merchant registerMerchant(String name,
-                                      String email,
-                                      String apiKey,
-                                      String apiSecret,
-                                      String webhookUrl,
-                                      MerchantConfiguration configuration) {
+    public Merchant registerMerchant(
+            String name,
+            String email,
+            String apiKey,
+            String apiSecret,
+            String webhookUrl,
+            MerchantConfiguration configuration) {
         // Check for duplicate email
         if (merchantRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Merchant with this email already exists: " + email);
@@ -43,15 +43,8 @@ public class MerchantDomainService {
         String apiSecretHash = hash(apiSecret);
 
         // Create and save merchant
-        Merchant merchant = Merchant.register(
-            name,
-            email,
-            apiKey,
-            apiKeyHash,
-            apiSecretHash,
-            webhookUrl,
-            configuration
-        );
+        Merchant merchant =
+                Merchant.register(name, email, apiKey, apiKeyHash, apiSecretHash, webhookUrl, configuration);
 
         return merchantRepository.save(merchant);
     }
@@ -60,8 +53,7 @@ public class MerchantDomainService {
      * Get merchant by ID.
      */
     public Merchant getMerchant(String merchantId) {
-        return merchantRepository.findById(merchantId)
-            .orElseThrow(() -> new MerchantNotFoundException(merchantId));
+        return merchantRepository.findById(merchantId).orElseThrow(() -> new MerchantNotFoundException(merchantId));
     }
 
     /**
@@ -69,8 +61,9 @@ public class MerchantDomainService {
      */
     public Merchant getMerchantByApiKey(String apiKey) {
         String apiKeyHash = hash(apiKey);
-        return merchantRepository.findByApiKeyHash(apiKeyHash)
-            .orElseThrow(() -> new MerchantNotFoundException("Invalid API key"));
+        return merchantRepository
+                .findByApiKeyHash(apiKeyHash)
+                .orElseThrow(() -> new MerchantNotFoundException("Invalid API key"));
     }
 
     /**
@@ -145,7 +138,7 @@ public class MerchantDomainService {
         Merchant merchant = getMerchant(merchantId);
         if (!merchant.canProcessPayments()) {
             throw new IllegalStateException(
-                "Merchant " + merchantId + " cannot process payments (status: " + merchant.getStatus() + ")");
+                    "Merchant " + merchantId + " cannot process payments (status: " + merchant.getStatus() + ")");
         }
     }
 

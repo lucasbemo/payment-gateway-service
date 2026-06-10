@@ -12,16 +12,11 @@ import org.springframework.context.annotation.FilterType;
 @ComponentScan(
         basePackages = "com.payment.gateway",
         excludeFilters = {
-                @ComponentScan.Filter(
-                        pattern = "com.payment.gateway.infrastructure.*.adapter.in.rest.*",
-                        type = FilterType.REGEX
-                ),
-                @ComponentScan.Filter(
-                        pattern = "com.payment.gateway.application.*.service.*",
-                        type = FilterType.REGEX
-                )
-        }
-)
+            @ComponentScan.Filter(
+                    pattern = "com.payment.gateway.infrastructure.*.adapter.in.rest.*",
+                    type = FilterType.REGEX),
+            @ComponentScan.Filter(pattern = "com.payment.gateway.application.*.service.*", type = FilterType.REGEX)
+        })
 public class RepositoryTestConfig {
     // Minimal configuration for repository tests
 }

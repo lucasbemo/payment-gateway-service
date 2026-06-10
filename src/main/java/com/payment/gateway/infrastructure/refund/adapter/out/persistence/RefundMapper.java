@@ -4,11 +4,10 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
+import org.springframework.stereotype.Component;
 
 @Component
 public class RefundMapper {
@@ -21,8 +20,14 @@ public class RefundMapper {
                 .merchantId(refund.getMerchantId())
                 .refundIdempotencyKey(refund.getRefundIdempotencyKey())
                 .type(refund.getType() != null ? refund.getType().name() : null)
-                .amount(refund.getAmount() != null ? BigDecimal.valueOf(refund.getAmount().getAmountInCents()) : null)
-                .refundedAmount(refund.getRefundedAmount() != null ? BigDecimal.valueOf(refund.getRefundedAmount().getAmountInCents()) : null)
+                .amount(
+                        refund.getAmount() != null
+                                ? BigDecimal.valueOf(refund.getAmount().getAmountInCents())
+                                : null)
+                .refundedAmount(
+                        refund.getRefundedAmount() != null
+                                ? BigDecimal.valueOf(refund.getRefundedAmount().getAmountInCents())
+                                : null)
                 .currency(refund.getCurrency())
                 .status(refund.getStatus() != null ? refund.getStatus().name() : null)
                 .reason(refund.getReason())

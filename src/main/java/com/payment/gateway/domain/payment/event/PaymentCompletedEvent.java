@@ -1,10 +1,9 @@
 package com.payment.gateway.domain.payment.event;
 
 import com.payment.gateway.commons.event.IntegrationEvent;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.Map;
+import lombok.Getter;
 
 /**
  * Event published when a payment is completed.
@@ -20,8 +19,8 @@ public class PaymentCompletedEvent extends IntegrationEvent {
     private final String currency;
     private final String providerTransactionId;
 
-    public PaymentCompletedEvent(String aggregateId, String merchantId, String amount,
-                                  String currency, String providerTransactionId) {
+    public PaymentCompletedEvent(
+            String aggregateId, String merchantId, String amount, String currency, String providerTransactionId) {
         super(aggregateId, CURRENT_SCHEMA_VERSION, "PAYMENT_COMPLETED");
         this.merchantId = merchantId;
         this.amount = amount;
@@ -29,9 +28,15 @@ public class PaymentCompletedEvent extends IntegrationEvent {
         this.providerTransactionId = providerTransactionId;
     }
 
-    public PaymentCompletedEvent(String id, Instant occurredOn, String aggregateId,
-                                  String merchantId, String amount, String currency,
-                                  String providerTransactionId, String schemaVersion) {
+    public PaymentCompletedEvent(
+            String id,
+            Instant occurredOn,
+            String aggregateId,
+            String merchantId,
+            String amount,
+            String currency,
+            String providerTransactionId,
+            String schemaVersion) {
         super(id, occurredOn, aggregateId, schemaVersion, "PAYMENT_COMPLETED");
         this.merchantId = merchantId;
         this.amount = amount;
@@ -55,15 +60,14 @@ public class PaymentCompletedEvent extends IntegrationEvent {
         }
 
         PaymentCompletedEvent event = new PaymentCompletedEvent(
-            (String) map.get("id"),
-            (Instant) map.get("occurredOn"),
-            (String) map.get("aggregateId"),
-            (String) map.get("merchantId"),
-            (String) map.get("amount"),
-            (String) map.get("currency"),
-            (String) map.get("providerTransactionId"),
-            schemaVersion
-        );
+                (String) map.get("id"),
+                (Instant) map.get("occurredOn"),
+                (String) map.get("aggregateId"),
+                (String) map.get("merchantId"),
+                (String) map.get("amount"),
+                (String) map.get("currency"),
+                (String) map.get("providerTransactionId"),
+                schemaVersion);
 
         if (!CURRENT_SCHEMA_VERSION.equals(schemaVersion)) {
             event = (PaymentCompletedEvent) event.migrateFrom(schemaVersion);

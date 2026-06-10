@@ -1,15 +1,27 @@
 package com.payment.gateway.application.payment.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
-import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
+import com.payment.gateway.domain.transaction.model.Transaction;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,19 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
 
 @DisplayName("Capture Payment Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +50,8 @@ class CapturePaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        capturePaymentService = new CapturePaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService, transactionQueryPort);
+        capturePaymentService = new CapturePaymentService(
+                paymentQueryPort, externalPaymentProviderPort, outboxEventService, transactionQueryPort);
     }
 
     @Nested
@@ -67,9 +67,9 @@ class CapturePaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId, PaymentStatus.AUTHORIZED);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
-            given(externalPaymentProviderPort.capture(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_123", null, null))
-            );
+            given(externalPaymentProviderPort.capture(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            true, "capture_txn_123", null, null)));
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
             Transaction transaction = org.mockito.Mockito.mock(Transaction.class);
             given(transaction.getId()).willReturn("txn_abc123");
@@ -98,9 +98,9 @@ class CapturePaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId, PaymentStatus.AUTHORIZED);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
-            given(externalPaymentProviderPort.capture(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_456", null, null))
-            );
+            given(externalPaymentProviderPort.capture(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            true, "capture_txn_456", null, null)));
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
             given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.empty());
 
@@ -233,9 +233,9 @@ class CapturePaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId, PaymentStatus.AUTHORIZED);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
-            given(externalPaymentProviderPort.capture(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "CAPTURE_FAILED", "Insufficient funds"))
-            );
+            given(externalPaymentProviderPort.capture(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            false, null, "CAPTURE_FAILED", "Insufficient funds")));
 
             // When & Then
             assertThatThrownBy(() -> capturePaymentService.capturePayment(paymentId, merchantId))
@@ -254,9 +254,9 @@ class CapturePaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId, PaymentStatus.AUTHORIZED);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
-            given(externalPaymentProviderPort.capture(any())).willReturn(
-                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(false, null, "TIMEOUT", "Gateway timeout"))
-            );
+            given(externalPaymentProviderPort.capture(any()))
+                    .willReturn(CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            false, null, "TIMEOUT", "Gateway timeout")));
 
             // When & Then
             assertThatThrownBy(() -> capturePaymentService.capturePayment(paymentId, merchantId))
@@ -277,8 +277,7 @@ class CapturePaymentServiceTest {
                 "Test payment",
                 PaymentMetadata.empty(),
                 List.of(),
-                null
-        );
+                null);
         setId(payment, id);
         setStatus(payment, status);
         return payment;

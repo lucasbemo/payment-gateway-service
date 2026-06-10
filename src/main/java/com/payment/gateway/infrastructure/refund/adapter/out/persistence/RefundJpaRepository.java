@@ -1,9 +1,8 @@
 package com.payment.gateway.infrastructure.refund.adapter.out.persistence;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RefundJpaRepository extends JpaRepository<RefundJpaEntity, String> {
 

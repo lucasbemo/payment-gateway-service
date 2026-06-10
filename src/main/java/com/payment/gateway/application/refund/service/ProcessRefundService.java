@@ -1,5 +1,7 @@
 package com.payment.gateway.application.refund.service;
 
+import com.payment.gateway.application.commons.port.out.AuditPort;
+import com.payment.gateway.application.commons.port.out.MetricsPort;
 import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.in.ProcessRefundUseCase;
@@ -13,17 +15,13 @@ import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
 import com.payment.gateway.domain.payment.event.RefundProcessedEvent;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.refund.model.Refund;
-import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
 import com.payment.gateway.domain.transaction.model.Transaction;
-import com.payment.gateway.application.commons.port.out.MetricsPort;
-import com.payment.gateway.application.commons.port.out.AuditPort;
+import java.util.Currency;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Currency;
 
 /**
  * Application service for processing refunds.
@@ -42,19 +40,21 @@ public class ProcessRefundService implements ProcessRefundUseCase {
     private final OutboxEventDomainService outboxEventService;
 
     @Override
-    public RefundResponse processRefund(String paymentId, String merchantId, Long amount,
-                                         String refundIdempotencyKey, String reason) {
+    public RefundResponse processRefund(
+            String paymentId, String merchantId, Long amount, String refundIdempotencyKey, String reason) {
         log.info("Processing refund for payment: {} for merchant: {}", paymentId, merchantId);
 
         // Check for duplicate refund (idempotency)
         if (refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)) {
             log.info("Duplicate refund detected for idempotency key: {}", refundIdempotencyKey);
-            Refund existingRefund = refundQueryPort.findByIdempotencyKey(refundIdempotencyKey).get();
+            Refund existingRefund =
+                    refundQueryPort.findByIdempotencyKey(refundIdempotencyKey).get();
             return mapToResponse(existingRefund);
         }
 
         // Get payment
-        Payment payment = refundPaymentQueryPort.findPaymentById(paymentId)
+        Payment payment = refundPaymentQueryPort
+                .findPaymentById(paymentId)
                 .orElseThrow(() -> new BusinessException("Payment not found: " + paymentId));
 
         // Validate merchant ownership
@@ -63,7 +63,8 @@ public class ProcessRefundService implements ProcessRefundUseCase {
         }
 
         // Validate merchant is active
-        Merchant merchant = merchantQueryPort.findById(merchantId)
+        Merchant merchant = merchantQueryPort
+                .findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
         if (!merchant.getStatus().canProcessPayments()) {
             throw new BusinessException("Merchant is not active: " + merchant.getStatus());
@@ -76,7 +77,8 @@ public class ProcessRefundService implements ProcessRefundUseCase {
         }
 
         // Get latest transaction
-        Transaction transaction = refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)
+        Transaction transaction = refundPaymentQueryPort
+                .findLatestTransactionByPaymentId(paymentId)
                 .orElseThrow(() -> new BusinessException("No transaction found for payment: " + paymentId));
 
         // Determine refund type
@@ -118,8 +120,7 @@ public class ProcessRefundService implements ProcessRefundUseCase {
                 savedRefund.getPaymentId(),
                 savedRefund.getMerchantId(),
                 "SUCCESS",
-                savedRefund.getAmount().getAmountInCents()
-        );
+                savedRefund.getAmount().getAmountInCents());
         return mapToResponse(savedRefund);
     }
 
@@ -130,8 +131,13 @@ public class ProcessRefundService implements ProcessRefundUseCase {
         return RefundType.PARTIAL;
     }
 
-    private Refund createRefund(Payment payment, Transaction transaction, RefundType refundType,
-                                 Long amount, String refundIdempotencyKey, String reason) {
+    private Refund createRefund(
+            Payment payment,
+            Transaction transaction,
+            RefundType refundType,
+            Long amount,
+            String refundIdempotencyKey,
+            String reason) {
         Long refundAmount = amount != null ? amount : payment.getAmount().getAmountInCents();
         Money refundMoney = Money.of(refundAmount, Currency.getInstance(payment.getCurrency()));
 
@@ -143,8 +149,7 @@ public class ProcessRefundService implements ProcessRefundUseCase {
                 refundMoney,
                 payment.getCurrency(),
                 refundIdempotencyKey,
-                reason
-        );
+                reason);
     }
 
     private void processRefundLogic(Refund refund) {

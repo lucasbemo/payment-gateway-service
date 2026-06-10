@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.customer.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("PaymentMethodStatus Enum Tests")
 class PaymentMethodStatusTest {
@@ -67,14 +67,15 @@ class PaymentMethodStatusTest {
             assertThat(PaymentMethodStatus.valueOf("INACTIVE")).isEqualTo(PaymentMethodStatus.INACTIVE);
             assertThat(PaymentMethodStatus.valueOf("EXPIRED")).isEqualTo(PaymentMethodStatus.EXPIRED);
             assertThat(PaymentMethodStatus.valueOf("VERIFIED")).isEqualTo(PaymentMethodStatus.VERIFIED);
-            assertThat(PaymentMethodStatus.valueOf("FAILED_VERIFICATION")).isEqualTo(PaymentMethodStatus.FAILED_VERIFICATION);
+            assertThat(PaymentMethodStatus.valueOf("FAILED_VERIFICATION"))
+                    .isEqualTo(PaymentMethodStatus.FAILED_VERIFICATION);
         }
 
         @Test
         @DisplayName("Should throw exception for invalid status")
         void shouldThrowExceptionForInvalidStatus() {
             assertThatThrownBy(() -> PaymentMethodStatus.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -87,15 +88,15 @@ class PaymentMethodStatusTest {
         void shouldReturnAllPaymentMethodStatuses() {
             PaymentMethodStatus[] values = PaymentMethodStatus.values();
             assertThat(values).hasSize(7);
-            assertThat(values).containsExactlyInAnyOrder(
-                PaymentMethodStatus.ACTIVE,
-                PaymentMethodStatus.INACTIVE,
-                PaymentMethodStatus.EXPIRED,
-                PaymentMethodStatus.REVOKED,
-                PaymentMethodStatus.PENDING_VERIFICATION,
-                PaymentMethodStatus.VERIFIED,
-                PaymentMethodStatus.FAILED_VERIFICATION
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            PaymentMethodStatus.ACTIVE,
+                            PaymentMethodStatus.INACTIVE,
+                            PaymentMethodStatus.EXPIRED,
+                            PaymentMethodStatus.REVOKED,
+                            PaymentMethodStatus.PENDING_VERIFICATION,
+                            PaymentMethodStatus.VERIFIED,
+                            PaymentMethodStatus.FAILED_VERIFICATION);
         }
     }
 }

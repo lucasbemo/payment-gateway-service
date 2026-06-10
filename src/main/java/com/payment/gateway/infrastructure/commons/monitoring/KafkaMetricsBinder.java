@@ -2,13 +2,12 @@ package com.payment.gateway.infrastructure.commons.monitoring;
 
 import io.micrometer.core.instrument.*;
 import io.micrometer.core.instrument.binder.MeterBinder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -16,19 +15,19 @@ import java.util.concurrent.atomic.AtomicLong;
 public class KafkaMetricsBinder implements MeterBinder {
 
     private final KafkaLagMonitor kafkaLagMonitor;
-    
+
     private MeterRegistry registry;
-    
+
     private final AtomicLong totalConsumerLag = new AtomicLong(0);
     private final AtomicLong lastLagCheckTimestamp = new AtomicLong(0);
-    
+
     private Counter messagesProducedTotal;
     private Counter messagesProducedFailed;
     private Counter messagesConsumedTotal;
     private Counter messagesConsumedFailed;
     private Timer producerLatency;
     private Timer consumerLatency;
-    
+
     private final ConcurrentMap<String, AtomicLong> topicLagGauges = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Counter> messagesProducedPerTopic = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Counter> messagesConsumedPerTopic = new ConcurrentHashMap<>();
@@ -36,12 +35,12 @@ public class KafkaMetricsBinder implements MeterBinder {
     @Override
     public void bindTo(MeterRegistry registry) {
         this.registry = registry;
-        
+
         bindConsumerLagMetrics(registry);
         bindProducerMetrics(registry);
         bindConsumerMetrics(registry);
         bindHealthMetrics(registry);
-        
+
         log.info("KafkaMetricsBinder initialized with consumer lag monitoring");
     }
 
@@ -108,20 +107,22 @@ public class KafkaMetricsBinder implements MeterBinder {
     public void updateLagMetrics() {
         totalConsumerLag.set(kafkaLagMonitor.getTotalLag());
         lastLagCheckTimestamp.set(kafkaLagMonitor.getLastCheckTimestamp());
-        
+
         for (var entry : kafkaLagMonitor.getTopicLags().entrySet()) {
             String topic = entry.getKey();
             long lag = entry.getValue();
-            
-            topicLagGauges.computeIfAbsent(topic, t -> {
-                AtomicLong gauge = new AtomicLong(0);
-                Gauge.builder("kafka.consumer.lag.topic", gauge, AtomicLong::get)
-                        .description("Consumer lag per topic")
-                        .tag("topic", t)
-                        .tag("group", kafkaLagMonitor.getConsumerGroupId())
-                        .register(registry);
-                return gauge;
-            }).set(lag);
+
+            topicLagGauges
+                    .computeIfAbsent(topic, t -> {
+                        AtomicLong gauge = new AtomicLong(0);
+                        Gauge.builder("kafka.consumer.lag.topic", gauge, AtomicLong::get)
+                                .description("Consumer lag per topic")
+                                .tag("topic", t)
+                                .tag("group", kafkaLagMonitor.getConsumerGroupId())
+                                .register(registry);
+                        return gauge;
+                    })
+                    .set(lag);
         }
     }
 
@@ -129,9 +130,9 @@ public class KafkaMetricsBinder implements MeterBinder {
         if (messagesProducedTotal != null) {
             messagesProducedTotal.increment();
         }
-        
-        messagesProducedPerTopic.computeIfAbsent(topic, t -> 
-                Counter.builder("kafka.producer.messages.sent.topic")
+
+        messagesProducedPerTopic
+                .computeIfAbsent(topic, t -> Counter.builder("kafka.producer.messages.sent.topic")
                         .description("Messages sent per topic")
                         .tag("topic", t)
                         .register(registry))
@@ -142,7 +143,7 @@ public class KafkaMetricsBinder implements MeterBinder {
         if (messagesProducedFailed != null) {
             messagesProducedFailed.increment();
         }
-        
+
         Counter.builder("kafka.producer.errors")
                 .description("Producer errors")
                 .tag("topic", topic)
@@ -155,9 +156,9 @@ public class KafkaMetricsBinder implements MeterBinder {
         if (messagesConsumedTotal != null) {
             messagesConsumedTotal.increment();
         }
-        
-        messagesConsumedPerTopic.computeIfAbsent(topic, t ->
-                Counter.builder("kafka.consumer.messages.consumed.topic")
+
+        messagesConsumedPerTopic
+                .computeIfAbsent(topic, t -> Counter.builder("kafka.consumer.messages.consumed.topic")
                         .description("Messages consumed per topic")
                         .tag("topic", t)
                         .tag("group", kafkaLagMonitor.getConsumerGroupId())
@@ -169,7 +170,7 @@ public class KafkaMetricsBinder implements MeterBinder {
         if (messagesConsumedFailed != null) {
             messagesConsumedFailed.increment();
         }
-        
+
         Counter.builder("kafka.consumer.errors")
                 .description("Consumer errors")
                 .tag("topic", topic)

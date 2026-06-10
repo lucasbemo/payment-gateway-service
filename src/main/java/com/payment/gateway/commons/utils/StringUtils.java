@@ -8,17 +8,11 @@ import java.util.regex.Pattern;
  */
 public final class StringUtils {
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-        "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-    );
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    private static final Pattern PHONE_PATTERN = Pattern.compile(
-        "^\\+?[1-9]\\d{1,14}$"
-    );
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[1-9]\\d{1,14}$");
 
-    private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile(
-        "^[a-zA-Z0-9]+$"
-    );
+    private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("^[a-zA-Z0-9]+$");
 
     private StringUtils() {
         // Private constructor to prevent instantiation
@@ -95,9 +89,9 @@ public final class StringUtils {
         if (length <= visibleAtStart + visibleAtEnd) {
             return "*".repeat(length);
         }
-        return str.substring(0, visibleAtStart) +
-               "*".repeat(length - visibleAtStart - visibleAtEnd) +
-               str.substring(length - visibleAtEnd);
+        return str.substring(0, visibleAtStart)
+                + "*".repeat(length - visibleAtStart - visibleAtEnd)
+                + str.substring(length - visibleAtEnd);
     }
 
     /**

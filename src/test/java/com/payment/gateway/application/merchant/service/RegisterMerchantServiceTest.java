@@ -1,12 +1,17 @@
 package com.payment.gateway.application.merchant.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.merchant.dto.MerchantResponse;
 import com.payment.gateway.application.merchant.dto.RegisterMerchantCommand;
 import com.payment.gateway.application.merchant.port.out.MerchantCommandPort;
 import com.payment.gateway.commons.exception.BusinessException;
-import com.payment.gateway.commons.utils.CryptoUtils;
-import com.payment.gateway.commons.utils.IdGenerator;
 import com.payment.gateway.domain.merchant.model.Merchant;
+import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,16 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Register Merchant Service Tests")
 @ExtendWith(MockitoExtension.class)

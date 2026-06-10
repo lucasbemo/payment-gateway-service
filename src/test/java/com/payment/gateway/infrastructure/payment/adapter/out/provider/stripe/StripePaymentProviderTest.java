@@ -1,19 +1,18 @@
 package com.payment.gateway.infrastructure.payment.adapter.out.provider.stripe;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StripePaymentProviderTest {
@@ -38,14 +37,18 @@ class StripePaymentProviderTest {
         when(mockIntent.getId()).thenReturn("pi_1234567890");
 
         try (MockedStatic<PaymentIntent> mockedStatic = mockStatic(PaymentIntent.class)) {
-            mockedStatic.when(() -> PaymentIntent.create(any(com.stripe.param.PaymentIntentCreateParams.class))).thenReturn(mockIntent);
+            mockedStatic
+                    .when(() -> PaymentIntent.create(any(com.stripe.param.PaymentIntentCreateParams.class)))
+                    .thenReturn(mockIntent);
 
-            var request = new com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderRequest(
-                    "pay-001", "merchant-001", 5000L, "USD", "tok_visa"
-            );
+            var request =
+                    new com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort
+                            .PaymentProviderRequest("pay-001", "merchant-001", 5000L, "USD", "tok_visa");
 
-            CompletableFuture<com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderResult> future =
-                    provider.authorize(request);
+            CompletableFuture<
+                            com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort
+                                    .PaymentProviderResult>
+                    future = provider.authorize(request);
             var result = future.join();
 
             assertThat(result.success()).isTrue();
@@ -64,12 +67,14 @@ class StripePaymentProviderTest {
         try (MockedStatic<PaymentIntent> mockedStatic = mockStatic(PaymentIntent.class)) {
             mockedStatic.when(() -> PaymentIntent.retrieve(any())).thenReturn(mockIntent);
 
-            var request = new com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderRequest(
-                    "pi_1234567890", "merchant-001", 5000L, "USD", "tok_visa"
-            );
+            var request =
+                    new com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort
+                            .PaymentProviderRequest("pi_1234567890", "merchant-001", 5000L, "USD", "tok_visa");
 
-            CompletableFuture<com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderResult> future =
-                    provider.capture(request);
+            CompletableFuture<
+                            com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort
+                                    .PaymentProviderResult>
+                    future = provider.capture(request);
             var result = future.join();
 
             assertThat(result.success()).isTrue();
@@ -86,12 +91,14 @@ class StripePaymentProviderTest {
         try (MockedStatic<PaymentIntent> mockedStatic = mockStatic(PaymentIntent.class)) {
             mockedStatic.when(() -> PaymentIntent.retrieve(any())).thenReturn(mockIntent);
 
-            var request = new com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderRequest(
-                    "pi_1234567890", "merchant-001", 5000L, "USD", "tok_visa"
-            );
+            var request =
+                    new com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort
+                            .PaymentProviderRequest("pi_1234567890", "merchant-001", 5000L, "USD", "tok_visa");
 
-            CompletableFuture<com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderResult> future =
-                    provider.cancel(request);
+            CompletableFuture<
+                            com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort
+                                    .PaymentProviderResult>
+                    future = provider.cancel(request);
             var result = future.join();
 
             assertThat(result.success()).isTrue();

@@ -1,5 +1,11 @@
 package com.payment.gateway.application.reconciliation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.reconciliation.dto.ReconciliationResponse;
 import com.payment.gateway.application.reconciliation.port.out.ReconciliationBatchPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
@@ -10,6 +16,11 @@ import com.payment.gateway.domain.reconciliation.service.ReconciliationDomainSer
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Currency;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,18 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Currency;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Reconcile Transactions Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -86,8 +85,10 @@ class ReconcileTransactionsServiceTest {
             then(reconciliationDomainService).should().startReconciliation(batchId);
             // total=3, matched=2 (CAPTURED+SETTLED), discrepancies=1 (FAILED),
             // totalAmount=4000 cents, matchedAmount=3500 cents
-            then(reconciliationDomainService).should().recordReconciliationResults(
-                    batchId, 3, 2, 1, BigDecimal.valueOf(4000L), BigDecimal.valueOf(3500L));
+            then(reconciliationDomainService)
+                    .should()
+                    .recordReconciliationResults(
+                            batchId, 3, 2, 1, BigDecimal.valueOf(4000L), BigDecimal.valueOf(3500L));
             then(reconciliationDomainService).should().completeReconciliation(batchId);
         }
 
@@ -113,8 +114,9 @@ class ReconcileTransactionsServiceTest {
 
             // Then
             assertThat(response).isNotNull();
-            then(reconciliationDomainService).should().recordReconciliationResults(
-                    batchId, 0, 0, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+            then(reconciliationDomainService)
+                    .should()
+                    .recordReconciliationResults(batchId, 0, 0, 0, BigDecimal.ZERO, BigDecimal.ZERO);
         }
     }
 

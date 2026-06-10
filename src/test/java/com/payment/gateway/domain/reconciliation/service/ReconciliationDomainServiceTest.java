@@ -1,10 +1,19 @@
 package com.payment.gateway.domain.reconciliation.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.reconciliation.model.*;
 import com.payment.gateway.domain.reconciliation.port.DiscrepancyRepositoryPort;
 import com.payment.gateway.domain.reconciliation.port.ReconciliationBatchRepositoryPort;
 import com.payment.gateway.domain.reconciliation.port.SettlementReportRepositoryPort;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,16 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ReconciliationDomainService Tests")
@@ -50,7 +49,8 @@ class ReconciliationDomainServiceTest {
 
     @BeforeEach
     void setUp() {
-        reconciliationDomainService = new ReconciliationDomainService(batchRepository, discrepancyRepository, settlementReportRepository);
+        reconciliationDomainService =
+                new ReconciliationDomainService(batchRepository, discrepancyRepository, settlementReportRepository);
     }
 
     @Nested
@@ -61,13 +61,13 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should create reconciliation batch successfully")
         void shouldCreateReconciliationBatchSuccessfully() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             given(batchRepository.save(any(ReconciliationBatch.class))).willReturn(batch);
 
             // When
             ReconciliationBatch result = reconciliationDomainService.createReconciliationBatch(
-                MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY
-            );
+                    MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
 
             // Then
             assertThat(result).isNotNull();
@@ -83,7 +83,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should start reconciliation successfully")
         void shouldStartReconciliationSuccessfully() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             given(batchRepository.findById(BATCH_ID)).willReturn(Optional.of(batch));
             given(batchRepository.save(any(ReconciliationBatch.class))).willReturn(batch);
 
@@ -104,8 +105,8 @@ class ReconciliationDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> reconciliationDomainService.startReconciliation(BATCH_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Reconciliation batch not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Reconciliation batch not found");
         }
     }
 
@@ -117,7 +118,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should update reconciliation progress successfully")
         void shouldUpdateReconciliationProgressSuccessfully() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             int total = 100;
             int matched = 95;
             int unmatched = 5;
@@ -125,9 +127,8 @@ class ReconciliationDomainServiceTest {
             given(batchRepository.save(any(ReconciliationBatch.class))).willReturn(batch);
 
             // When
-            ReconciliationBatch result = reconciliationDomainService.updateReconciliationProgress(
-                BATCH_ID, total, matched, unmatched
-            );
+            ReconciliationBatch result =
+                    reconciliationDomainService.updateReconciliationProgress(BATCH_ID, total, matched, unmatched);
 
             // Then
             assertThat(result).isEqualTo(batch);
@@ -144,7 +145,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should create discrepancy successfully")
         void shouldCreateDiscrepancySuccessfully() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             DiscrepancyType type = DiscrepancyType.AMOUNT_MISMATCH;
             String description = "Amount differs between systems";
             Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, type, TRANSACTION_ID, description);
@@ -155,8 +157,7 @@ class ReconciliationDomainServiceTest {
 
             // When
             Discrepancy result = reconciliationDomainService.createDiscrepancy(
-                BATCH_ID, MERCHANT_ID, type, TRANSACTION_ID, description
-            );
+                    BATCH_ID, MERCHANT_ID, type, TRANSACTION_ID, description);
 
             // Then
             assertThat(result).isNotNull();
@@ -168,7 +169,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should increment discrepancy count on batch")
         void shouldIncrementDiscrepancyCountOnBatch() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             DiscrepancyType type = DiscrepancyType.MISSING_IN_GATEWAY;
             String description = "Transaction not found in gateway";
             Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, type, TRANSACTION_ID, description);
@@ -193,14 +195,16 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should resolve discrepancy successfully")
         void shouldResolveDiscrepancySuccessfully() {
             // Given
-            Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
+            Discrepancy discrepancy = Discrepancy.create(
+                    BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
             String resolutionNotes = "Adjusted manually";
             String resolvedBy = "admin";
             given(discrepancyRepository.findById(DISCREPANCY_ID)).willReturn(Optional.of(discrepancy));
             given(discrepancyRepository.save(any(Discrepancy.class))).willReturn(discrepancy);
 
             // When
-            Discrepancy result = reconciliationDomainService.resolveDiscrepancy(DISCREPANCY_ID, resolutionNotes, resolvedBy);
+            Discrepancy result =
+                    reconciliationDomainService.resolveDiscrepancy(DISCREPANCY_ID, resolutionNotes, resolvedBy);
 
             // Then
             assertThat(result).isEqualTo(discrepancy);
@@ -216,9 +220,10 @@ class ReconciliationDomainServiceTest {
             given(discrepancyRepository.findById(DISCREPANCY_ID)).willReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> reconciliationDomainService.resolveDiscrepancy(DISCREPANCY_ID, "Notes", "Resolver"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Discrepancy not found");
+            assertThatThrownBy(
+                            () -> reconciliationDomainService.resolveDiscrepancy(DISCREPANCY_ID, "Notes", "Resolver"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Discrepancy not found");
         }
     }
 
@@ -230,7 +235,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should escalate discrepancy successfully")
         void shouldEscalateDiscrepancySuccessfully() {
             // Given
-            Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
+            Discrepancy discrepancy = Discrepancy.create(
+                    BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
             given(discrepancyRepository.findById(DISCREPANCY_ID)).willReturn(Optional.of(discrepancy));
             given(discrepancyRepository.save(any(Discrepancy.class))).willReturn(discrepancy);
 
@@ -252,7 +258,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should complete reconciliation successfully")
         void shouldCompleteReconciliationSuccessfully() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             given(batchRepository.findById(BATCH_ID)).willReturn(Optional.of(batch));
             given(batchRepository.save(any(ReconciliationBatch.class))).willReturn(batch);
 
@@ -282,16 +289,26 @@ class ReconciliationDomainServiceTest {
             String currency = "BRL";
 
             SettlementReport report = SettlementReport.create(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, gatewayReportId,
-                grossAmount, feeAmount, netAmount, currency
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    gatewayReportId,
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    currency);
             given(settlementReportRepository.save(any(SettlementReport.class))).willReturn(report);
 
             // When
             SettlementReport result = reconciliationDomainService.createSettlementReport(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, gatewayReportId,
-                grossAmount, feeAmount, netAmount, currency
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    gatewayReportId,
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    currency);
 
             // Then
             assertThat(result).isNotNull();
@@ -314,9 +331,14 @@ class ReconciliationDomainServiceTest {
             String currency = "BRL";
 
             SettlementReport report = SettlementReport.create(
-                MERCHANT_ID, GATEWAY_NAME, RECONCILIATION_DATE, gatewayReportId,
-                grossAmount, feeAmount, netAmount, currency
-            );
+                    MERCHANT_ID,
+                    GATEWAY_NAME,
+                    RECONCILIATION_DATE,
+                    gatewayReportId,
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    currency);
             given(settlementReportRepository.findById(REPORT_ID)).willReturn(Optional.of(report));
             given(settlementReportRepository.save(any(SettlementReport.class))).willReturn(report);
 
@@ -337,8 +359,8 @@ class ReconciliationDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> reconciliationDomainService.markSettlementAsSettled(REPORT_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Settlement report not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Settlement report not found");
         }
     }
 
@@ -350,7 +372,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should return list of batches by merchant ID")
         void shouldReturnListOfBatchesByMerchantId() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             given(batchRepository.findByMerchantId(MERCHANT_ID)).willReturn(List.of(batch));
 
             // When
@@ -370,7 +393,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should return list of discrepancies by batch ID")
         void shouldReturnListOfDiscrepanciesByBatchId() {
             // Given
-            Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
+            Discrepancy discrepancy = Discrepancy.create(
+                    BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
             given(discrepancyRepository.findByBatchId(BATCH_ID)).willReturn(List.of(discrepancy));
 
             // When
@@ -390,7 +414,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should return list of open discrepancies")
         void shouldReturnListOfOpenDiscrepancies() {
             // Given
-            Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
+            Discrepancy discrepancy = Discrepancy.create(
+                    BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
             given(discrepancyRepository.findByStatus(DiscrepancyStatus.OPEN)).willReturn(List.of(discrepancy));
 
             // When
@@ -410,7 +435,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should return batch when found")
         void shouldReturnBatchWhenFound() {
             // Given
-            ReconciliationBatch batch = ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
+            ReconciliationBatch batch =
+                    ReconciliationBatch.create(MERCHANT_ID, RECONCILIATION_DATE, GATEWAY_NAME, INITIATED_BY);
             given(batchRepository.findById(BATCH_ID)).willReturn(Optional.of(batch));
 
             // When
@@ -429,8 +455,8 @@ class ReconciliationDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> reconciliationDomainService.getBatchOrThrow(BATCH_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Reconciliation batch not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Reconciliation batch not found");
         }
     }
 
@@ -442,7 +468,8 @@ class ReconciliationDomainServiceTest {
         @DisplayName("Should return discrepancy when found")
         void shouldReturnDiscrepancyWhenFound() {
             // Given
-            Discrepancy discrepancy = Discrepancy.create(BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
+            Discrepancy discrepancy = Discrepancy.create(
+                    BATCH_ID, MERCHANT_ID, DiscrepancyType.AMOUNT_MISMATCH, TRANSACTION_ID, "Description");
             given(discrepancyRepository.findById(DISCREPANCY_ID)).willReturn(Optional.of(discrepancy));
 
             // When
@@ -461,8 +488,8 @@ class ReconciliationDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> reconciliationDomainService.getDiscrepancyOrThrow(DISCREPANCY_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Discrepancy not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Discrepancy not found");
         }
     }
 }

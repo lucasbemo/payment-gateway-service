@@ -1,25 +1,18 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.e2e.testdata.TestDataFactory;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.test.context.TestPropertySource;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for Kafka event propagation.
@@ -37,14 +30,13 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -61,12 +53,9 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
         // When: Processing the payment
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         // Then: Payment is processed
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -103,10 +92,10 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
         Map<String, Object> event = createPaymentEvent(eventType, paymentId, merchantId, "10000", "USD");
 
         // When: Validating event structure
-        boolean hasRequiredFields = event.containsKey("eventType") &&
-                                    event.containsKey("aggregateId") &&
-                                    event.containsKey("merchantId") &&
-                                    event.containsKey("timestamp");
+        boolean hasRequiredFields = event.containsKey("eventType")
+                && event.containsKey("aggregateId")
+                && event.containsKey("merchantId")
+                && event.containsKey("timestamp");
 
         // Then: Event has all required fields
         assertThat(hasRequiredFields).isTrue();
@@ -125,15 +114,13 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
             var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-            var response = getApiClient().processPayment(
-                paymentData.merchantId,
-                paymentData.amountInCents,
-                paymentData.currency,
-                idempotencyKey
-            );
+            var response = getApiClient()
+                    .processPayment(
+                            paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
+            Map<String, Object> payment =
+                    (Map<String, Object>) response.getBody().get("data");
             paymentIds.add((String) payment.get("id"));
         }
 
@@ -155,13 +142,14 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
         String merchantId = "test-merchant";
         String eventType = "REFUND_PROCESSED";
 
-        Map<String, Object> event = createRefundEvent(eventType, refundId, paymentId, merchantId, "5000", "USD", "FULL");
+        Map<String, Object> event =
+                createRefundEvent(eventType, refundId, paymentId, merchantId, "5000", "USD", "FULL");
 
         // When: Validating event structure
-        boolean hasRequiredFields = event.containsKey("eventType") &&
-                                    event.containsKey("aggregateId") &&
-                                    event.containsKey("paymentId") &&
-                                    event.containsKey("merchantId");
+        boolean hasRequiredFields = event.containsKey("eventType")
+                && event.containsKey("aggregateId")
+                && event.containsKey("paymentId")
+                && event.containsKey("merchantId");
 
         // Then: Event has all required fields
         assertThat(hasRequiredFields).isTrue();
@@ -222,8 +210,8 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
 
     // Helper methods
 
-    private Map<String, Object> createPaymentEvent(String eventType, String aggregateId,
-                                                    String merchantId, String amount, String currency) {
+    private Map<String, Object> createPaymentEvent(
+            String eventType, String aggregateId, String merchantId, String amount, String currency) {
         Map<String, Object> event = new java.util.HashMap<>();
         event.put("eventType", eventType);
         event.put("aggregateId", aggregateId);
@@ -236,9 +224,14 @@ class KafkaEventPropagationE2ETest extends E2ETestBase {
         return event;
     }
 
-    private Map<String, Object> createRefundEvent(String eventType, String refundId,
-                                                   String paymentId, String merchantId,
-                                                   String refundAmount, String currency, String refundType) {
+    private Map<String, Object> createRefundEvent(
+            String eventType,
+            String refundId,
+            String paymentId,
+            String merchantId,
+            String refundAmount,
+            String currency,
+            String refundType) {
         Map<String, Object> event = new java.util.HashMap<>();
         event.put("eventType", eventType);
         event.put("aggregateId", refundId);

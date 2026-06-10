@@ -13,23 +13,14 @@ public interface ExternalRefundProviderPort {
     boolean isHealthy();
 
     record RefundProviderRequest(
-        String refundId,
-        String originalPaymentId,
-        String providerTransactionId,
-        Long amount,
-        String currency,
-        String reason
-    ) {}
+            String refundId,
+            String originalPaymentId,
+            String providerTransactionId,
+            Long amount,
+            String currency,
+            String reason) {}
 
-    record RefundProviderResult(
-        boolean success,
-        String providerRefundId,
-        String errorCode,
-        String errorMessage
-    ) {}
+    record RefundProviderResult(boolean success, String providerRefundId, String errorCode, String errorMessage) {}
 
-    record RefundStatusResult(
-        String status,
-        java.time.Instant processedAt
-    ) {}
+    record RefundStatusResult(String status, java.time.Instant processedAt) {}
 }

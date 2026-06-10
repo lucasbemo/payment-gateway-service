@@ -1,45 +1,34 @@
 package com.payment.gateway.infrastructure.payment.adapter.in.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
-import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
-import com.payment.gateway.domain.payment.port.PaymentEventPublisherPort;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
-
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
+import com.payment.gateway.domain.payment.port.PaymentEventPublisherPort;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 
 /**
  * Tests for PaymentEventListeners using embedded Kafka.
  */
 @EmbeddedKafka(
         partitions = 1,
-        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" },
-        topics = {
-                "payment.created",
-                "payment.completed",
-                "payment.failed",
-                "payment.cancelled"
-        }
-)
+        brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"},
+        topics = {"payment.created", "payment.completed", "payment.failed", "payment.cancelled"})
 @DisplayName("Payment Event Listeners Tests")
 class PaymentEventListenersTest {
 
@@ -59,8 +48,8 @@ class PaymentEventListenersTest {
         webhookDeliveryPort = mock(WebhookDeliveryPort.class);
         messageHandler = new TestMessageHandler();
 
-        listeners = new PaymentEventListeners(paymentQueryPort, paymentEventPublisher, objectMapper,
-                webhookDeliveryPort);
+        listeners =
+                new PaymentEventListeners(paymentQueryPort, paymentEventPublisher, objectMapper, webhookDeliveryPort);
     }
 
     @Nested
@@ -75,8 +64,7 @@ class PaymentEventListenersTest {
                     "merchantId", "merchant_123",
                     "amount", "100.00",
                     "currency", "USD",
-                    "idempotencyKey", "idem_123"
-            );
+                    "idempotencyKey", "idem_123");
 
             listeners.onPaymentCreated(event, null);
 
@@ -90,8 +78,7 @@ class PaymentEventListenersTest {
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_123",
                     "amount", "100.00",
-                    "currency", "USD"
-            );
+                    "currency", "USD");
 
             listeners.onPaymentCreated(event, null);
 
@@ -112,8 +99,7 @@ class PaymentEventListenersTest {
                     "merchantId", "merchant_123",
                     "amount", "100.00",
                     "currency", "USD",
-                    "providerTransactionId", "txn_abc"
-            );
+                    "providerTransactionId", "txn_abc");
 
             listeners.onPaymentCompleted(event, null);
 
@@ -125,8 +111,7 @@ class PaymentEventListenersTest {
         void shouldHandleMissingProviderTransactionId() {
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_123",
-                    "merchantId", "merchant_123"
-            );
+                    "merchantId", "merchant_123");
 
             listeners.onPaymentCompleted(event, null);
 
@@ -137,13 +122,13 @@ class PaymentEventListenersTest {
         @DisplayName("Should not break consumption when webhook delivery throws")
         void shouldNotBreakConsumptionWhenWebhookDeliveryThrows() {
             doThrow(new RuntimeException("webhook endpoint down"))
-                    .when(webhookDeliveryPort).deliver(anyString(), anyString(), anyString());
+                    .when(webhookDeliveryPort)
+                    .deliver(anyString(), anyString(), anyString());
 
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_123",
                     "merchantId", "merchant_123",
-                    "providerTransactionId", "txn_abc"
-            );
+                    "providerTransactionId", "txn_abc");
 
             // Listener must not propagate webhook failures (the message must still be acked)
             listeners.onPaymentCompleted(event, null);
@@ -165,8 +150,7 @@ class PaymentEventListenersTest {
                     "amount", "100.00",
                     "currency", "USD",
                     "errorCode", "ERR_001",
-                    "errorMessage", "Insufficient funds"
-            );
+                    "errorMessage", "Insufficient funds");
 
             listeners.onPaymentCreated(event, null);
 
@@ -179,8 +163,7 @@ class PaymentEventListenersTest {
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_456",
                     "errorCode", "ERR_TIMEOUT",
-                    "errorMessage", "Connection timeout"
-            );
+                    "errorMessage", "Connection timeout");
 
             listeners.onPaymentFailed(event, null);
 
@@ -199,8 +182,7 @@ class PaymentEventListenersTest {
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_123",
                     "merchantId", "merchant_123",
-                    "reason", "Customer request"
-            );
+                    "reason", "Customer request");
 
             listeners.onPaymentCancelled(event, null);
 
@@ -212,8 +194,7 @@ class PaymentEventListenersTest {
         void shouldHandleMissingReason() {
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_123",
-                    "merchantId", "merchant_123"
-            );
+                    "merchantId", "merchant_123");
 
             listeners.onPaymentCancelled(event, null);
 
@@ -230,8 +211,7 @@ class PaymentEventListenersTest {
         void shouldLogEventProcessing() throws Exception {
             Map<String, Object> event = Map.of(
                     "aggregateId", "pay_test",
-                    "merchantId", "merchant_test"
-            );
+                    "merchantId", "merchant_test");
 
             listeners.onPaymentCreated(event, null);
 

@@ -2,7 +2,6 @@ package com.payment.gateway.application.refund.port.out;
 
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.transaction.model.Transaction;
-
 import java.util.Optional;
 
 /**

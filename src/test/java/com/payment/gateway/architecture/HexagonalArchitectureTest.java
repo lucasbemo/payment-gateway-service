@@ -1,13 +1,13 @@
 package com.payment.gateway.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @DisplayName("Hexagonal Architecture Tests")
 class HexagonalArchitectureTest {
@@ -19,9 +19,7 @@ class HexagonalArchitectureTest {
     @Test
     @DisplayName("Cyclic dependencies should not exist between main packages")
     void noCyclicDependenciesBetweenPackages() {
-        slices().matching("com.payment.gateway.(*)..")
-                .should().beFreeOfCycles()
-                .check(classes);
+        slices().matching("com.payment.gateway.(*)..").should().beFreeOfCycles().check(classes);
     }
 
     @Nested
@@ -32,13 +30,19 @@ class HexagonalArchitectureTest {
         @DisplayName("Domain layer should not depend on Application or Infrastructure layers")
         void domainLayerShouldNotDependOnApplicationOrInfrastructure() {
             noClasses()
-                    .that().resideInAPackage("com.payment.gateway.domain..")
-                    .should().dependOnClassesThat().resideInAPackage("com.payment.gateway.application..")
+                    .that()
+                    .resideInAPackage("com.payment.gateway.domain..")
+                    .should()
+                    .dependOnClassesThat()
+                    .resideInAPackage("com.payment.gateway.application..")
                     .check(classes);
 
             noClasses()
-                    .that().resideInAPackage("com.payment.gateway.domain..")
-                    .should().dependOnClassesThat().resideInAPackage("com.payment.gateway.infrastructure..")
+                    .that()
+                    .resideInAPackage("com.payment.gateway.domain..")
+                    .should()
+                    .dependOnClassesThat()
+                    .resideInAPackage("com.payment.gateway.infrastructure..")
                     .check(classes);
         }
     }
@@ -51,8 +55,11 @@ class HexagonalArchitectureTest {
         @DisplayName("Application layer should only depend on Domain layer")
         void applicationLayerShouldOnlyDependOnDomain() {
             noClasses()
-                    .that().resideInAPackage("com.payment.gateway.application..")
-                    .should().dependOnClassesThat().resideInAPackage("com.payment.gateway.infrastructure..")
+                    .that()
+                    .resideInAPackage("com.payment.gateway.application..")
+                    .should()
+                    .dependOnClassesThat()
+                    .resideInAPackage("com.payment.gateway.infrastructure..")
                     .check(classes);
         }
     }
@@ -64,8 +71,10 @@ class HexagonalArchitectureTest {
         @Test
         @DisplayName("Bounded contexts should be properly isolated")
         void boundedContextsShouldBeProperlyIsolated() {
-            slices().matching("com.payment.gateway.domain.(payment|merchant|transaction|refund|customer|idempotency|reconciliation|outbox).(*)..")
-                    .should().beFreeOfCycles()
+            slices().matching(
+                            "com.payment.gateway.domain.(payment|merchant|transaction|refund|customer|idempotency|reconciliation|outbox).(*)..")
+                    .should()
+                    .beFreeOfCycles()
                     .check(classes);
         }
     }

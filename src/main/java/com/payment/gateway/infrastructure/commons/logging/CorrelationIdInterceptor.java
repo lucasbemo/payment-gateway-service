@@ -2,10 +2,9 @@ package com.payment.gateway.infrastructure.commons.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.UUID;
 
 /**
  * Interceptor that adds a correlation ID to every request for distributed tracing.
@@ -17,8 +16,7 @@ public class CorrelationIdInterceptor implements HandlerInterceptor {
     public static final String CORRELATION_ID_MDC_KEY = "correlationId";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                              Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String correlationId = request.getHeader(CORRELATION_ID_HEADER);
         if (correlationId == null || correlationId.isBlank()) {
             correlationId = UUID.randomUUID().toString();
@@ -30,8 +28,8 @@ public class CorrelationIdInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-                                 Object handler, Exception ex) {
+    public void afterCompletion(
+            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         MDC.remove(CORRELATION_ID_MDC_KEY);
     }
 }

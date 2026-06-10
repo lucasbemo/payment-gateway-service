@@ -1,13 +1,12 @@
 package com.payment.gateway.infrastructure.payment.adapter.in.rest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -38,10 +37,9 @@ public class PaymentResponse {
     private String currency;
 
     @Schema(
-        description = "Payment status",
-        example = "AUTHORIZED",
-        allowableValues = {"PENDING", "AUTHORIZED", "CAPTURED", "CANCELLED", "FAILED"}
-    )
+            description = "Payment status",
+            example = "AUTHORIZED",
+            allowableValues = {"PENDING", "AUTHORIZED", "CAPTURED", "CANCELLED", "FAILED"})
     private String status;
 
     @Schema(description = "Idempotency key used", example = "550e8400-e29b-41d4-a716-446655440000")
@@ -80,16 +78,16 @@ public class PaymentResponse {
     @Builder
     @Schema(description = "Payment line item response")
     public static class PaymentItemResponse {
-        
+
         @Schema(description = "Item description", example = "Premium Widget")
         private String description;
-        
+
         @Schema(description = "Quantity", example = "2")
         private Integer quantity;
-        
+
         @Schema(description = "Unit price in cents", example = "5000")
         private Long unitPriceInCents;
-        
+
         @Schema(description = "Total price in cents", example = "10000")
         private Long totalInCents;
     }

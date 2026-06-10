@@ -1,5 +1,7 @@
 package com.payment.gateway.infrastructure.commons.monitoring;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -8,8 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("CustomMetricsBinder Tests")
 class CustomMetricsBinderTest {
@@ -32,8 +32,10 @@ class CustomMetricsBinderTest {
         void shouldRegisterPaymentsProcessedCounter() {
             metricsBinder.bindTo(meterRegistry);
 
-            Counter counter = meterRegistry.find("payment.gateway.payments.processed.total")
-                    .tag("type", "payment").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.payments.processed.total")
+                    .tag("type", "payment")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(0.0);
         }
@@ -43,8 +45,10 @@ class CustomMetricsBinderTest {
         void shouldRegisterPaymentsFailedCounter() {
             metricsBinder.bindTo(meterRegistry);
 
-            Counter counter = meterRegistry.find("payment.gateway.payments.failed.total")
-                    .tag("type", "payment").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.payments.failed.total")
+                    .tag("type", "payment")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(0.0);
         }
@@ -54,8 +58,10 @@ class CustomMetricsBinderTest {
         void shouldRegisterRefundsProcessedCounter() {
             metricsBinder.bindTo(meterRegistry);
 
-            Counter counter = meterRegistry.find("payment.gateway.refunds.processed.total")
-                    .tag("type", "refund").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.refunds.processed.total")
+                    .tag("type", "refund")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(0.0);
         }
@@ -65,8 +71,10 @@ class CustomMetricsBinderTest {
         void shouldRegisterPaymentProcessingTimer() {
             metricsBinder.bindTo(meterRegistry);
 
-            Timer timer = meterRegistry.find("payment.gateway.payments.processing.duration")
-                    .tag("type", "payment").timer();
+            Timer timer = meterRegistry
+                    .find("payment.gateway.payments.processing.duration")
+                    .tag("type", "payment")
+                    .timer();
             assertThat(timer).isNotNull();
             assertThat(timer.count()).isEqualTo(0);
         }
@@ -83,8 +91,10 @@ class CustomMetricsBinderTest {
 
             metricsBinder.recordPaymentProcessed();
 
-            Counter counter = meterRegistry.find("payment.gateway.payments.processed.total")
-                    .tag("type", "payment").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.payments.processed.total")
+                    .tag("type", "payment")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(1.0);
         }
@@ -98,8 +108,10 @@ class CustomMetricsBinderTest {
             metricsBinder.recordPaymentProcessed();
             metricsBinder.recordPaymentProcessed();
 
-            Counter counter = meterRegistry.find("payment.gateway.payments.processed.total")
-                    .tag("type", "payment").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.payments.processed.total")
+                    .tag("type", "payment")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(3.0);
         }
@@ -124,8 +136,10 @@ class CustomMetricsBinderTest {
 
             metricsBinder.recordPaymentFailed();
 
-            Counter counter = meterRegistry.find("payment.gateway.payments.failed.total")
-                    .tag("type", "payment").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.payments.failed.total")
+                    .tag("type", "payment")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(1.0);
         }
@@ -149,8 +163,10 @@ class CustomMetricsBinderTest {
 
             metricsBinder.recordRefundProcessed();
 
-            Counter counter = meterRegistry.find("payment.gateway.refunds.processed.total")
-                    .tag("type", "refund").counter();
+            Counter counter = meterRegistry
+                    .find("payment.gateway.refunds.processed.total")
+                    .tag("type", "refund")
+                    .counter();
             assertThat(counter).isNotNull();
             assertThat(counter.count()).isEqualTo(1.0);
         }
@@ -202,14 +218,23 @@ class CustomMetricsBinderTest {
             metricsBinder.recordRefundProcessed();
             metricsBinder.recordRefundProcessed();
 
-            assertThat(meterRegistry.find("payment.gateway.payments.processed.total")
-                    .tag("type", "payment").counter().count())
+            assertThat(meterRegistry
+                            .find("payment.gateway.payments.processed.total")
+                            .tag("type", "payment")
+                            .counter()
+                            .count())
                     .isEqualTo(2.0);
-            assertThat(meterRegistry.find("payment.gateway.payments.failed.total")
-                    .tag("type", "payment").counter().count())
+            assertThat(meterRegistry
+                            .find("payment.gateway.payments.failed.total")
+                            .tag("type", "payment")
+                            .counter()
+                            .count())
                     .isEqualTo(1.0);
-            assertThat(meterRegistry.find("payment.gateway.refunds.processed.total")
-                    .tag("type", "refund").counter().count())
+            assertThat(meterRegistry
+                            .find("payment.gateway.refunds.processed.total")
+                            .tag("type", "refund")
+                            .counter()
+                            .count())
                     .isEqualTo(3.0);
         }
     }

@@ -1,21 +1,19 @@
 package com.payment.gateway.domain.refund;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.domain.refund.exception.RefundProcessingException;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundItem;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Nested;
-
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for Refund aggregate.
@@ -34,8 +32,8 @@ class RefundTest {
 
     @BeforeEach
     void setUp() {
-        refund = Refund.create(PAYMENT_ID, TRANSACTION_ID, MERCHANT_ID, RefundType.PARTIAL,
-                                AMOUNT, CURRENCY, IDEMPOTENCY_KEY, REASON);
+        refund = Refund.create(
+                PAYMENT_ID, TRANSACTION_ID, MERCHANT_ID, RefundType.PARTIAL, AMOUNT, CURRENCY, IDEMPOTENCY_KEY, REASON);
     }
 
     @Nested

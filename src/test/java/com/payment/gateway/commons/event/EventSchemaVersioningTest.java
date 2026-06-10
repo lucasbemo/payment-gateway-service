@@ -1,18 +1,17 @@
 package com.payment.gateway.commons.event;
 
-import com.payment.gateway.domain.payment.event.PaymentCreatedEvent;
-import com.payment.gateway.domain.payment.event.PaymentCompletedEvent;
-import com.payment.gateway.domain.payment.event.PaymentFailedEvent;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.payment.gateway.domain.payment.event.PaymentCompletedEvent;
+import com.payment.gateway.domain.payment.event.PaymentCreatedEvent;
+import com.payment.gateway.domain.payment.event.PaymentFailedEvent;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for event schema versioning and backward compatibility.
@@ -27,9 +26,7 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should create event with current schema version")
         void shouldCreateEventWithCurrentSchemaVersion() {
-            PaymentCreatedEvent event = new PaymentCreatedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "idem_123"
-            );
+            PaymentCreatedEvent event = new PaymentCreatedEvent("pay_123", "merchant_123", "100.00", "USD", "idem_123");
 
             assertThat(event.getSchemaVersion()).isEqualTo("1.0.0");
             assertThat(event.getEventType()).isEqualTo("PAYMENT_CREATED");
@@ -38,9 +35,7 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should check compatibility with same major version")
         void shouldCheckCompatibilityWithSameMajorVersion() {
-            PaymentCreatedEvent event = new PaymentCreatedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "idem_123"
-            );
+            PaymentCreatedEvent event = new PaymentCreatedEvent("pay_123", "merchant_123", "100.00", "USD", "idem_123");
 
             assertThat(event.isCompatibleWith("1.0.0")).isTrue();
             assertThat(event.isCompatibleWith("1.1.0")).isTrue();
@@ -50,9 +45,7 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should not be compatible with different major version")
         void shouldNotBeCompatibleWithDifferentMajorVersion() {
-            PaymentCreatedEvent event = new PaymentCreatedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "idem_123"
-            );
+            PaymentCreatedEvent event = new PaymentCreatedEvent("pay_123", "merchant_123", "100.00", "USD", "idem_123");
 
             assertThat(event.isCompatibleWith("2.0.0")).isFalse();
             assertThat(event.isCompatibleWith("0.9.0")).isFalse();
@@ -66,9 +59,7 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should serialize event to map with schema version")
         void shouldSerializeEventToMap() {
-            PaymentCreatedEvent event = new PaymentCreatedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "idem_123"
-            );
+            PaymentCreatedEvent event = new PaymentCreatedEvent("pay_123", "merchant_123", "100.00", "USD", "idem_123");
 
             Map<String, Object> map = event.toMap();
 
@@ -144,9 +135,7 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should throw exception for unsupported major version")
         void shouldThrowExceptionForUnsupportedMajorVersion() {
-            PaymentCreatedEvent event = new PaymentCreatedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "idem_123"
-            );
+            PaymentCreatedEvent event = new PaymentCreatedEvent("pay_123", "merchant_123", "100.00", "USD", "idem_123");
 
             assertThatThrownBy(() -> event.migrateFrom("2.0.0"))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -161,9 +150,8 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should serialize payment completed event to map")
         void shouldSerializePaymentCompletedEvent() {
-            PaymentCompletedEvent event = new PaymentCompletedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "txn_abc"
-            );
+            PaymentCompletedEvent event =
+                    new PaymentCompletedEvent("pay_123", "merchant_123", "100.00", "USD", "txn_abc");
 
             Map<String, Object> map = event.toMap();
 
@@ -200,9 +188,8 @@ class EventSchemaVersioningTest {
         @Test
         @DisplayName("Should serialize payment failed event to map")
         void shouldSerializePaymentFailedEvent() {
-            PaymentFailedEvent event = new PaymentFailedEvent(
-                    "pay_123", "merchant_123", "100.00", "USD", "ERR_001", "Insufficient funds"
-            );
+            PaymentFailedEvent event =
+                    new PaymentFailedEvent("pay_123", "merchant_123", "100.00", "USD", "ERR_001", "Insufficient funds");
 
             Map<String, Object> map = event.toMap();
 

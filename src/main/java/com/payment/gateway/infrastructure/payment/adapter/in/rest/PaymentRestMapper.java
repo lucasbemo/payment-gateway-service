@@ -3,13 +3,11 @@ package com.payment.gateway.infrastructure.payment.adapter.in.rest;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentItem;
-import com.payment.gateway.infrastructure.payment.adapter.out.persistence.PaymentItemJpaEntity;
 import com.payment.gateway.infrastructure.payment.adapter.out.persistence.PaymentJpaEntity;
-import org.springframework.stereotype.Component;
-
 import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 
 /**
  * Mapper between Payment domain model and REST DTOs.
@@ -24,11 +22,11 @@ public class PaymentRestMapper {
         if (request.getItems() != null) {
             items = request.getItems().stream()
                     .map(item -> {
-                        Money unitPrice = Money.of(item.getUnitPriceInCents(), Currency.getInstance(request.getCurrency()));
+                        Money unitPrice =
+                                Money.of(item.getUnitPriceInCents(), Currency.getInstance(request.getCurrency()));
                         Money total = Money.of(
                                 item.getUnitPriceInCents() * item.getQuantity(),
-                                Currency.getInstance(request.getCurrency())
-                        );
+                                Currency.getInstance(request.getCurrency()));
                         return new PaymentItem(item.getDescription(), item.getQuantity(), unitPrice, total);
                     })
                     .collect(Collectors.toList());
@@ -43,8 +41,7 @@ public class PaymentRestMapper {
                 request.getDescription(),
                 com.payment.gateway.domain.payment.model.PaymentMetadata.empty(),
                 items,
-                request.getCustomerId()
-        );
+                request.getCustomerId());
     }
 
     public PaymentResponse toResponse(Payment payment) {

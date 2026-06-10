@@ -2,6 +2,7 @@ package com.payment.gateway.infrastructure.refund.adapter.in.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +10,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Kafka listeners for refund events.
@@ -31,12 +30,12 @@ public class RefundEventListeners {
     private String refundFailedTopic;
 
     @KafkaListener(
-        topics = "${kafka.topics.refund-processed:refund.processed}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onRefundProcessed(@Payload Map<String, Object> event,
-                                   @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.refund-processed:refund.processed}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onRefundProcessed(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received refund.processed event: {}", event);
         try {
             String refundId = (String) event.get("refundId");
@@ -57,12 +56,12 @@ public class RefundEventListeners {
     }
 
     @KafkaListener(
-        topics = "${kafka.topics.refund-failed:refund.failed}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onRefundFailed(@Payload Map<String, Object> event,
-                                @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.refund-failed:refund.failed}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onRefundFailed(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received refund.failed event: {}", event);
         try {
             String refundId = (String) event.get("refundId");
@@ -80,11 +79,21 @@ public class RefundEventListeners {
         }
     }
 
-    private void handleRefundProcessed(String refundId, String paymentId, String merchantId,
-                                        String refundAmount, String currency, String refundType,
-                                        Map<String, Object> event) {
-        log.info("Handling refund processed: refundId={}, paymentId={}, merchantId={}, amount={} {}",
-                 refundId, paymentId, merchantId, refundAmount, currency);
+    private void handleRefundProcessed(
+            String refundId,
+            String paymentId,
+            String merchantId,
+            String refundAmount,
+            String currency,
+            String refundType,
+            Map<String, Object> event) {
+        log.info(
+                "Handling refund processed: refundId={}, paymentId={}, merchantId={}, amount={} {}",
+                refundId,
+                paymentId,
+                merchantId,
+                refundAmount,
+                currency);
         deliverMerchantWebhook("refund.processed", merchantId, event);
     }
 
@@ -94,9 +103,8 @@ public class RefundEventListeners {
      */
     private void deliverMerchantWebhook(String fallbackEventType, String merchantId, Map<String, Object> event) {
         try {
-            String eventType = event.get("eventType") instanceof String type && !type.isBlank()
-                    ? type
-                    : fallbackEventType;
+            String eventType =
+                    event.get("eventType") instanceof String type && !type.isBlank() ? type : fallbackEventType;
             String payloadJson = objectMapper.writeValueAsString(event);
             webhookDeliveryPort.deliver(merchantId, eventType, payloadJson);
         } catch (Exception e) {
@@ -104,10 +112,13 @@ public class RefundEventListeners {
         }
     }
 
-    private void handleRefundFailed(String refundId, String paymentId,
-                                     String errorCode, String errorMessage) {
-        log.info("Handling refund failed: refundId={}, paymentId={}, errorCode={}, errorMessage={}",
-                 refundId, paymentId, errorCode, errorMessage);
+    private void handleRefundFailed(String refundId, String paymentId, String errorCode, String errorMessage) {
+        log.info(
+                "Handling refund failed: refundId={}, paymentId={}, errorCode={}, errorMessage={}",
+                refundId,
+                paymentId,
+                errorCode,
+                errorMessage);
         // Add business logic here (e.g., notify customer, trigger retry, escalate, etc.)
     }
 }

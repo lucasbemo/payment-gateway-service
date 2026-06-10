@@ -7,17 +7,7 @@ public interface ExternalTransactionProviderPort {
 
     CaptureResult capture(CaptureRequest request);
 
-    record CaptureRequest(
-            String transactionId,
-            String gatewayTransactionId,
-            Long amount,
-            String currency
-    ) {}
+    record CaptureRequest(String transactionId, String gatewayTransactionId, Long amount, String currency) {}
 
-    record CaptureResult(
-            boolean success,
-            String gatewayTransactionId,
-            String errorCode,
-            String errorMessage
-    ) {}
+    record CaptureResult(boolean success, String gatewayTransactionId, String errorCode, String errorMessage) {}
 }

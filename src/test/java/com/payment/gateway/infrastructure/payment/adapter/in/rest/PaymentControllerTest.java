@@ -1,5 +1,11 @@
 package com.payment.gateway.infrastructure.payment.adapter.in.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.in.CancelPaymentUseCase;
@@ -7,6 +13,7 @@ import com.payment.gateway.application.payment.port.in.CapturePaymentUseCase;
 import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.in.ProcessPaymentUseCase;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +23,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.Instant;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("PaymentController Tests")
 @WebMvcTest(PaymentController.class)
@@ -76,7 +75,8 @@ class PaymentControllerTest {
                         .status("PENDING")
                         .build());
 
-        String requestBody = """
+        String requestBody =
+                """
                 {
                     "merchantId": "merchant-1",
                     "amountInCents": 10000,
@@ -120,8 +120,7 @@ class PaymentControllerTest {
                         .status("AUTHORIZED")
                         .build());
 
-        mockMvc.perform(get("/api/v1/payments/pay-123")
-                        .param("merchantId", "merchant-1"))
+        mockMvc.perform(get("/api/v1/payments/pay-123").param("merchantId", "merchant-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value("pay-123"));
@@ -150,8 +149,7 @@ class PaymentControllerTest {
                         .status("CAPTURED")
                         .build());
 
-        mockMvc.perform(post("/api/v1/payments/pay-123/capture")
-                        .param("merchantId", "merchant-1"))
+        mockMvc.perform(post("/api/v1/payments/pay-123/capture").param("merchantId", "merchant-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("Payment captured successfully"));
@@ -180,8 +178,7 @@ class PaymentControllerTest {
                         .status("CANCELLED")
                         .build());
 
-        mockMvc.perform(post("/api/v1/payments/pay-123/cancel")
-                        .param("merchantId", "merchant-1"))
+        mockMvc.perform(post("/api/v1/payments/pay-123/cancel").param("merchantId", "merchant-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("Payment cancelled successfully"));

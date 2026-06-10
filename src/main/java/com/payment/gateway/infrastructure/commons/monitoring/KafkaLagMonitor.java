@@ -1,5 +1,11 @@
 package com.payment.gateway.infrastructure.commons.monitoring;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsOptions;
@@ -11,13 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
 @Component
 public class KafkaLagMonitor {
@@ -25,7 +24,7 @@ public class KafkaLagMonitor {
     private final String bootstrapServers;
     private final String consumerGroupId;
     private AdminClient adminClient;
-    
+
     private final Map<TopicPartition, Long> currentLags = new ConcurrentHashMap<>();
     private final Map<String, Long> topicLags = new ConcurrentHashMap<>();
     private long totalLag = 0;
@@ -72,8 +71,7 @@ public class KafkaLagMonitor {
 
         try {
             Map<TopicPartition, OffsetAndMetadata> consumerOffsets = adminClient
-                    .listConsumerGroupOffsets(consumerGroupId, new ListConsumerGroupOffsetsOptions()
-                            .timeoutMs(5000))
+                    .listConsumerGroupOffsets(consumerGroupId, new ListConsumerGroupOffsetsOptions().timeoutMs(5000))
                     .partitionsToOffsetAndMetadata()
                     .get(5, TimeUnit.SECONDS);
 
@@ -93,7 +91,10 @@ public class KafkaLagMonitor {
                     .get(5, TimeUnit.SECONDS)
                     .entrySet()
                     .stream()
-                    .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue().offset()), HashMap::putAll);
+                    .collect(
+                            HashMap::new,
+                            (m, e) -> m.put(e.getKey(), e.getValue().offset()),
+                            HashMap::putAll);
 
             currentLags.clear();
             topicLags.clear();
@@ -116,8 +117,11 @@ public class KafkaLagMonitor {
             lastCheckTimestamp = System.currentTimeMillis();
 
             if (log.isDebugEnabled() && totalLag > 0) {
-                log.debug("Consumer lag check - Group: {}, Total lag: {}, Topics: {}", 
-                        consumerGroupId, totalLag, topicLags);
+                log.debug(
+                        "Consumer lag check - Group: {}, Total lag: {}, Topics: {}",
+                        consumerGroupId,
+                        totalLag,
+                        topicLags);
             }
 
             if (totalLag > 1000) {

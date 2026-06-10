@@ -1,17 +1,16 @@
 package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.domain.reconciliation.model.ReconciliationBatch;
 import com.payment.gateway.domain.reconciliation.model.ReconciliationStatus;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ReconciliationMapperTest {
 
@@ -186,12 +185,8 @@ class ReconciliationMapperTest {
         @Test
         @DisplayName("should preserve key data through toEntity then toDomain")
         void shouldPreserveDataThroughRoundTrip() {
-            ReconciliationBatch original = ReconciliationBatch.create(
-                    "merchant-rt",
-                    LocalDate.of(2025, 8, 10),
-                    "stripe",
-                    "admin-rt"
-            );
+            ReconciliationBatch original =
+                    ReconciliationBatch.create("merchant-rt", LocalDate.of(2025, 8, 10), "stripe", "admin-rt");
 
             ReconciliationBatchJpaEntity entity = mapper.toEntity(original);
             ReconciliationBatch restored = mapper.toDomain(entity);

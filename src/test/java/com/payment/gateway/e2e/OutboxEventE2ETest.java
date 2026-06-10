@@ -1,16 +1,15 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for the Outbox pattern.
@@ -25,14 +24,13 @@ class OutboxEventE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -42,15 +40,11 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // Create a payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
         assertThat(paymentResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         paymentId = (String) payment.get("id");
     }
 
@@ -63,9 +57,9 @@ class OutboxEventE2ETest extends E2ETestBase {
         // Note: Outbox entries may be created asynchronously
         // Verify the outbox_event table exists and is accessible
         boolean tableExists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'outbox_events'",
-            Integer.class
-        ) > 0;
+                        "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'outbox_events'",
+                        Integer.class)
+                > 0;
 
         // Then: Outbox table exists
         assertThat(tableExists).isTrue();
@@ -78,19 +72,19 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Checking table structure
         boolean hasIdColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'id'",
-            Integer.class
-        ) > 0;
+                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'id'",
+                        Integer.class)
+                > 0;
 
         boolean hasEventTypeColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'event_type'",
-            Integer.class
-        ) > 0;
+                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'event_type'",
+                        Integer.class)
+                > 0;
 
         boolean hasPayloadColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'payload'",
-            Integer.class
-        ) > 0;
+                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'payload'",
+                        Integer.class)
+                > 0;
 
         // Then: Required columns exist
         assertThat(hasIdColumn).isTrue();
@@ -105,9 +99,9 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Checking for status column
         boolean hasStatusColumn = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'status'",
-            Integer.class
-        ) > 0;
+                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'outbox_events' AND column_name = 'status'",
+                        Integer.class)
+                > 0;
 
         // Then: Status column exists for tracking
         assertThat(hasStatusColumn).isTrue();
@@ -124,14 +118,13 @@ class OutboxEventE2ETest extends E2ETestBase {
 
         // When: Inserting an outbox event
         int rowsInserted = jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
-            eventId,
-            eventType,
-            "Payment",
-            aggregateId,
-            payload,
-            "PENDING"
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
+                eventId,
+                eventType,
+                "Payment",
+                aggregateId,
+                payload,
+                "PENDING");
 
         // Then: Event is inserted
         assertThat(rowsInserted).isEqualTo(1);
@@ -147,31 +140,26 @@ class OutboxEventE2ETest extends E2ETestBase {
         // Given: An outbox event
         String eventId = "test-event-" + System.currentTimeMillis();
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
-            eventId,
-            "TEST_EVENT",
-            "Payment",
-            "test-aggregate",
-            "{}",
-            "PENDING"
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
+                eventId,
+                "TEST_EVENT",
+                "Payment",
+                "test-aggregate",
+                "{}",
+                "PENDING");
 
         // When: Updating status to PUBLISHED
         int rowsUpdated = jdbcTemplate.update(
-            "UPDATE outbox_events SET status = ?, published_at = ? WHERE id = ?",
-            "PUBLISHED",
-            Timestamp.from(Instant.now()),
-            eventId
-        );
+                "UPDATE outbox_events SET status = ?, published_at = ? WHERE id = ?",
+                "PUBLISHED",
+                Timestamp.from(Instant.now()),
+                eventId);
 
         // Then: Status is updated
         assertThat(rowsUpdated).isEqualTo(1);
 
-        String status = jdbcTemplate.queryForObject(
-            "SELECT status FROM outbox_events WHERE id = ?",
-            String.class,
-            eventId
-        );
+        String status =
+                jdbcTemplate.queryForObject("SELECT status FROM outbox_events WHERE id = ?", String.class, eventId);
         assertThat(status).isEqualTo("PUBLISHED");
     }
 
@@ -183,38 +171,32 @@ class OutboxEventE2ETest extends E2ETestBase {
         String event2Id = "test-event-2-" + System.currentTimeMillis();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
-            event1Id,
-            "TEST_EVENT_1",
-            "Payment",
-            "aggregate-1",
-            "{}",
-            "PENDING"
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
+                event1Id,
+                "TEST_EVENT_1",
+                "Payment",
+                "aggregate-1",
+                "{}",
+                "PENDING");
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
-            event2Id,
-            "TEST_EVENT_2",
-            "Payment",
-            "aggregate-2",
-            "{}",
-            "PUBLISHED"
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
+                event2Id,
+                "TEST_EVENT_2",
+                "Payment",
+                "aggregate-2",
+                "{}",
+                "PUBLISHED");
 
         // When: Querying by status (scoped to this test's seeded events — payment
         // processing in other tests legitimately writes its own outbox rows)
         Integer pendingCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_events WHERE status = ? AND event_type LIKE 'TEST_EVENT%'",
-            Integer.class,
-            "PENDING"
-        );
+                "SELECT COUNT(*) FROM outbox_events WHERE status = ? AND event_type LIKE 'TEST_EVENT%'",
+                Integer.class, "PENDING");
 
         Integer publishedCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM outbox_events WHERE status = ? AND event_type LIKE 'TEST_EVENT%'",
-            Integer.class,
-            "PUBLISHED"
-        );
+                "SELECT COUNT(*) FROM outbox_events WHERE status = ? AND event_type LIKE 'TEST_EVENT%'",
+                Integer.class, "PUBLISHED");
 
         // Then: Correct counts are returned
         assertThat(pendingCount).isEqualTo(1);
@@ -229,21 +211,17 @@ class OutboxEventE2ETest extends E2ETestBase {
         String payload = "{\"paymentId\": \"" + paymentId + "\", \"amount\": 10000, \"currency\": \"USD\"}";
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
-            eventId,
-            "PAYMENT_CREATED",
-            "Payment",
-            paymentId,
-            payload,
-            "PENDING"
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
+                eventId,
+                "PAYMENT_CREATED",
+                "Payment",
+                paymentId,
+                payload,
+                "PENDING");
 
         // When: Retrieving the payload
-        String retrievedPayload = jdbcTemplate.queryForObject(
-            "SELECT payload FROM outbox_events WHERE id = ?",
-            String.class,
-            eventId
-        );
+        String retrievedPayload =
+                jdbcTemplate.queryForObject("SELECT payload FROM outbox_events WHERE id = ?", String.class, eventId);
 
         // Then: Payload is correctly stored and retrieved
         assertThat(retrievedPayload).contains(paymentId);
@@ -258,22 +236,18 @@ class OutboxEventE2ETest extends E2ETestBase {
         Instant now = Instant.now();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?::jsonb, ?, ?)",
-            eventId,
-            "TEST_EVENT",
-            "Payment",
-            "test-aggregate",
-            "{}",
-            "PENDING",
-            Timestamp.from(now)
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status, created_at) VALUES (?, ?, ?, ?, ?::jsonb, ?, ?)",
+                eventId,
+                "TEST_EVENT",
+                "Payment",
+                "test-aggregate",
+                "{}",
+                "PENDING",
+                Timestamp.from(now));
 
         // When: Retrieving created_at
         Timestamp createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM outbox_events WHERE id = ?",
-            Timestamp.class,
-            eventId
-        );
+                "SELECT created_at FROM outbox_events WHERE id = ?", Timestamp.class, eventId);
 
         // Then: Timestamp is within expected range
         assertThat(createdAt).isNotNull();
@@ -288,29 +262,24 @@ class OutboxEventE2ETest extends E2ETestBase {
         String eventId = "test-event-" + System.currentTimeMillis();
 
         jdbcTemplate.update(
-            "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
-            eventId,
-            "TEST_EVENT",
-            "Payment",
-            "test-aggregate",
-            "{}",
-            "PENDING"
-        );
+                "INSERT INTO outbox_events (id, event_type, aggregate_type, aggregate_id, payload, status) VALUES (?, ?, ?, ?, ?::jsonb, ?)",
+                eventId,
+                "TEST_EVENT",
+                "Payment",
+                "test-aggregate",
+                "{}",
+                "PENDING");
 
         // When: Setting published_at
         Instant publishedAt = Instant.now();
         jdbcTemplate.update(
-            "UPDATE outbox_events SET status = ?, published_at = ? WHERE id = ?",
-            "PUBLISHED",
-            Timestamp.from(publishedAt),
-            eventId
-        );
+                "UPDATE outbox_events SET status = ?, published_at = ? WHERE id = ?",
+                "PUBLISHED",
+                Timestamp.from(publishedAt),
+                eventId);
 
         Timestamp retrievedPublishedAt = jdbcTemplate.queryForObject(
-            "SELECT published_at FROM outbox_events WHERE id = ?",
-            Timestamp.class,
-            eventId
-        );
+                "SELECT published_at FROM outbox_events WHERE id = ?", Timestamp.class, eventId);
 
         // Then: Published timestamp is correct
         assertThat(retrievedPublishedAt).isNotNull();

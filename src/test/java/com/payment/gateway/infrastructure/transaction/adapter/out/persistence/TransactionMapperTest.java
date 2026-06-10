@@ -1,19 +1,18 @@
 package com.payment.gateway.infrastructure.transaction.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Currency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Currency;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionMapperTest {
 
@@ -193,11 +192,7 @@ class TransactionMapperTest {
         void shouldPreserveDataThroughRoundTrip() {
             Currency usd = Currency.getInstance("USD");
             Transaction original = Transaction.create(
-                    "pay-rt", "merchant-rt",
-                    TransactionType.CAPTURE,
-                    Money.of(new BigDecimal("75.00"), usd),
-                    "USD"
-            );
+                    "pay-rt", "merchant-rt", TransactionType.CAPTURE, Money.of(new BigDecimal("75.00"), usd), "USD");
 
             TransactionJpaEntity entity = mapper.toEntity(original);
             Transaction restored = mapper.toDomain(entity);
@@ -208,7 +203,8 @@ class TransactionMapperTest {
             assertThat(restored.getType()).isEqualTo(original.getType());
             assertThat(restored.getCurrency()).isEqualTo(original.getCurrency());
             assertThat(restored.getStatus()).isEqualTo(original.getStatus());
-            assertThat(restored.getAmount().getAmount()).isEqualByComparingTo(original.getAmount().getAmount());
+            assertThat(restored.getAmount().getAmount())
+                    .isEqualByComparingTo(original.getAmount().getAmount());
         }
     }
 }

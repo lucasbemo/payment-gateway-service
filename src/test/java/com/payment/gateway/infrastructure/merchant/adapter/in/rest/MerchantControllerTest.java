@@ -1,5 +1,10 @@
 package com.payment.gateway.infrastructure.merchant.adapter.in.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.merchant.dto.MerchantResponse;
 import com.payment.gateway.application.merchant.port.in.ActivateMerchantUseCase;
@@ -8,6 +13,7 @@ import com.payment.gateway.application.merchant.port.in.RegisterMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.SuspendMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.UpdateMerchantUseCase;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +23,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.Instant;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("MerchantController Tests")
 @WebMvcTest(MerchantController.class)

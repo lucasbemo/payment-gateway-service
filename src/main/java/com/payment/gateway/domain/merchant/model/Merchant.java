@@ -1,10 +1,9 @@
 package com.payment.gateway.domain.merchant.model;
 
 import com.payment.gateway.commons.exception.BusinessException;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
 /**
  * Aggregate Root representing a Merchant.
@@ -30,13 +29,14 @@ public class Merchant {
     /**
      * Register a new merchant.
      */
-    public static Merchant register(String name,
-                                     String email,
-                                     String apiKey,
-                                     String apiKeyHash,
-                                     String apiSecretHash,
-                                     String webhookUrl,
-                                     MerchantConfiguration configuration) {
+    public static Merchant register(
+            String name,
+            String email,
+            String apiKey,
+            String apiKeyHash,
+            String apiSecretHash,
+            String webhookUrl,
+            MerchantConfiguration configuration) {
         validateMerchantData(name, email, apiKey, apiKeyHash, apiSecretHash);
 
         Merchant merchant = new Merchant();
@@ -56,8 +56,8 @@ public class Merchant {
         return merchant;
     }
 
-    private static void validateMerchantData(String name, String email,
-                                              String apiKey, String apiKeyHash, String apiSecretHash) {
+    private static void validateMerchantData(
+            String name, String email, String apiKey, String apiKeyHash, String apiSecretHash) {
         if (name == null || name.isBlank()) {
             throw new BusinessException("Merchant name is required");
         }
@@ -138,8 +138,7 @@ public class Merchant {
 
     private void validateTransition(MerchantStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
-            throw new BusinessException(
-                "Cannot transition from " + this.status + " to " + newStatus);
+            throw new BusinessException("Cannot transition from " + this.status + " to " + newStatus);
         }
     }
 

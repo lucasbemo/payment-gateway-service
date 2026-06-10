@@ -1,12 +1,11 @@
 package com.payment.gateway.domain.customer.model;
 
+import java.time.YearMonth;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.YearMonth;
-import java.util.UUID;
 
 /**
  * CardDetails value object representing card information.
@@ -45,8 +44,13 @@ public class CardDetails {
         return new Builder();
     }
 
-    public static CardDetails create(String cardNumberLast4, String cardNumberBin, String cardBrand,
-                                      int expiryMonth, int expiryYear, String cardholderName) {
+    public static CardDetails create(
+            String cardNumberLast4,
+            String cardNumberBin,
+            String cardBrand,
+            int expiryMonth,
+            int expiryYear,
+            String cardholderName) {
         validateCardNumberLast4(cardNumberLast4);
         validateCardNumberBin(cardNumberBin);
         validateExpiryDate(expiryMonth, expiryYear);

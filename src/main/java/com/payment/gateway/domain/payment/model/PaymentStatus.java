@@ -42,10 +42,11 @@ public enum PaymentStatus {
      */
     public boolean canTransitionTo(PaymentStatus newStatus) {
         return switch (this) {
-            case PENDING -> newStatus == AUTHORIZED || newStatus == CAPTURED ||
-                           newStatus == FAILED || newStatus == CANCELLED;
-            case AUTHORIZED -> newStatus == CAPTURED || newStatus == CANCELLED ||
-                              newStatus == FAILED;
+            case PENDING -> newStatus == AUTHORIZED
+                    || newStatus == CAPTURED
+                    || newStatus == FAILED
+                    || newStatus == CANCELLED;
+            case AUTHORIZED -> newStatus == CAPTURED || newStatus == CANCELLED || newStatus == FAILED;
             case CAPTURED -> newStatus == REFUNDED;
             case FAILED, CANCELLED, REFUNDED -> false;
         };
@@ -72,7 +73,6 @@ public enum PaymentStatus {
         return Arrays.stream(values())
                 .filter(s -> s.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Invalid payment status: " + value));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid payment status: " + value));
     }
 }

@@ -1,11 +1,11 @@
 package com.payment.gateway.infrastructure.payment.adapter.out.provider;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderRequest;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Stub Payment Provider Tests")
 class StubPaymentProviderTest {

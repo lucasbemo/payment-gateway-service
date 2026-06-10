@@ -6,10 +6,9 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * PayPal payment provider implementation.
@@ -37,27 +36,24 @@ public class PayPalPaymentProvider implements ExternalPaymentProviderPort {
     @RateLimiter(name = "payment", fallbackMethod = "authorizeFallback")
     @Async
     public CompletableFuture<PaymentProviderResult> authorize(PaymentProviderRequest request) {
-        log.info("PayPal authorize: paymentId={}, merchantId={}, amount={}",
-                request.paymentId(), request.merchantId(), request.amount());
+        log.info(
+                "PayPal authorize: paymentId={}, merchantId={}, amount={}",
+                request.paymentId(),
+                request.merchantId(),
+                request.amount());
         // TODO: Implement PayPal API call for authorization
-        return CompletableFuture.completedFuture(new PaymentProviderResult(
-                true,
-                "paypal-auth-" + request.paymentId(),
-                null,
-                null
-        ));
+        return CompletableFuture.completedFuture(
+                new PaymentProviderResult(true, "paypal-auth-" + request.paymentId(), null, null));
     }
 
     @SuppressWarnings("unused")
     public CompletableFuture<PaymentProviderResult> authorizeFallback(PaymentProviderRequest request, Throwable t) {
-        log.error("PayPal authorize failed after retries (fallback): paymentId={}, error={}",
-                request.paymentId(), t.getMessage());
+        log.error(
+                "PayPal authorize failed after retries (fallback): paymentId={}, error={}",
+                request.paymentId(),
+                t.getMessage());
         return CompletableFuture.completedFuture(new PaymentProviderResult(
-                false,
-                null,
-                "FALLBACK",
-                "Payment authorization temporarily unavailable. Please retry."
-        ));
+                false, null, "FALLBACK", "Payment authorization temporarily unavailable. Please retry."));
     }
 
     @Override
@@ -68,27 +64,24 @@ public class PayPalPaymentProvider implements ExternalPaymentProviderPort {
     @RateLimiter(name = "payment", fallbackMethod = "captureFallback")
     @Async
     public CompletableFuture<PaymentProviderResult> capture(PaymentProviderRequest request) {
-        log.info("PayPal capture: paymentId={}, merchantId={}, amount={}",
-                request.paymentId(), request.merchantId(), request.amount());
+        log.info(
+                "PayPal capture: paymentId={}, merchantId={}, amount={}",
+                request.paymentId(),
+                request.merchantId(),
+                request.amount());
         // TODO: Implement PayPal API call for capture
-        return CompletableFuture.completedFuture(new PaymentProviderResult(
-                true,
-                "paypal-capture-" + request.paymentId(),
-                null,
-                null
-        ));
+        return CompletableFuture.completedFuture(
+                new PaymentProviderResult(true, "paypal-capture-" + request.paymentId(), null, null));
     }
 
     @SuppressWarnings("unused")
     public CompletableFuture<PaymentProviderResult> captureFallback(PaymentProviderRequest request, Throwable t) {
-        log.error("PayPal capture failed after retries (fallback): paymentId={}, error={}",
-                request.paymentId(), t.getMessage());
+        log.error(
+                "PayPal capture failed after retries (fallback): paymentId={}, error={}",
+                request.paymentId(),
+                t.getMessage());
         return CompletableFuture.completedFuture(new PaymentProviderResult(
-                false,
-                null,
-                "FALLBACK",
-                "Payment capture temporarily unavailable. Please retry."
-        ));
+                false, null, "FALLBACK", "Payment capture temporarily unavailable. Please retry."));
     }
 
     @Override
@@ -99,27 +92,20 @@ public class PayPalPaymentProvider implements ExternalPaymentProviderPort {
     @RateLimiter(name = "payment", fallbackMethod = "cancelFallback")
     @Async
     public CompletableFuture<PaymentProviderResult> cancel(PaymentProviderRequest request) {
-        log.info("PayPal cancel: paymentId={}, merchantId={}",
-                request.paymentId(), request.merchantId());
+        log.info("PayPal cancel: paymentId={}, merchantId={}", request.paymentId(), request.merchantId());
         // TODO: Implement PayPal API call for cancellation/void
-        return CompletableFuture.completedFuture(new PaymentProviderResult(
-                true,
-                "paypal-cancel-" + request.paymentId(),
-                null,
-                null
-        ));
+        return CompletableFuture.completedFuture(
+                new PaymentProviderResult(true, "paypal-cancel-" + request.paymentId(), null, null));
     }
 
     @SuppressWarnings("unused")
     public CompletableFuture<PaymentProviderResult> cancelFallback(PaymentProviderRequest request, Throwable t) {
-        log.error("PayPal cancel failed after retries (fallback): paymentId={}, error={}",
-                request.paymentId(), t.getMessage());
+        log.error(
+                "PayPal cancel failed after retries (fallback): paymentId={}, error={}",
+                request.paymentId(),
+                t.getMessage());
         return CompletableFuture.completedFuture(new PaymentProviderResult(
-                false,
-                null,
-                "FALLBACK",
-                "Payment cancellation temporarily unavailable. Please retry."
-        ));
+                false, null, "FALLBACK", "Payment cancellation temporarily unavailable. Please retry."));
     }
 
     @Override
@@ -130,7 +116,8 @@ public class PayPalPaymentProvider implements ExternalPaymentProviderPort {
     @RateLimiter(name = "payment", fallbackMethod = "tokenizeCardFallback")
     @Async
     public CompletableFuture<String> tokenizeCard(CardTokenizationRequest request) {
-        log.info("PayPal tokenizeCard: card=****{}",
+        log.info(
+                "PayPal tokenizeCard: card=****{}",
                 request.cardNumber().substring(request.cardNumber().length() - 4));
         // TODO: Implement PayPal vault API call
         return CompletableFuture.completedFuture("tok_paypal_" + System.currentTimeMillis());

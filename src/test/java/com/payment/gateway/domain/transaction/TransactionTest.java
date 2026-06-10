@@ -1,19 +1,17 @@
 package com.payment.gateway.domain.transaction;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.domain.transaction.exception.InvalidTransactionStateException;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Nested;
-
 import java.math.BigDecimal;
 import java.util.Currency;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for Transaction aggregate.

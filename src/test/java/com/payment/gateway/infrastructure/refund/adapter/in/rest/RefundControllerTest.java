@@ -1,11 +1,18 @@
 package com.payment.gateway.infrastructure.refund.adapter.in.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.in.CancelRefundUseCase;
 import com.payment.gateway.application.refund.port.in.GetRefundUseCase;
 import com.payment.gateway.application.refund.port.in.ProcessRefundUseCase;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +22,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.Instant;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("RefundController Tests")
 @WebMvcTest(RefundController.class)
@@ -60,11 +59,14 @@ class RefundControllerTest {
                 .createdAt(Instant.now())
                 .build();
 
-        given(processRefundUseCase.processRefund(any(), any(), any(), any(), any())).willReturn(response);
+        given(processRefundUseCase.processRefund(any(), any(), any(), any(), any()))
+                .willReturn(response);
 
-        mockMvc.perform(post("/api/v1/refunds")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentId\":\"pay-123\",\"merchantId\":\"m-1\",\"amount\":5000,\"reason\":\"Customer request\"}"))
+        mockMvc.perform(
+                        post("/api/v1/refunds")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"paymentId\":\"pay-123\",\"merchantId\":\"m-1\",\"amount\":5000,\"reason\":\"Customer request\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value("ref-123"));

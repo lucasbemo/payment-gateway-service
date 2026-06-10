@@ -4,11 +4,10 @@ import com.payment.gateway.application.merchant.port.out.MerchantCommandPort;
 import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.port.MerchantRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Persistence adapter for Merchant repository.

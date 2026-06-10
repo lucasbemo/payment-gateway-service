@@ -1,14 +1,13 @@
 package com.payment.gateway.infrastructure.customer.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.domain.customer.model.Customer;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class CustomerMapperTest {
 
@@ -52,8 +51,7 @@ class CustomerMapperTest {
             assertThat(entity.getToken()).isNotNull();
             assertThat(entity.getToken()).isNotBlank();
             // UUID format: 8-4-4-4-12
-            assertThat(entity.getToken()).matches(
-                    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+            assertThat(entity.getToken()).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
         }
 
         @Test
@@ -171,7 +169,8 @@ class CustomerMapperTest {
 
             Customer customer = mapper.toDomain(entity);
 
-            assertThat(customer.getStatus()).isEqualTo(com.payment.gateway.domain.customer.model.CustomerStatus.INACTIVE);
+            assertThat(customer.getStatus())
+                    .isEqualTo(com.payment.gateway.domain.customer.model.CustomerStatus.INACTIVE);
         }
     }
 

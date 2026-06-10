@@ -1,5 +1,11 @@
 package com.payment.gateway.application.transaction.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.transaction.dto.TransactionResponse;
 import com.payment.gateway.application.transaction.port.out.TransactionCommandPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
@@ -8,6 +14,9 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,16 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Void Transaction Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -55,7 +54,8 @@ class VoidTransactionServiceTest {
             String merchantId = "merchant-123";
             Transaction transaction = createTransaction(transactionId, merchantId, TransactionStatus.AUTHORIZED);
 
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)).willReturn(Optional.of(transaction));
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId))
+                    .willReturn(Optional.of(transaction));
             given(transactionCommandPort.updateTransaction(any())).willAnswer(invocation -> invocation.getArgument(0));
 
             // When
@@ -80,7 +80,8 @@ class VoidTransactionServiceTest {
         void shouldThrowExceptionWhenTransactionNotFound() {
             // Given
             String transactionId = "invalid-txn";
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, "merchant-123")).willReturn(Optional.empty());
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, "merchant-123"))
+                    .willReturn(Optional.empty());
 
             // When & Then
             assertThatThrownBy(() -> voidTransactionService.voidTransaction(transactionId, "merchant-123"))
@@ -96,7 +97,8 @@ class VoidTransactionServiceTest {
             String merchantId = "merchant-123";
             Transaction transaction = createTransaction(transactionId, merchantId, TransactionStatus.SETTLED);
 
-            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)).willReturn(Optional.of(transaction));
+            given(transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId))
+                    .willReturn(Optional.of(transaction));
 
             // When & Then
             assertThatThrownBy(() -> voidTransactionService.voidTransaction(transactionId, merchantId))
@@ -111,8 +113,7 @@ class VoidTransactionServiceTest {
                 merchantId,
                 TransactionType.PAYMENT,
                 Money.of(10000L, Currency.getInstance("USD")),
-                "USD"
-        );
+                "USD");
         setId(transaction, id);
         setStatus(transaction, status);
         return transaction;

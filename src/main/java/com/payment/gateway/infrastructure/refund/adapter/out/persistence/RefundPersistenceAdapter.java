@@ -4,12 +4,11 @@ import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.port.RefundRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -32,7 +31,9 @@ public class RefundPersistenceAdapter implements RefundQueryPort, RefundReposito
 
     @Override
     public Optional<Refund> findByIdempotencyKey(String refundIdempotencyKey) {
-        return refundJpaRepository.findByRefundIdempotencyKey(refundIdempotencyKey).map(refundMapper::toDomain);
+        return refundJpaRepository
+                .findByRefundIdempotencyKey(refundIdempotencyKey)
+                .map(refundMapper::toDomain);
     }
 
     @Override

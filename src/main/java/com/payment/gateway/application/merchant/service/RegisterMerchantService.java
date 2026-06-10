@@ -52,8 +52,7 @@ public class RegisterMerchantService implements RegisterMerchantUseCase {
                 apiKeyHash,
                 apiSecretHash,
                 command.getWebhookUrl(),
-                MerchantConfiguration.empty()
-        );
+                MerchantConfiguration.empty());
 
         // Save merchant
         Merchant savedMerchant = merchantCommandPort.saveMerchant(merchant);

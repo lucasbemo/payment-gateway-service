@@ -1,5 +1,7 @@
 package com.payment.gateway.application.payment.service;
 
+import com.payment.gateway.application.commons.port.out.AuditPort;
+import com.payment.gateway.application.commons.port.out.MetricsPort;
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.dto.ProcessPaymentCommand;
 import com.payment.gateway.application.payment.port.in.ProcessPaymentUseCase;
@@ -14,28 +16,23 @@ import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.exception.PaymentDeclinedException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.commons.utils.IdGenerator;
-import com.payment.gateway.domain.customer.model.CardDetails;
-import com.payment.gateway.domain.customer.model.Customer;
 import com.payment.gateway.domain.merchant.model.Merchant;
-import com.payment.gateway.domain.payment.model.Payment;
-import com.payment.gateway.domain.payment.model.PaymentItem;
-import com.payment.gateway.domain.payment.model.PaymentMetadata;
-import com.payment.gateway.domain.payment.model.PaymentMethod;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
 import com.payment.gateway.domain.payment.event.PaymentCreatedEvent;
 import com.payment.gateway.domain.payment.event.PaymentFailedEvent;
-import com.payment.gateway.application.commons.port.out.MetricsPort;
-import com.payment.gateway.application.commons.port.out.AuditPort;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.payment.gateway.domain.payment.model.Payment;
+import com.payment.gateway.domain.payment.model.PaymentItem;
+import com.payment.gateway.domain.payment.model.PaymentMetadata;
+import com.payment.gateway.domain.payment.model.PaymentMethod;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for processing payments.
@@ -62,8 +59,11 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
     @Override
     @Transactional(noRollbackFor = PaymentDeclinedException.class)
     public PaymentResponse processPayment(ProcessPaymentCommand command) {
-        log.info("Processing payment for merchant: {}, amount: {} {}",
-                 command.getMerchantId(), command.getAmount(), command.getCurrency());
+        log.info(
+                "Processing payment for merchant: {}, amount: {} {}",
+                command.getMerchantId(),
+                command.getAmount(),
+                command.getCurrency());
 
         // Validate merchant
         Merchant merchant = validateMerchant(command.getMerchantId());
@@ -116,13 +116,13 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 savedPayment.getMerchantId(),
                 "AUTHORIZE",
                 "SUCCESS",
-                savedPayment.getAmount().getAmountInCents()
-        );
+                savedPayment.getAmount().getAmountInCents());
         return mapToResponse(savedPayment);
     }
 
     private Merchant validateMerchant(String merchantId) {
-        Merchant merchant = merchantQueryPort.findById(merchantId)
+        Merchant merchant = merchantQueryPort
+                .findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
         if (!merchant.getStatus().canProcessPayments()) {
             throw new BusinessException("Merchant is not active: " + merchant.getStatus());
@@ -157,27 +157,22 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
         return PaymentMethod.CREDIT_CARD; // default
     }
 
-    private Payment createPayment(ProcessPaymentCommand command,
-                                   Merchant merchant,
-                                   PaymentMethod paymentMethod,
-                                   String paymentMethodToken) {
+    private Payment createPayment(
+            ProcessPaymentCommand command, Merchant merchant, PaymentMethod paymentMethod, String paymentMethodToken) {
         Money amount = Money.of(command.getAmount(), Currency.getInstance(command.getCurrency()));
 
         PaymentMetadata metadata = PaymentMetadata.empty();
 
-        List<PaymentItem> items = command.getItems() != null ?
-                command.getItems().stream()
+        List<PaymentItem> items = command.getItems() != null
+                ? command.getItems().stream()
                         .map(itemDto -> {
-                            Money unitPrice = Money.of(itemDto.getUnitPrice(), Currency.getInstance(command.getCurrency()));
+                            Money unitPrice =
+                                    Money.of(itemDto.getUnitPrice(), Currency.getInstance(command.getCurrency()));
                             Money total = unitPrice.multiply(BigDecimal.valueOf(itemDto.getQuantity()));
-                            return new PaymentItem(
-                                    itemDto.getDescription(),
-                                    itemDto.getQuantity(),
-                                    unitPrice,
-                                    total
-                            );
+                            return new PaymentItem(itemDto.getDescription(), itemDto.getQuantity(), unitPrice, total);
                         })
-                        .collect(Collectors.toList()) : List.of();
+                        .collect(Collectors.toList())
+                : List.of();
 
         return Payment.create(
                 merchant.getId(),
@@ -188,8 +183,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 command.getDescription(),
                 metadata,
                 items,
-                command.getCustomerId()
-        );
+                command.getCustomerId());
     }
 
     private void authorizeWithProvider(Payment payment) {
@@ -201,8 +195,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                         payment.getMerchantId(),
                         payment.getAmount().getAmountInCents(),
                         payment.getCurrency(),
-                        payment.getPaymentMethodId()
-                );
+                        payment.getPaymentMethodId());
 
         try {
             ExternalPaymentProviderPort.PaymentProviderResult result =
@@ -249,23 +242,20 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 payment.getMerchantId(),
                 "AUTHORIZE",
                 "FAILED",
-                payment.getAmount().getAmountInCents()
-        );
+                payment.getAmount().getAmountInCents());
         throw new PaymentDeclinedException(errorCode, errorMessage);
     }
 
     private void createTransaction(Payment payment) {
         log.debug("Creating transaction for payment {}", payment.getId());
 
-        TransactionCommandPort.CreateTransactionCommand command =
-                new TransactionCommandPort.CreateTransactionCommand(
-                        payment.getId(),
-                        payment.getMerchantId(),
-                        "PAYMENT",
-                        payment.getAmount().getAmountInCents(),
-                        payment.getCurrency(),
-                        payment.getStatus().name()
-                );
+        TransactionCommandPort.CreateTransactionCommand command = new TransactionCommandPort.CreateTransactionCommand(
+                payment.getId(),
+                payment.getMerchantId(),
+                "PAYMENT",
+                payment.getAmount().getAmountInCents(),
+                payment.getCurrency(),
+                payment.getStatus().name());
 
         transactionCommandPort.createTransaction(command);
     }
@@ -276,20 +266,26 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
                 .paymentMethodId(payment.getPaymentMethodId())
-                .transactionId(transactionQueryPort.findLatestByPaymentId(payment.getId()).map(t -> t.getId()).orElse(null))
+                .transactionId(transactionQueryPort
+                        .findLatestByPaymentId(payment.getId())
+                        .map(t -> t.getId())
+                        .orElse(null))
                 .amount(payment.getAmount().getAmountInCents())
                 .currency(payment.getCurrency())
                 .status(payment.getStatus().name())
                 .idempotencyKey(payment.getIdempotencyKey())
                 .description(payment.getDescription())
-                .items(payment.getItems() != null ? payment.getItems().stream()
-                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
-                                .description(item.getDescription())
-                                .quantity(item.getQuantity())
-                                .unitPrice(item.getUnitPrice().getAmountInCents())
-                                .total(item.getTotal().getAmountInCents())
-                                .build())
-                        .collect(Collectors.toList()) : List.of())
+                .items(
+                        payment.getItems() != null
+                                ? payment.getItems().stream()
+                                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
+                                                .description(item.getDescription())
+                                                .quantity(item.getQuantity())
+                                                .unitPrice(item.getUnitPrice().getAmountInCents())
+                                                .total(item.getTotal().getAmountInCents())
+                                                .build())
+                                        .collect(Collectors.toList())
+                                : List.of())
                 .createdAt(payment.getCreatedAt())
                 .updatedAt(payment.getUpdatedAt())
                 .build();

@@ -1,14 +1,13 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for refund flow.
@@ -24,14 +23,13 @@ class RefundFlowE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -41,15 +39,16 @@ class RefundFlowE2ETest extends E2ETestBase {
 
         // Create a payment to refund
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L, // $100.00
-            "USD",
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient()
+                .processPayment(
+                        merchantId,
+                        10000L, // $100.00
+                        "USD",
+                        idempotencyKey);
 
         assertThat(paymentResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         paymentId = (String) payment.get("id");
         paymentAmount = (Long) payment.get("amount");
     }
@@ -62,13 +61,13 @@ class RefundFlowE2ETest extends E2ETestBase {
         var refundData = TestDataFactory.RefundData.create(paymentId, merchantId);
 
         // When: Processing the full refund
-        var response = getApiClient().processRefund(
-            refundData.paymentId,
-            refundData.merchantId,
-            refundData.amountInCents,
-            idempotencyKey,
-            refundData.reason
-        );
+        var response = getApiClient()
+                .processRefund(
+                        refundData.paymentId,
+                        refundData.merchantId,
+                        refundData.amountInCents,
+                        idempotencyKey,
+                        refundData.reason);
 
         // Then: Refund is successfully processed
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -93,13 +92,8 @@ class RefundFlowE2ETest extends E2ETestBase {
         Long refundAmount = 5000L; // $50.00 (half of $100)
 
         // When: Processing the partial refund
-        var response = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            refundAmount,
-            idempotencyKey,
-            "Partial refund"
-        );
+        var response =
+                getApiClient().processRefund(paymentId, merchantId, refundAmount, idempotencyKey, "Partial refund");
 
         // Then: Refund is successfully processed
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -116,24 +110,24 @@ class RefundFlowE2ETest extends E2ETestBase {
     void testMultiplePartialRefunds() {
         // Given: First partial refund
         String idempotencyKey1 = TestDataFactory.generateIdempotencyKey();
-        var response1 = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            3000L, // $30.00
-            idempotencyKey1,
-            "First partial refund"
-        );
+        var response1 = getApiClient()
+                .processRefund(
+                        paymentId,
+                        merchantId,
+                        3000L, // $30.00
+                        idempotencyKey1,
+                        "First partial refund");
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // When: Processing second partial refund
         String idempotencyKey2 = TestDataFactory.generateIdempotencyKey();
-        var response2 = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            4000L, // $40.00
-            idempotencyKey2,
-            "Second partial refund"
-        );
+        var response2 = getApiClient()
+                .processRefund(
+                        paymentId,
+                        merchantId,
+                        4000L, // $40.00
+                        idempotencyKey2,
+                        "Second partial refund");
 
         // Then: Second refund is also processed
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -147,8 +141,7 @@ class RefundFlowE2ETest extends E2ETestBase {
 
         // Verify total refunded amount
         Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM refunds WHERE payment_id = ?", Integer.class, paymentId
-        );
+                "SELECT COUNT(*) FROM refunds WHERE payment_id = ?", Integer.class, paymentId);
         assertThat(count).isEqualTo(2);
     }
 
@@ -159,13 +152,13 @@ class RefundFlowE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing refund for more than the payment amount
-        var response = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            15000L, // $150.00 (more than $100 payment)
-            idempotencyKey,
-            "Invalid refund"
-        );
+        var response = getApiClient()
+                .processRefund(
+                        paymentId,
+                        merchantId,
+                        15000L, // $150.00 (more than $100 payment)
+                        idempotencyKey,
+                        "Invalid refund");
 
         // Then: Request fails with error
         assertThat(response.getStatusCode()).isIn(HttpStatus.BAD_REQUEST, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -179,13 +172,8 @@ class RefundFlowE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing refund for non-existent payment
-        var response = getApiClient().processRefund(
-            fakePaymentId,
-            merchantId,
-            5000L,
-            idempotencyKey,
-            "Invalid payment"
-        );
+        var response =
+                getApiClient().processRefund(fakePaymentId, merchantId, 5000L, idempotencyKey, "Invalid payment");
 
         // Then: Request fails with error (400 for invalid payment, 404 for not found)
         assertThat(response.getStatusCode()).isIn(HttpStatus.BAD_REQUEST, HttpStatus.NOT_FOUND);
@@ -199,21 +187,11 @@ class RefundFlowE2ETest extends E2ETestBase {
         Long refundAmount = 5000L;
 
         // When: Processing the same refund twice
-        var response1 = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            refundAmount,
-            idempotencyKey,
-            "First attempt"
-        );
+        var response1 =
+                getApiClient().processRefund(paymentId, merchantId, refundAmount, idempotencyKey, "First attempt");
 
-        var response2 = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            refundAmount,
-            idempotencyKey,
-            "Second attempt"
-        );
+        var response2 =
+                getApiClient().processRefund(paymentId, merchantId, refundAmount, idempotencyKey, "Second attempt");
 
         // Then: Second request returns same refund (idempotency)
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -221,8 +199,10 @@ class RefundFlowE2ETest extends E2ETestBase {
         assertThat(response2.getStatusCode()).isIn(HttpStatus.CREATED, HttpStatus.BAD_REQUEST, HttpStatus.OK);
 
         if (response2.getStatusCode() == HttpStatus.CREATED) {
-            Map<String, Object> refund1 = (Map<String, Object>) response1.getBody().get("data");
-            Map<String, Object> refund2 = (Map<String, Object>) response2.getBody().get("data");
+            Map<String, Object> refund1 =
+                    (Map<String, Object>) response1.getBody().get("data");
+            Map<String, Object> refund2 =
+                    (Map<String, Object>) response2.getBody().get("data");
             assertThat(refund1.get("id")).isEqualTo(refund2.get("id"));
         }
     }
@@ -234,15 +214,16 @@ class RefundFlowE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var refundData = TestDataFactory.RefundData.create(paymentId, merchantId);
 
-        var processResponse = getApiClient().processRefund(
-            refundData.paymentId,
-            refundData.merchantId,
-            refundData.amountInCents,
-            idempotencyKey,
-            refundData.reason
-        );
+        var processResponse = getApiClient()
+                .processRefund(
+                        refundData.paymentId,
+                        refundData.merchantId,
+                        refundData.amountInCents,
+                        idempotencyKey,
+                        refundData.reason);
 
-        Map<String, Object> refund = (Map<String, Object>) processResponse.getBody().get("data");
+        Map<String, Object> refund =
+                (Map<String, Object>) processResponse.getBody().get("data");
         String refundId = (String) refund.get("id");
 
         // When: Getting the refund by ID
@@ -251,7 +232,8 @@ class RefundFlowE2ETest extends E2ETestBase {
         // Then: Refund is retrieved successfully
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Map<String, Object> retrievedRefund = (Map<String, Object>) getResponse.getBody().get("data");
+        Map<String, Object> retrievedRefund =
+                (Map<String, Object>) getResponse.getBody().get("data");
         assertThat(retrievedRefund.get("id")).isEqualTo(refundId);
         assertThat(retrievedRefund.get("paymentId")).isEqualTo(paymentId);
     }
@@ -263,15 +245,16 @@ class RefundFlowE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var refundData = TestDataFactory.RefundData.create(paymentId, merchantId);
 
-        var processResponse = getApiClient().processRefund(
-            refundData.paymentId,
-            refundData.merchantId,
-            refundData.amountInCents,
-            idempotencyKey,
-            refundData.reason
-        );
+        var processResponse = getApiClient()
+                .processRefund(
+                        refundData.paymentId,
+                        refundData.merchantId,
+                        refundData.amountInCents,
+                        idempotencyKey,
+                        refundData.reason);
 
-        Map<String, Object> refund = (Map<String, Object>) processResponse.getBody().get("data");
+        Map<String, Object> refund =
+                (Map<String, Object>) processResponse.getBody().get("data");
         String refundId = (String) refund.get("id");
 
         // When: Cancelling the refund
@@ -290,13 +273,7 @@ class RefundFlowE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing refund without authentication
-        var response = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            5000L,
-            idempotencyKey,
-            "No auth"
-        );
+        var response = getApiClient().processRefund(paymentId, merchantId, 5000L, idempotencyKey, "No auth");
 
         // Then: Request is rejected with 401
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -311,13 +288,7 @@ class RefundFlowE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
         // When: Processing refund with invalid API key
-        var response = getApiClient().processRefund(
-            paymentId,
-            merchantId,
-            5000L,
-            idempotencyKey,
-            "Invalid auth"
-        );
+        var response = getApiClient().processRefund(paymentId, merchantId, 5000L, idempotencyKey, "Invalid auth");
 
         // Then: Request is rejected with 401
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

@@ -1,7 +1,6 @@
 package com.payment.gateway.domain.merchant.port;
 
 import com.payment.gateway.domain.merchant.model.Merchant;
-
 import java.util.List;
 import java.util.Optional;
 

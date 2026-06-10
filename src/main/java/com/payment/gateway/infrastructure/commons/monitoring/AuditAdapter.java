@@ -31,7 +31,8 @@ public class AuditAdapter implements AuditPort {
     }
 
     @Override
-    public void logWebhookDelivery(String merchantId, String eventType, String webhookUrl, String outcome, int attempts) {
+    public void logWebhookDelivery(
+            String merchantId, String eventType, String webhookUrl, String outcome, int attempts) {
         auditLogger.logWebhookDelivery(merchantId, eventType, webhookUrl, outcome, attempts);
     }
 }

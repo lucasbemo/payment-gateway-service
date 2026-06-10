@@ -33,16 +33,14 @@ public class RefundController implements RefundApi {
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<RefundResponse>> processRefund(
-            @Valid @RequestBody CreateRefundRequest request) {
+    public ResponseEntity<ApiResponse<RefundResponse>> processRefund(@Valid @RequestBody CreateRefundRequest request) {
         log.info("Processing refund for payment: {} amount: {}", request.getPaymentId(), request.getAmount());
         var response = processRefundUseCase.processRefund(
                 request.getPaymentId(),
                 request.getMerchantId(),
                 request.getAmount(),
                 request.getIdempotencyKey(),
-                request.getReason()
-        );
+                request.getReason());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Refund processed successfully", response));
     }
@@ -50,8 +48,7 @@ public class RefundController implements RefundApi {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RefundResponse>> getRefund(
-            @PathVariable String id,
-            @RequestParam String merchantId) {
+            @PathVariable String id, @RequestParam String merchantId) {
         log.info("Getting refund: {} for merchant: {}", id, merchantId);
         var response = getRefundUseCase.getRefundById(id, merchantId);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -60,9 +57,7 @@ public class RefundController implements RefundApi {
     @Override
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<RefundResponse>> cancelRefund(
-            @PathVariable String id,
-            @RequestParam String merchantId,
-            @RequestParam(required = false) String reason) {
+            @PathVariable String id, @RequestParam String merchantId, @RequestParam(required = false) String reason) {
         log.info("Cancelling refund: {} for merchant: {}", id, merchantId);
         var response = cancelRefundUseCase.cancelRefund(id, merchantId, reason);
         return ResponseEntity.ok(ApiResponse.success("Refund cancelled successfully", response));
@@ -75,7 +70,10 @@ public class RefundController implements RefundApi {
     @Schema(description = "Request to process a refund")
     public static class CreateRefundRequest {
 
-        @Schema(description = "Payment ID to refund", example = "pay_abc123", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "Payment ID to refund",
+                example = "pay_abc123",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Payment ID is required")
         private String paymentId;
 
@@ -88,7 +86,9 @@ public class RefundController implements RefundApi {
         @Positive(message = "Amount must be positive")
         private Long amount;
 
-        @Schema(description = "Idempotency key for duplicate protection", example = "550e8400-e29b-41d4-a716-446655440000")
+        @Schema(
+                description = "Idempotency key for duplicate protection",
+                example = "550e8400-e29b-41d4-a716-446655440000")
         private String idempotencyKey;
 
         @Schema(description = "Reason for the refund", example = "Customer requested")

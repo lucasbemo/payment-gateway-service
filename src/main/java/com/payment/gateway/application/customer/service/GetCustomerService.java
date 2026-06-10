@@ -27,7 +27,8 @@ public class GetCustomerService implements GetCustomerUseCase {
     public CustomerResponse getCustomerById(String customerId, String merchantId) {
         log.info("Getting customer by id: {} for merchant: {}", customerId, merchantId);
 
-        Customer customer = customerCommandPort.findByIdAndMerchantId(customerId, merchantId)
+        Customer customer = customerCommandPort
+                .findByIdAndMerchantId(customerId, merchantId)
                 .orElseThrow(() -> new BusinessException("Customer not found: " + customerId));
 
         return mapToResponse(customer);

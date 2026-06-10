@@ -1,5 +1,9 @@
 package com.payment.gateway.infrastructure.commons.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,11 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Collections;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("AuditorAwareImpl Tests")
 class AuditorAwareImplTest {
@@ -111,8 +110,7 @@ class AuditorAwareImplTest {
         @Test
         @DisplayName("should return 'system' when authentication is not authenticated")
         void shouldReturnSystemWhenNotAuthenticated() {
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken("user", "pass");
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("user", "pass");
             // This token is not authenticated (no authorities constructor sets authenticated=false)
             SecurityContextHolder.getContext().setAuthentication(auth);
 

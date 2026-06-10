@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.outbox.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("EventType Enum Tests")
 class EventTypeTest {
@@ -104,8 +104,7 @@ class EventTypeTest {
         @Test
         @DisplayName("Should throw exception for invalid type")
         void shouldThrowExceptionForInvalidType() {
-            assertThatThrownBy(() -> EventType.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> EventType.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -118,20 +117,20 @@ class EventTypeTest {
         void shouldReturnAllEventTypes() {
             EventType[] values = EventType.values();
             assertThat(values).hasSize(12);
-            assertThat(values).containsExactlyInAnyOrder(
-                EventType.PAYMENT_CREATED,
-                EventType.PAYMENT_COMPLETED,
-                EventType.PAYMENT_FAILED,
-                EventType.PAYMENT_CANCELLED,
-                EventType.REFUND_PROCESSED,
-                EventType.TRANSACTION_CREATED,
-                EventType.TRANSACTION_COMPLETED,
-                EventType.TRANSACTION_FAILED,
-                EventType.CUSTOMER_CREATED,
-                EventType.CUSTOMER_UPDATED,
-                EventType.MERCHANT_ACTIVATED,
-                EventType.MERCHANT_SUSPENDED
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            EventType.PAYMENT_CREATED,
+                            EventType.PAYMENT_COMPLETED,
+                            EventType.PAYMENT_FAILED,
+                            EventType.PAYMENT_CANCELLED,
+                            EventType.REFUND_PROCESSED,
+                            EventType.TRANSACTION_CREATED,
+                            EventType.TRANSACTION_COMPLETED,
+                            EventType.TRANSACTION_FAILED,
+                            EventType.CUSTOMER_CREATED,
+                            EventType.CUSTOMER_UPDATED,
+                            EventType.MERCHANT_ACTIVATED,
+                            EventType.MERCHANT_SUSPENDED);
         }
     }
 }

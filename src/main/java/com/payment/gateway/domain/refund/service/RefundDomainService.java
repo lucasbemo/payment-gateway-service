@@ -1,7 +1,6 @@
 package com.payment.gateway.domain.refund.service;
 
 import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.domain.refund.exception.InvalidRefundAmountException;
 import com.payment.gateway.domain.refund.exception.RefundNotFoundException;
 import com.payment.gateway.domain.refund.exception.RefundProcessingException;
 import com.payment.gateway.domain.refund.model.Refund;
@@ -10,13 +9,12 @@ import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
 import com.payment.gateway.domain.refund.port.RefundEventPublisherPort;
 import com.payment.gateway.domain.refund.port.RefundRepositoryPort;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Refund domain service.
@@ -31,31 +29,43 @@ public class RefundDomainService {
     private final RefundRepositoryPort repository;
     private final RefundEventPublisherPort eventPublisher;
 
-    public Refund createRefund(String paymentId, String transactionId, String merchantId,
-                                RefundType type, Money amount, String currency,
-                                String refundIdempotencyKey, String reason) {
+    public Refund createRefund(
+            String paymentId,
+            String transactionId,
+            String merchantId,
+            RefundType type,
+            Money amount,
+            String currency,
+            String refundIdempotencyKey,
+            String reason) {
         log.info("Creating {} refund for payment {} with amount {}", type, paymentId, amount);
 
         if (repository.existsByRefundIdempotencyKey(refundIdempotencyKey)) {
             throw new RefundProcessingException("Refund with this idempotency key already exists");
         }
 
-        Refund refund = Refund.create(paymentId, transactionId, merchantId, type, amount, currency,
-                                       refundIdempotencyKey, reason);
+        Refund refund = Refund.create(
+                paymentId, transactionId, merchantId, type, amount, currency, refundIdempotencyKey, reason);
         refund = repository.save(refund);
         eventPublisher.publishRefundCreated(refund);
 
         return refund;
     }
 
-    public Refund createRefundWithItems(String paymentId, String transactionId, String merchantId,
-                                         RefundType type, Money amount, String currency,
-                                         String refundIdempotencyKey, String reason,
-                                         List<RefundItem> items) {
+    public Refund createRefundWithItems(
+            String paymentId,
+            String transactionId,
+            String merchantId,
+            RefundType type,
+            Money amount,
+            String currency,
+            String refundIdempotencyKey,
+            String reason,
+            List<RefundItem> items) {
         log.info("Creating {} refund with {} items for payment {}", type, items.size(), paymentId);
 
-        Refund refund = createRefund(paymentId, transactionId, merchantId, type, amount, currency,
-                                      refundIdempotencyKey, reason);
+        Refund refund = createRefund(
+                paymentId, transactionId, merchantId, type, amount, currency, refundIdempotencyKey, reason);
         refund.addItems(items);
         refund = repository.save(refund);
 
@@ -69,8 +79,7 @@ public class RefundDomainService {
 
         if (!refund.isPending()) {
             throw new RefundProcessingException(
-                "Can only approve pending refunds. Current status: " + refund.getStatus()
-            );
+                    "Can only approve pending refunds. Current status: " + refund.getStatus());
         }
 
         refund.approve();
@@ -98,8 +107,7 @@ public class RefundDomainService {
 
         if (refund.getStatus() != RefundStatus.APPROVED && refund.getStatus() != RefundStatus.PROCESSING) {
             throw new RefundProcessingException(
-                "Can only complete approved or processing refunds. Current status: " + refund.getStatus()
-            );
+                    "Can only complete approved or processing refunds. Current status: " + refund.getStatus());
         }
 
         refund.complete();
@@ -126,9 +134,7 @@ public class RefundDomainService {
         Refund refund = getRefundOrThrow(refundId);
 
         if (refund.isTerminal()) {
-            throw new RefundProcessingException(
-                "Cannot cancel terminal refund. Current status: " + refund.getStatus()
-            );
+            throw new RefundProcessingException("Cannot cancel terminal refund. Current status: " + refund.getStatus());
         }
 
         refund.cancel(cancellationReason);
@@ -151,8 +157,7 @@ public class RefundDomainService {
     }
 
     public Refund getRefundOrThrow(String refundId) {
-        return repository.findById(refundId)
-                .orElseThrow(() -> new RefundNotFoundException(refundId));
+        return repository.findById(refundId).orElseThrow(() -> new RefundNotFoundException(refundId));
     }
 
     public Optional<Refund> getRefundByPaymentId(String paymentId) {

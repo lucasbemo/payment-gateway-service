@@ -1,5 +1,15 @@
 package com.payment.gateway.application.refund.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+
+import com.payment.gateway.application.commons.port.out.AuditPort;
+import com.payment.gateway.application.commons.port.out.MetricsPort;
 import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.out.RefundPaymentQueryPort;
@@ -12,15 +22,16 @@ import com.payment.gateway.domain.merchant.model.MerchantStatus;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentMethod;
-import com.payment.gateway.domain.payment.model.PaymentStatus;
 import com.payment.gateway.domain.refund.model.Refund;
 import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
-import com.payment.gateway.application.commons.port.out.MetricsPort;
-import com.payment.gateway.application.commons.port.out.AuditPort;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,19 +39,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 
 @DisplayName("Process Refund Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +66,8 @@ class ProcessRefundServiceTest {
 
     @BeforeEach
     void setUp() {
-        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, merchantQueryPort, metricsPort, auditPort, outboxEventService);
+        processRefundService = new ProcessRefundService(
+                refundQueryPort, refundPaymentQueryPort, merchantQueryPort, metricsPort, auditPort, outboxEventService);
     }
 
     @Nested
@@ -92,7 +91,8 @@ class ProcessRefundServiceTest {
             given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
             given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
-            given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)).willReturn(Optional.of(transaction));
+            given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId))
+                    .willReturn(Optional.of(transaction));
             given(refundQueryPort.saveRefund(any(Refund.class))).willAnswer(invocation -> {
                 Refund refund = invocation.getArgument(0);
                 setId(refund, refundId);
@@ -100,7 +100,8 @@ class ProcessRefundServiceTest {
             });
 
             // When
-            RefundResponse response = processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Customer request");
+            RefundResponse response = processRefundService.processRefund(
+                    paymentId, merchantId, null, refundIdempotencyKey, "Customer request");
 
             // Then
             assertThat(response).isNotNull();
@@ -129,7 +130,8 @@ class ProcessRefundServiceTest {
             given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
             given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
-            given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)).willReturn(Optional.of(transaction));
+            given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId))
+                    .willReturn(Optional.of(transaction));
             given(refundQueryPort.saveRefund(any(Refund.class))).willAnswer(invocation -> {
                 Refund refund = invocation.getArgument(0);
                 setId(refund, refundId);
@@ -137,7 +139,8 @@ class ProcessRefundServiceTest {
             });
 
             // When
-            RefundResponse response = processRefundService.processRefund(paymentId, merchantId, partialAmount, refundIdempotencyKey, "Partial refund");
+            RefundResponse response = processRefundService.processRefund(
+                    paymentId, merchantId, partialAmount, refundIdempotencyKey, "Partial refund");
 
             // Then
             assertThat(response).isNotNull();
@@ -163,7 +166,8 @@ class ProcessRefundServiceTest {
             given(refundQueryPort.findByIdempotencyKey(refundIdempotencyKey)).willReturn(Optional.of(existingRefund));
 
             // When
-            RefundResponse response = processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Customer request");
+            RefundResponse response = processRefundService.processRefund(
+                    paymentId, merchantId, null, refundIdempotencyKey, "Customer request");
 
             // Then
             assertThat(response).isNotNull();
@@ -190,7 +194,8 @@ class ProcessRefundServiceTest {
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
+            assertThatThrownBy(() -> processRefundService.processRefund(
+                            paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Payment not found");
         }
@@ -209,7 +214,8 @@ class ProcessRefundServiceTest {
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
 
             // When & Then
-            assertThatThrownBy(() -> processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
+            assertThatThrownBy(() -> processRefundService.processRefund(
+                            paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Payment does not belong to merchant");
         }
@@ -230,7 +236,8 @@ class ProcessRefundServiceTest {
             given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
 
             // When & Then
-            assertThatThrownBy(() -> processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
+            assertThatThrownBy(() -> processRefundService.processRefund(
+                            paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Merchant is not active: SUSPENDED");
 
@@ -251,10 +258,12 @@ class ProcessRefundServiceTest {
             given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
             given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
-            given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)).willReturn(Optional.empty());
+            given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId))
+                    .willReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
+            assertThatThrownBy(() -> processRefundService.processRefund(
+                            paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("No transaction found for payment");
         }
@@ -270,8 +279,7 @@ class ProcessRefundServiceTest {
                 "hashed_key",
                 "hashed_secret",
                 "https://webhook.example.com",
-                MerchantConfiguration.empty()
-        );
+                MerchantConfiguration.empty());
         setId(merchant, id);
         setStatus(merchant, status);
         return merchant;
@@ -287,8 +295,7 @@ class ProcessRefundServiceTest {
                 "Test payment",
                 PaymentMetadata.empty(),
                 List.of(),
-                null
-        );
+                null);
         setId(payment, id);
         return payment;
     }
@@ -299,8 +306,7 @@ class ProcessRefundServiceTest {
                 "merchant_123",
                 TransactionType.PAYMENT,
                 Money.of(10000L, Currency.getInstance("USD")),
-                "USD"
-        );
+                "USD");
         setId(transaction, id);
         setStatus(transaction, TransactionStatus.CAPTURED);
         return transaction;
@@ -315,8 +321,7 @@ class ProcessRefundServiceTest {
                 Money.of(10000L, Currency.getInstance("USD")),
                 "USD",
                 refundIdempotencyKey,
-                "Test refund"
-        );
+                "Test refund");
         setId(refund, id);
         return refund;
     }

@@ -27,7 +27,8 @@ public class GetTransactionService implements GetTransactionUseCase {
     public TransactionResponse getTransactionById(String transactionId, String merchantId) {
         log.info("Getting transaction by id: {} for merchant: {}", transactionId, merchantId);
 
-        Transaction transaction = transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)
+        Transaction transaction = transactionQueryPort
+                .findByIdAndMerchantId(transactionId, merchantId)
                 .orElseThrow(() -> new BusinessException("Transaction not found: " + transactionId));
 
         return mapToResponse(transaction);

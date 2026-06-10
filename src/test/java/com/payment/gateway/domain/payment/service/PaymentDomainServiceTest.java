@@ -1,9 +1,16 @@
 package com.payment.gateway.domain.payment.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.exception.DuplicatePaymentException;
 import com.payment.gateway.domain.payment.model.*;
 import com.payment.gateway.domain.payment.port.PaymentRepositoryPort;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,14 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PaymentDomainService Tests")
@@ -51,32 +50,30 @@ class PaymentDomainServiceTest {
             Money amount = Money.of(150000, CURRENCY_USD);
             PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
             Payment payment = Payment.create(
-                MERCHANT_ID,
-                amount,
-                CURRENCY,
-                paymentMethod,
-                IDEMPOTENCY_KEY,
-                DESCRIPTION,
-                PaymentMetadata.empty(),
-                List.of(),
-                null
-            );
+                    MERCHANT_ID,
+                    amount,
+                    CURRENCY,
+                    paymentMethod,
+                    IDEMPOTENCY_KEY,
+                    DESCRIPTION,
+                    PaymentMetadata.empty(),
+                    List.of(),
+                    null);
 
             given(paymentRepository.existsByIdempotencyKey(IDEMPOTENCY_KEY)).willReturn(false);
             given(paymentRepository.save(any(Payment.class))).willReturn(payment);
 
             // When
             Payment result = paymentDomainService.processPayment(
-                MERCHANT_ID,
-                amount,
-                CURRENCY,
-                paymentMethod,
-                IDEMPOTENCY_KEY,
-                DESCRIPTION,
-                PaymentMetadata.empty(),
-                List.of(),
-                null
-            );
+                    MERCHANT_ID,
+                    amount,
+                    CURRENCY,
+                    paymentMethod,
+                    IDEMPOTENCY_KEY,
+                    DESCRIPTION,
+                    PaymentMetadata.empty(),
+                    List.of(),
+                    null);
 
             // Then
             assertThat(result).isNotNull();
@@ -97,18 +94,17 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.processPayment(
-                MERCHANT_ID,
-                amount,
-                CURRENCY,
-                paymentMethod,
-                IDEMPOTENCY_KEY,
-                DESCRIPTION,
-                PaymentMetadata.empty(),
-                List.of(),
-                null
-            ))
-                .isInstanceOf(DuplicatePaymentException.class)
-                .hasMessageContaining(IDEMPOTENCY_KEY);
+                            MERCHANT_ID,
+                            amount,
+                            CURRENCY,
+                            paymentMethod,
+                            IDEMPOTENCY_KEY,
+                            DESCRIPTION,
+                            PaymentMetadata.empty(),
+                            List.of(),
+                            null))
+                    .isInstanceOf(DuplicatePaymentException.class)
+                    .hasMessageContaining(IDEMPOTENCY_KEY);
 
             verify(paymentRepository).existsByIdempotencyKey(IDEMPOTENCY_KEY);
             verify(paymentRepository, never()).save(any(Payment.class));
@@ -125,16 +121,15 @@ class PaymentDomainServiceTest {
             // Given
             String paymentId = "pay_123";
             Payment payment = Payment.create(
-                MERCHANT_ID,
-                Money.of(150000, CURRENCY_USD),
-                CURRENCY,
-                PaymentMethod.CREDIT_CARD,
-                IDEMPOTENCY_KEY,
-                DESCRIPTION,
-                PaymentMetadata.empty(),
-                List.of(),
-                null
-            );
+                    MERCHANT_ID,
+                    Money.of(150000, CURRENCY_USD),
+                    CURRENCY,
+                    PaymentMethod.CREDIT_CARD,
+                    IDEMPOTENCY_KEY,
+                    DESCRIPTION,
+                    PaymentMetadata.empty(),
+                    List.of(),
+                    null);
 
             given(paymentRepository.findById(paymentId)).willReturn(Optional.of(payment));
 
@@ -155,8 +150,8 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.getPayment(paymentId))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Payment not found");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Payment not found");
 
             verify(paymentRepository).findById(paymentId);
         }
@@ -166,16 +161,15 @@ class PaymentDomainServiceTest {
         void shouldReturnPaymentWhenFoundByIdempotencyKey() {
             // Given
             Payment payment = Payment.create(
-                MERCHANT_ID,
-                Money.of(150000, CURRENCY_USD),
-                CURRENCY,
-                PaymentMethod.CREDIT_CARD,
-                IDEMPOTENCY_KEY,
-                DESCRIPTION,
-                PaymentMetadata.empty(),
-                List.of(),
-                null
-            );
+                    MERCHANT_ID,
+                    Money.of(150000, CURRENCY_USD),
+                    CURRENCY,
+                    PaymentMethod.CREDIT_CARD,
+                    IDEMPOTENCY_KEY,
+                    DESCRIPTION,
+                    PaymentMetadata.empty(),
+                    List.of(),
+                    null);
 
             given(paymentRepository.findByIdempotencyKey(IDEMPOTENCY_KEY)).willReturn(Optional.of(payment));
 
@@ -195,8 +189,8 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.getPaymentByIdempotencyKey(IDEMPOTENCY_KEY))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Payment not found for idempotency key");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Payment not found for idempotency key");
 
             verify(paymentRepository).findByIdempotencyKey(IDEMPOTENCY_KEY);
         }
@@ -214,7 +208,7 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatCode(() -> paymentDomainService.validatePaymentAmount(validAmount))
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -222,8 +216,8 @@ class PaymentDomainServiceTest {
         void shouldThrowWhenAmountIsNull() {
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.validatePaymentAmount(null))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Payment amount must be greater than zero");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Payment amount must be greater than zero");
         }
 
         @Test
@@ -234,8 +228,8 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.validatePaymentAmount(zeroAmount))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Payment amount must be greater than zero");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Payment amount must be greater than zero");
         }
     }
 
@@ -251,7 +245,7 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatCode(() -> paymentDomainService.validateCurrency(validCurrency))
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -259,8 +253,8 @@ class PaymentDomainServiceTest {
         void shouldThrowWhenCurrencyIsNull() {
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.validateCurrency(null))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Invalid currency code");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Invalid currency code");
         }
 
         @Test
@@ -271,8 +265,8 @@ class PaymentDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> paymentDomainService.validateCurrency(invalidCurrency))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Invalid currency code");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Invalid currency code");
         }
     }
 }

@@ -53,7 +53,6 @@ public enum MerchantStatus {
         return Arrays.stream(values())
                 .filter(s -> s.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Invalid merchant status: " + value));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid merchant status: " + value));
     }
 }

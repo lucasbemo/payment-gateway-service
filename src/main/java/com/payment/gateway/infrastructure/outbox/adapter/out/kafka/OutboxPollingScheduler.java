@@ -3,13 +3,12 @@ package com.payment.gateway.infrastructure.outbox.adapter.out.kafka;
 import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import com.payment.gateway.domain.outbox.port.OutboxEventRepositoryPort;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component

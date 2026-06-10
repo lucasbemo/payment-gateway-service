@@ -53,8 +53,7 @@ public class CustomerController implements CustomerApi {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(
-            @PathVariable String id,
-            @RequestParam String merchantId) {
+            @PathVariable String id, @RequestParam String merchantId) {
         log.info("Getting customer: {} for merchant: {}", id, merchantId);
         var response = getCustomerUseCase.getCustomerById(id, merchantId);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -63,8 +62,7 @@ public class CustomerController implements CustomerApi {
     @Override
     @PostMapping("/{id}/payment-methods")
     public ResponseEntity<ApiResponse<CustomerResponse>> addPaymentMethod(
-            @PathVariable String id,
-            @Valid @RequestBody AddPaymentMethodRequest request) {
+            @PathVariable String id, @Valid @RequestBody AddPaymentMethodRequest request) {
         log.info("Adding payment method for customer: {}", id);
         var command = AddPaymentMethodCommand.builder()
                 .customerId(id)
@@ -84,8 +82,7 @@ public class CustomerController implements CustomerApi {
     @Override
     @DeleteMapping("/{id}/payment-methods/{pmId}")
     public ResponseEntity<ApiResponse<CustomerResponse>> removePaymentMethod(
-            @PathVariable String id,
-            @PathVariable String pmId) {
+            @PathVariable String id, @PathVariable String pmId) {
         log.info("Removing payment method: {} from customer: {}", pmId, id);
         var response = removePaymentMethodUseCase.removePaymentMethod(id, pmId);
         return ResponseEntity.ok(ApiResponse.success("Payment method removed successfully", response));
@@ -98,11 +95,17 @@ public class CustomerController implements CustomerApi {
     @Schema(description = "Request to register a new customer")
     public static class CreateCustomerRequest {
 
-        @Schema(description = "Merchant ID that will own this customer", example = "merch_abc123", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "Merchant ID that will own this customer",
+                example = "merch_abc123",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Merchant ID is required")
         private String merchantId;
 
-        @Schema(description = "Customer email address", example = "john@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "Customer email address",
+                example = "john@example.com",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Email is required")
         private String email;
 
@@ -128,7 +131,10 @@ public class CustomerController implements CustomerApi {
         @NotBlank(message = "Merchant ID is required")
         private String merchantId;
 
-        @Schema(description = "Card number (test: 4111111111111111)", example = "4111111111111111", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "Card number (test: 4111111111111111)",
+                example = "4111111111111111",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Card number is required")
         @jakarta.validation.constraints.Pattern(regexp = "\\d{13,19}", message = "Card number must be 13-19 digits")
         private String cardNumber;

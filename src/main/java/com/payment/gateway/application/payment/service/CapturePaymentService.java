@@ -11,13 +11,12 @@ import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
 import com.payment.gateway.domain.payment.event.PaymentCompletedEvent;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Application service for capturing authorized payments.
@@ -37,7 +36,8 @@ public class CapturePaymentService implements CapturePaymentUseCase {
     public PaymentResponse capturePayment(String paymentId, String merchantId) {
         log.info("Capturing payment: {} for merchant: {}", paymentId, merchantId);
 
-        Payment payment = paymentQueryPort.findById(paymentId)
+        Payment payment = paymentQueryPort
+                .findById(paymentId)
                 .orElseThrow(() -> new BusinessException("Payment not found: " + paymentId));
 
         // Validate ownership
@@ -47,7 +47,8 @@ public class CapturePaymentService implements CapturePaymentUseCase {
 
         // Validate payment is authorized and can be captured
         if (payment.getStatus() != PaymentStatus.AUTHORIZED) {
-            throw new BusinessException("Payment must be authorized before capture. Current status: " + payment.getStatus());
+            throw new BusinessException(
+                    "Payment must be authorized before capture. Current status: " + payment.getStatus());
         }
 
         // Capture with external provider
@@ -82,8 +83,7 @@ public class CapturePaymentService implements CapturePaymentUseCase {
                         payment.getMerchantId(),
                         payment.getAmount().getAmountInCents(),
                         payment.getCurrency(),
-                        payment.getPaymentMethodId()
-                );
+                        payment.getPaymentMethodId());
 
         try {
             ExternalPaymentProviderPort.PaymentProviderResult result =
@@ -108,20 +108,26 @@ public class CapturePaymentService implements CapturePaymentUseCase {
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
                 .paymentMethodId(payment.getPaymentMethodId())
-                .transactionId(transactionQueryPort.findLatestByPaymentId(payment.getId()).map(t -> t.getId()).orElse(null))
+                .transactionId(transactionQueryPort
+                        .findLatestByPaymentId(payment.getId())
+                        .map(t -> t.getId())
+                        .orElse(null))
                 .amount(payment.getAmount().getAmountInCents())
                 .currency(payment.getCurrency())
                 .status(payment.getStatus().name())
                 .idempotencyKey(payment.getIdempotencyKey())
                 .description(payment.getDescription())
-                .items(payment.getItems() != null ? payment.getItems().stream()
-                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
-                                .description(item.getDescription())
-                                .quantity(item.getQuantity())
-                                .unitPrice(item.getUnitPrice().getAmountInCents())
-                                .total(item.getTotal().getAmountInCents())
-                                .build())
-                        .collect(Collectors.toList()) : List.of())
+                .items(
+                        payment.getItems() != null
+                                ? payment.getItems().stream()
+                                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
+                                                .description(item.getDescription())
+                                                .quantity(item.getQuantity())
+                                                .unitPrice(item.getUnitPrice().getAmountInCents())
+                                                .total(item.getTotal().getAmountInCents())
+                                                .build())
+                                        .collect(Collectors.toList())
+                                : List.of())
                 .createdAt(payment.getCreatedAt())
                 .updatedAt(payment.getUpdatedAt())
                 .build();

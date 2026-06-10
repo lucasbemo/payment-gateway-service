@@ -21,7 +21,8 @@ public class VoidTransactionService implements VoidTransactionUseCase {
     private final TransactionQueryPort transactionQueryPort;
     private final TransactionCommandPort transactionCommandPort;
 
-    public VoidTransactionService(TransactionQueryPort transactionQueryPort, TransactionCommandPort transactionCommandPort) {
+    public VoidTransactionService(
+            TransactionQueryPort transactionQueryPort, TransactionCommandPort transactionCommandPort) {
         this.transactionQueryPort = transactionQueryPort;
         this.transactionCommandPort = transactionCommandPort;
     }
@@ -30,11 +31,14 @@ public class VoidTransactionService implements VoidTransactionUseCase {
     public TransactionResponse voidTransaction(String transactionId, String merchantId) {
         log.info("Voiding transaction: {} for merchant: {}", transactionId, merchantId);
 
-        Transaction transaction = transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)
+        Transaction transaction = transactionQueryPort
+                .findByIdAndMerchantId(transactionId, merchantId)
                 .orElseThrow(() -> new BusinessException("Transaction not found: " + transactionId));
 
         // Validate transaction can be voided
-        if (!transaction.getStatus().canTransitionTo(com.payment.gateway.domain.transaction.model.TransactionStatus.REVERSED)) {
+        if (!transaction
+                .getStatus()
+                .canTransitionTo(com.payment.gateway.domain.transaction.model.TransactionStatus.REVERSED)) {
             throw new BusinessException("Cannot void transaction in current state: " + transaction.getStatus());
         }
 

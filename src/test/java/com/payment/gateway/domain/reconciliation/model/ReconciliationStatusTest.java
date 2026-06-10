@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.reconciliation.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("ReconciliationStatus Enum Tests")
 class ReconciliationStatusTest {
@@ -62,14 +62,15 @@ class ReconciliationStatusTest {
             assertThat(ReconciliationStatus.valueOf("RECONCILING")).isEqualTo(ReconciliationStatus.RECONCILING);
             assertThat(ReconciliationStatus.valueOf("COMPLETED")).isEqualTo(ReconciliationStatus.COMPLETED);
             assertThat(ReconciliationStatus.valueOf("FAILED")).isEqualTo(ReconciliationStatus.FAILED);
-            assertThat(ReconciliationStatus.valueOf("PARTIALLY_RECONCILED")).isEqualTo(ReconciliationStatus.PARTIALLY_RECONCILED);
+            assertThat(ReconciliationStatus.valueOf("PARTIALLY_RECONCILED"))
+                    .isEqualTo(ReconciliationStatus.PARTIALLY_RECONCILED);
         }
 
         @Test
         @DisplayName("Should throw exception for invalid status")
         void shouldThrowExceptionForInvalidStatus() {
             assertThatThrownBy(() -> ReconciliationStatus.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -82,14 +83,14 @@ class ReconciliationStatusTest {
         void shouldReturnAllReconciliationStatuses() {
             ReconciliationStatus[] values = ReconciliationStatus.values();
             assertThat(values).hasSize(6);
-            assertThat(values).containsExactlyInAnyOrder(
-                ReconciliationStatus.PENDING,
-                ReconciliationStatus.PROCESSING,
-                ReconciliationStatus.RECONCILING,
-                ReconciliationStatus.COMPLETED,
-                ReconciliationStatus.FAILED,
-                ReconciliationStatus.PARTIALLY_RECONCILED
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            ReconciliationStatus.PENDING,
+                            ReconciliationStatus.PROCESSING,
+                            ReconciliationStatus.RECONCILING,
+                            ReconciliationStatus.COMPLETED,
+                            ReconciliationStatus.FAILED,
+                            ReconciliationStatus.PARTIALLY_RECONCILED);
         }
     }
 }

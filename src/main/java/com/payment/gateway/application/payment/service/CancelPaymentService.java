@@ -9,14 +9,12 @@ import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
 import com.payment.gateway.domain.payment.event.PaymentCancelledEvent;
 import com.payment.gateway.domain.payment.model.Payment;
-import com.payment.gateway.domain.payment.model.PaymentStatus;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Application service for canceling payments.
@@ -35,7 +33,8 @@ public class CancelPaymentService implements CancelPaymentUseCase {
     public PaymentResponse cancelPayment(String paymentId, String merchantId) {
         log.info("Canceling payment: {} for merchant: {}", paymentId, merchantId);
 
-        Payment payment = paymentQueryPort.findById(paymentId)
+        Payment payment = paymentQueryPort
+                .findById(paymentId)
                 .orElseThrow(() -> new BusinessException("Payment not found: " + paymentId));
 
         // Validate ownership
@@ -61,9 +60,7 @@ public class CancelPaymentService implements CancelPaymentUseCase {
                 "PAYMENT",
                 EventType.PAYMENT_CANCELLED,
                 new PaymentCancelledEvent(
-                        savedPayment.getId(),
-                        savedPayment.getMerchantId(),
-                        "Cancelled by merchant request"));
+                        savedPayment.getId(), savedPayment.getMerchantId(), "Cancelled by merchant request"));
 
         log.info("Payment canceled successfully: {}", paymentId);
         return mapToResponse(savedPayment);
@@ -78,16 +75,17 @@ public class CancelPaymentService implements CancelPaymentUseCase {
                         payment.getMerchantId(),
                         payment.getAmount().getAmountInCents(),
                         payment.getCurrency(),
-                        payment.getPaymentMethodId()
-                );
+                        payment.getPaymentMethodId());
 
         try {
             ExternalPaymentProviderPort.PaymentProviderResult result =
                     externalPaymentProviderPort.cancel(request).join();
 
             if (!result.success()) {
-                log.warn("Payment cancellation with provider failed: {} - {}",
-                        result.errorCode(), result.errorMessage());
+                log.warn(
+                        "Payment cancellation with provider failed: {} - {}",
+                        result.errorCode(),
+                        result.errorMessage());
                 // Don't throw exception - allow local cancellation even if provider fails
             }
         } catch (Exception e) {
@@ -107,14 +105,17 @@ public class CancelPaymentService implements CancelPaymentUseCase {
                 .status(payment.getStatus().name())
                 .idempotencyKey(payment.getIdempotencyKey())
                 .description(payment.getDescription())
-                .items(payment.getItems() != null ? payment.getItems().stream()
-                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
-                                .description(item.getDescription())
-                                .quantity(item.getQuantity())
-                                .unitPrice(item.getUnitPrice().getAmountInCents())
-                                .total(item.getTotal().getAmountInCents())
-                                .build())
-                        .collect(Collectors.toList()) : List.of())
+                .items(
+                        payment.getItems() != null
+                                ? payment.getItems().stream()
+                                        .map(item -> PaymentResponse.PaymentItemResponse.builder()
+                                                .description(item.getDescription())
+                                                .quantity(item.getQuantity())
+                                                .unitPrice(item.getUnitPrice().getAmountInCents())
+                                                .total(item.getTotal().getAmountInCents())
+                                                .build())
+                                        .collect(Collectors.toList())
+                                : List.of())
                 .createdAt(payment.getCreatedAt())
                 .updatedAt(payment.getUpdatedAt())
                 .build();

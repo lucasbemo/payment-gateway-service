@@ -1,14 +1,13 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for resilience patterns (circuit breaker, retry, rate limiting).
@@ -23,14 +22,13 @@ class ResilienceE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant first
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -48,12 +46,7 @@ class ResilienceE2ETest extends E2ETestBase {
         // When: Processing payments in sequence (simulating concurrent load)
         for (int i = 0; i < numPayments; i++) {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-            var response = getApiClient().processPayment(
-                merchantId,
-                10000L,
-                "USD",
-                idempotencyKey
-            );
+            var response = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         }
 
@@ -73,12 +66,12 @@ class ResilienceE2ETest extends E2ETestBase {
         // When: Sending rapid requests
         for (int i = 0; i < numRequests; i++) {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-            var response = getApiClient().processPayment(
-                merchantId,
-                1000L, // Small amount
-                "USD",
-                idempotencyKey
-            );
+            var response = getApiClient()
+                    .processPayment(
+                            merchantId,
+                            1000L, // Small amount
+                            "USD",
+                            idempotencyKey);
             if (response.getStatusCode() == HttpStatus.OK) {
                 successCount++;
             }
@@ -94,22 +87,12 @@ class ResilienceE2ETest extends E2ETestBase {
         // Given: Heavy load
         for (int i = 0; i < 20; i++) {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-            getApiClient().processPayment(
-                merchantId,
-                1000L,
-                "USD",
-                idempotencyKey
-            );
+            getApiClient().processPayment(merchantId, 1000L, "USD", idempotencyKey);
         }
 
         // When: Making a request after load
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var response = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var response = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
         // Then: System still processes payments
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -122,26 +105,11 @@ class ResilienceE2ETest extends E2ETestBase {
         String idempotencyKey = "load-test-idempotency-" + System.currentTimeMillis();
 
         // When: Sending same request multiple times
-        var response1 = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var response1 = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
-        var response2 = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var response2 = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
-        var response3 = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var response3 = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
         // Then: All responses return the same payment
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -169,19 +137,9 @@ class ResilienceE2ETest extends E2ETestBase {
         String idempotencyKey1 = TestDataFactory.generateIdempotencyKey();
         String idempotencyKey2 = TestDataFactory.generateIdempotencyKey();
 
-        var response1 = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey1
-        );
+        var response1 = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey1);
 
-        var response2 = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey2
-        );
+        var response2 = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey2);
 
         // Then: Both payments are processed independently
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -198,32 +156,20 @@ class ResilienceE2ETest extends E2ETestBase {
     void testSystemHandlesMixedOperations() {
         // Given: Various operations
         // Register merchant
-        var merchantResponse = getApiClient().registerMerchant(
-            "Test Merchant 2",
-            "test2@example.com",
-            null
-        );
+        var merchantResponse = getApiClient().registerMerchant("Test Merchant 2", "test2@example.com", null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchant2 = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchant2 =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
 
         // Create customer
-        var customerResponse = getApiClient().registerCustomer(
-            merchantId,
-            "customer@example.com",
-            "Test Customer",
-            null,
-            null
-        );
+        var customerResponse =
+                getApiClient().registerCustomer(merchantId, "customer@example.com", "Test Customer", null, null);
         assertThat(customerResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // Process payment
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            TestDataFactory.generateIdempotencyKey()
-        );
+        var paymentResponse =
+                getApiClient().processPayment(merchantId, 10000L, "USD", TestDataFactory.generateIdempotencyKey());
         assertThat(paymentResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // When: Getting all data
@@ -239,12 +185,7 @@ class ResilienceE2ETest extends E2ETestBase {
         // Given: Valid payment requests
         // When: Making requests that should succeed
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var response = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var response = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
         // Then: Request succeeds
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -258,12 +199,8 @@ class ResilienceE2ETest extends E2ETestBase {
         setApiKey("invalid-key");
 
         // When: Making invalid requests
-        var response = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            TestDataFactory.generateIdempotencyKey()
-        );
+        var response =
+                getApiClient().processPayment(merchantId, 10000L, "USD", TestDataFactory.generateIdempotencyKey());
 
         // Then: System returns proper error (not crash)
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -278,12 +215,7 @@ class ResilienceE2ETest extends E2ETestBase {
         // When: Making many requests
         for (int i = 0; i < numRequests; i++) {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-            var response = getApiClient().processPayment(
-                merchantId,
-                1000L,
-                "USD",
-                idempotencyKey
-            );
+            var response = getApiClient().processPayment(merchantId, 1000L, "USD", idempotencyKey);
             assertThat(response.getStatusCode()).isIn(HttpStatus.OK, HttpStatus.BAD_REQUEST);
         }
 
@@ -299,12 +231,7 @@ class ResilienceE2ETest extends E2ETestBase {
 
         // When: Making a valid payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var response = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var response = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
         // Then: Payment is created (not rolled back since it's valid)
         int finalCount = getCount("payments");

@@ -1,6 +1,9 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,10 +12,6 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for observability (actuator, metrics, health).
@@ -131,12 +130,11 @@ class ObservabilityE2ETest extends E2ETestBase {
     @DisplayName("E2E: Health After Payment Processing")
     void testHealth_AfterPaymentProcessing() {
         // Given: Register a merchant
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
-        Map<String, Object> merchant = (Map<String, Object>) merchantResponse.getBody().get("data");
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
+        Map<String, Object> merchant =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         String merchantId = (String) merchant.get("id");
         String apiKey = (String) merchant.get("apiKey");
         setApiKey(apiKey);
@@ -146,12 +144,7 @@ class ObservabilityE2ETest extends E2ETestBase {
 
         // When: Processing a payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
         assertThat(paymentResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // Then: Health is still UP
@@ -165,23 +158,18 @@ class ObservabilityE2ETest extends E2ETestBase {
     @DisplayName("E2E: Metrics Available After Payment")
     void testMetrics_AfterPayment() {
         // Given: Register a merchant and process payment
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
-        Map<String, Object> merchant = (Map<String, Object>) merchantResponse.getBody().get("data");
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
+        Map<String, Object> merchant =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         setApiKey((String) merchant.get("apiKey"));
 
         // Activate merchant so it can process payments
         getApiClient().activateMerchant((String) merchant.get("id"));
 
-        getApiClient().processPayment(
-            (String) merchant.get("id"),
-            10000L,
-            "USD",
-            TestDataFactory.generateIdempotencyKey()
-        );
+        getApiClient()
+                .processPayment((String) merchant.get("id"), 10000L, "USD", TestDataFactory.generateIdempotencyKey());
 
         // When: Getting metrics
         ResponseEntity<Map> response = restTemplate.getForEntity("/actuator/metrics", Map.class);

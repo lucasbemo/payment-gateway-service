@@ -1,8 +1,13 @@
 package com.payment.gateway.domain.idempotency.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.payment.gateway.domain.idempotency.model.IdempotencyKey;
 import com.payment.gateway.domain.idempotency.model.IdempotencyStatus;
 import com.payment.gateway.domain.idempotency.port.IdempotencyKeyRepositoryPort;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,12 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("IdempotencyDomainService Tests")
@@ -47,13 +46,13 @@ class IdempotencyDomainServiceTest {
         void shouldCreateNewIdempotencyKeyWhenItDoesNotExist() {
             // Given
             given(repository.findByIdempotencyKey(IDEMPOTENCY_KEY)).willReturn(Optional.empty());
-            IdempotencyKey newKey = IdempotencyKey.create(IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, "hash123", TTL_SECONDS);
+            IdempotencyKey newKey =
+                    IdempotencyKey.create(IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, "hash123", TTL_SECONDS);
             given(repository.save(any(IdempotencyKey.class))).willReturn(newKey);
 
             // When
             IdempotencyKey result = idempotencyDomainService.createOrGetIdempotencyKey(
-                IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY
-            );
+                    IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY);
 
             // Then
             assertThat(result).isNotNull();
@@ -66,13 +65,13 @@ class IdempotencyDomainServiceTest {
         @DisplayName("Should return existing idempotency key when already exists")
         void shouldReturnExistingIdempotencyKeyWhenAlreadyExists() {
             // Given
-            IdempotencyKey existingKey = IdempotencyKey.create(IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, "hash123", TTL_SECONDS);
+            IdempotencyKey existingKey =
+                    IdempotencyKey.create(IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, "hash123", TTL_SECONDS);
             given(repository.findByIdempotencyKey(IDEMPOTENCY_KEY)).willReturn(Optional.of(existingKey));
 
             // When
             IdempotencyKey result = idempotencyDomainService.createOrGetIdempotencyKey(
-                IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY
-            );
+                    IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY);
 
             // Then
             assertThat(result).isEqualTo(existingKey);
@@ -84,14 +83,14 @@ class IdempotencyDomainServiceTest {
         @DisplayName("Should return existing key when it has completed response")
         void shouldReturnExistingKeyWhenHasCompletedResponse() {
             // Given
-            IdempotencyKey existingKey = IdempotencyKey.create(IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, "hash123", TTL_SECONDS);
+            IdempotencyKey existingKey =
+                    IdempotencyKey.create(IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, "hash123", TTL_SECONDS);
             existingKey.complete("200", "{\"paymentId\":\"pay_123\"}");
             given(repository.findByIdempotencyKey(IDEMPOTENCY_KEY)).willReturn(Optional.of(existingKey));
 
             // When
             IdempotencyKey result = idempotencyDomainService.createOrGetIdempotencyKey(
-                IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY
-            );
+                    IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY);
 
             // Then
             assertThat(result).isEqualTo(existingKey);
@@ -108,10 +107,9 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.createOrGetIdempotencyKey(
-                IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY
-            ))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("expired");
+                            IDEMPOTENCY_KEY, MERCHANT_ID, OPERATION, REQUEST_BODY))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("expired");
         }
     }
 
@@ -145,8 +143,8 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.acquireLock(IDEMPOTENCY_KEY, LOCK_TOKEN))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Idempotency key not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Idempotency key not found");
         }
 
         @Test
@@ -159,8 +157,8 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.acquireLock(IDEMPOTENCY_KEY, LOCK_TOKEN))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("already locked");
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("already locked");
         }
 
         @Test
@@ -173,8 +171,8 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.acquireLock(IDEMPOTENCY_KEY, LOCK_TOKEN))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Cannot lock terminal");
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Cannot lock terminal");
         }
     }
 
@@ -195,8 +193,7 @@ class IdempotencyDomainServiceTest {
 
             // When
             IdempotencyKey result = idempotencyDomainService.completeWithResponse(
-                IDEMPOTENCY_KEY, LOCK_TOKEN, responseCode, responseBody
-            );
+                    IDEMPOTENCY_KEY, LOCK_TOKEN, responseCode, responseBody);
 
             // Then
             assertThat(result).isEqualTo(key);
@@ -213,10 +210,9 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.completeWithResponse(
-                IDEMPOTENCY_KEY, LOCK_TOKEN, "200", "{\"response\":\"ok\"}"
-            ))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Idempotency key not found");
+                            IDEMPOTENCY_KEY, LOCK_TOKEN, "200", "{\"response\":\"ok\"}"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Idempotency key not found");
         }
 
         @Test
@@ -229,10 +225,9 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.completeWithResponse(
-                IDEMPOTENCY_KEY, LOCK_TOKEN, "200", "{\"response\":\"ok\"}"
-            ))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Invalid lock token");
+                            IDEMPOTENCY_KEY, LOCK_TOKEN, "200", "{\"response\":\"ok\"}"))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Invalid lock token");
         }
     }
 
@@ -291,8 +286,8 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.releaseLock(IDEMPOTENCY_KEY, LOCK_TOKEN))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Idempotency key not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Idempotency key not found");
         }
     }
 
@@ -349,8 +344,8 @@ class IdempotencyDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> idempotencyDomainService.getIdempotencyKeyOrThrow(IDEMPOTENCY_KEY))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Idempotency key not found");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Idempotency key not found");
         }
     }
 

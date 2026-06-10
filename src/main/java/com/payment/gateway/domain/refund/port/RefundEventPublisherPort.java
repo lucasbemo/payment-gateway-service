@@ -7,6 +7,8 @@ import com.payment.gateway.domain.refund.model.Refund;
  */
 public interface RefundEventPublisherPort {
     void publishRefundCreated(Refund refund);
+
     void publishRefundCompleted(Refund refund);
+
     void publishRefundFailed(Refund refund);
 }

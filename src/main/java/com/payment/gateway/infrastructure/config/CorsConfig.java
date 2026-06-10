@@ -1,5 +1,7 @@
 package com.payment.gateway.infrastructure.config;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,9 +10,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * CORS configuration for the payment gateway API.
@@ -40,11 +39,7 @@ public class CorsConfig {
         configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of(
-            "X-Idempotency-Key",
-            "X-Correlation-Id",
-            "X-Request-Id"
-        ));
+        configuration.setExposedHeaders(List.of("X-Idempotency-Key", "X-Correlation-Id", "X-Request-Id"));
         configuration.setMaxAge(3600L);
         configuration.setAllowCredentials(true);
 
@@ -66,31 +61,22 @@ public class CorsConfig {
 
         // Parse allowed origins from configuration
         List<String> origins = Arrays.asList(allowedOrigins.split(","));
-        configuration.setAllowedOrigins(origins.stream()
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .toList());
+        configuration.setAllowedOrigins(
+                origins.stream().map(String::trim).filter(s -> !s.isEmpty()).toList());
 
-        configuration.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
-        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
         configuration.setAllowedHeaders(List.of(
-            "Content-Type",
-            "Authorization",
-            "X-Api-Key",
-            "X-Api-Secret",
-            "X-Idempotency-Key",
-            "X-Correlation-Id",
-            "X-Request-Id"
-        ));
+                "Content-Type",
+                "Authorization",
+                "X-Api-Key",
+                "X-Api-Secret",
+                "X-Idempotency-Key",
+                "X-Correlation-Id",
+                "X-Request-Id"));
 
-        configuration.setExposedHeaders(List.of(
-            "X-Idempotency-Key",
-            "X-Correlation-Id",
-            "X-Request-Id",
-            "X-Total-Count"
-        ));
+        configuration.setExposedHeaders(
+                List.of("X-Idempotency-Key", "X-Correlation-Id", "X-Request-Id", "X-Total-Count"));
 
         configuration.setMaxAge(3600L);
         configuration.setAllowCredentials(true);

@@ -4,10 +4,8 @@ import com.payment.gateway.application.webhook.port.in.WebhookProcessingPort;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
-import lombok.extern.slf4j.Slf4j;
-
-import java.time.Instant;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class StripeWebhookHandler implements WebhookProcessingPort {
@@ -33,14 +31,14 @@ public class StripeWebhookHandler implements WebhookProcessingPort {
             }
 
             Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
-            
+
             String eventType = event.getType();
             String entityId = extractEntityId(event);
-            
+
             log.info("Stripe webhook processed: type={}, id={}, entityId={}", eventType, event.getId(), entityId);
-            
+
             return new WebhookProcessingResult(true, eventType, entityId, null);
-            
+
         } catch (SignatureVerificationException e) {
             log.error("Invalid webhook signature: {}", e.getMessage());
             return new WebhookProcessingResult(false, null, null, "Invalid signature");
@@ -78,7 +76,7 @@ public class StripeWebhookHandler implements WebhookProcessingPort {
         if (event.getData() == null || event.getData().getObject() == null) {
             return null;
         }
-        
+
         var obj = event.getData().getObject();
         if (obj instanceof com.stripe.model.PaymentIntent pi) {
             return pi.getId();
@@ -89,7 +87,7 @@ public class StripeWebhookHandler implements WebhookProcessingPort {
         } else if (obj instanceof com.stripe.model.Charge charge) {
             return charge.getId();
         }
-        
+
         return null;
     }
 }

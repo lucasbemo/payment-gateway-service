@@ -1,9 +1,9 @@
 package com.payment.gateway.domain.merchant.model;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.exception.BusinessException;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for Merchant aggregate.
@@ -19,14 +19,13 @@ class MerchantTest {
     @Test
     void shouldRegisterMerchantWithValidData() {
         Merchant merchant = Merchant.register(
-            MERCHANT_NAME,
-            MERCHANT_EMAIL,
-            API_KEY,
-            hash(API_KEY),
-            hash(API_SECRET),
-            WEBHOOK_URL,
-            MerchantConfiguration.empty()
-        );
+                MERCHANT_NAME,
+                MERCHANT_EMAIL,
+                API_KEY,
+                hash(API_KEY),
+                hash(API_SECRET),
+                WEBHOOK_URL,
+                MerchantConfiguration.empty());
 
         assertNotNull(merchant);
         assertEquals(MERCHANT_NAME, merchant.getName());
@@ -38,49 +37,43 @@ class MerchantTest {
     @Test
     void shouldThrowExceptionWhenNameIsMissing() {
         assertThrows(
-            BusinessException.class,
-            () -> Merchant.register(
-                null,
-                MERCHANT_EMAIL,
-                API_KEY,
-                hash(API_KEY),
-                hash(API_SECRET),
-                WEBHOOK_URL,
-                MerchantConfiguration.empty()
-            )
-        );
+                BusinessException.class,
+                () -> Merchant.register(
+                        null,
+                        MERCHANT_EMAIL,
+                        API_KEY,
+                        hash(API_KEY),
+                        hash(API_SECRET),
+                        WEBHOOK_URL,
+                        MerchantConfiguration.empty()));
     }
 
     @Test
     void shouldThrowExceptionWhenEmailIsInvalid() {
         assertThrows(
-            BusinessException.class,
-            () -> Merchant.register(
-                MERCHANT_NAME,
-                "invalid-email",
-                API_KEY,
-                hash(API_KEY),
-                hash(API_SECRET),
-                WEBHOOK_URL,
-                MerchantConfiguration.empty()
-            )
-        );
+                BusinessException.class,
+                () -> Merchant.register(
+                        MERCHANT_NAME,
+                        "invalid-email",
+                        API_KEY,
+                        hash(API_KEY),
+                        hash(API_SECRET),
+                        WEBHOOK_URL,
+                        MerchantConfiguration.empty()));
     }
 
     @Test
     void shouldThrowExceptionWhenApiKeyHashIsMissing() {
         assertThrows(
-            BusinessException.class,
-            () -> Merchant.register(
-                MERCHANT_NAME,
-                MERCHANT_EMAIL,
-                null,
-                hash(API_KEY),
-                hash(API_SECRET),
-                WEBHOOK_URL,
-                MerchantConfiguration.empty()
-            )
-        );
+                BusinessException.class,
+                () -> Merchant.register(
+                        MERCHANT_NAME,
+                        MERCHANT_EMAIL,
+                        null,
+                        hash(API_KEY),
+                        hash(API_SECRET),
+                        WEBHOOK_URL,
+                        MerchantConfiguration.empty()));
     }
 
     @Test
@@ -133,10 +126,7 @@ class MerchantTest {
         merchant.activate();
         merchant.close();
 
-        BusinessException exception = assertThrows(
-            BusinessException.class,
-            merchant::reactivate
-        );
+        BusinessException exception = assertThrows(BusinessException.class, merchant::reactivate);
 
         assertTrue(exception.getMessage().contains("Cannot transition from CLOSED to ACTIVE"));
     }
@@ -164,9 +154,7 @@ class MerchantTest {
     @Test
     void shouldUpdateConfiguration() {
         Merchant merchant = createTestMerchant();
-        MerchantConfiguration newConfig = MerchantConfiguration.of(
-            java.util.Map.of("key", "value")
-        );
+        MerchantConfiguration newConfig = MerchantConfiguration.of(java.util.Map.of("key", "value"));
 
         merchant.updateConfiguration(newConfig);
 
@@ -179,24 +167,21 @@ class MerchantTest {
 
         assertDoesNotThrow(() -> merchant.validateApiKey(hash(API_KEY)));
 
-        BusinessException exception = assertThrows(
-            BusinessException.class,
-            () -> merchant.validateApiKey(hash("wrong-key"))
-        );
+        BusinessException exception =
+                assertThrows(BusinessException.class, () -> merchant.validateApiKey(hash("wrong-key")));
 
         assertEquals("Invalid API key", exception.getMessage());
     }
 
     private Merchant createTestMerchant() {
         return Merchant.register(
-            MERCHANT_NAME,
-            MERCHANT_EMAIL,
-            API_KEY,
-            hash(API_KEY),
-            hash(API_SECRET),
-            WEBHOOK_URL,
-            MerchantConfiguration.empty()
-        );
+                MERCHANT_NAME,
+                MERCHANT_EMAIL,
+                API_KEY,
+                hash(API_KEY),
+                hash(API_SECRET),
+                WEBHOOK_URL,
+                MerchantConfiguration.empty());
     }
 
     private String hash(String value) {

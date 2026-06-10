@@ -24,8 +24,8 @@ public abstract class IntegrationEvent {
         this.eventType = eventType;
     }
 
-    protected IntegrationEvent(String id, Instant occurredOn, String aggregateId,
-                                String schemaVersion, String eventType) {
+    protected IntegrationEvent(
+            String id, Instant occurredOn, String aggregateId, String schemaVersion, String eventType) {
         this.id = id;
         this.occurredOn = occurredOn;
         this.aggregateId = aggregateId;

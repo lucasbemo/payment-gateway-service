@@ -1,9 +1,8 @@
 package com.payment.gateway.infrastructure.security.tokenization;
 
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 /**
  * Entity representing a tokenized card in the token vault.
@@ -21,8 +20,14 @@ class TokenVaultEntity {
     private final Instant createdAt;
     private boolean active;
 
-    TokenVaultEntity(String token, String cardHash, String cardNumber,
-                     String lastFourDigits, String cardBrand, Instant createdAt, boolean active) {
+    TokenVaultEntity(
+            String token,
+            String cardHash,
+            String cardNumber,
+            String lastFourDigits,
+            String cardBrand,
+            Instant createdAt,
+            boolean active) {
         this.token = token;
         this.cardHash = cardHash;
         this.cardNumber = cardNumber;
