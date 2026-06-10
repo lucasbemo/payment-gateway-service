@@ -42,6 +42,15 @@ spring:
     exclude:
       - io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration
 
+# Merchant webhook delivery: keep e2e fast and non-blocking
+# (single attempt, sub-second timeouts; failures are swallowed by design)
+webhook:
+  delivery:
+    max-attempts: 1
+    base-backoff-ms: 10
+    connect-timeout-ms: 500
+    read-timeout-ms: 500
+
 cloud:
   aws:
     region:

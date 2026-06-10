@@ -9,7 +9,9 @@ import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.application.payment.port.out.TokenizationServicePort;
 import com.payment.gateway.application.payment.port.out.TransactionCommandPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
+import com.payment.gateway.commons.exception.PaymentDeclinedException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.commons.utils.IdGenerator;
 import com.payment.gateway.domain.customer.model.CardDetails;
@@ -22,6 +24,7 @@ import com.payment.gateway.domain.payment.model.PaymentMethod;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
 import com.payment.gateway.domain.payment.event.PaymentCreatedEvent;
+import com.payment.gateway.domain.payment.event.PaymentFailedEvent;
 import com.payment.gateway.application.commons.port.out.MetricsPort;
 import com.payment.gateway.application.commons.port.out.AuditPort;
 import lombok.RequiredArgsConstructor;
@@ -50,12 +53,14 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
     private final ExternalPaymentProviderPort externalPaymentProviderPort;
     private final TokenizationServicePort tokenizationServicePort;
     private final TransactionCommandPort transactionCommandPort;
+    private final TransactionQueryPort transactionQueryPort;
     private final IdGenerator idGenerator;
     private final MetricsPort metricsPort;
     private final AuditPort auditPort;
     private final OutboxEventDomainService outboxEventService;
 
     @Override
+    @Transactional(noRollbackFor = PaymentDeclinedException.class)
     public PaymentResponse processPayment(ProcessPaymentCommand command) {
         log.info("Processing payment for merchant: {}, amount: {} {}",
                  command.getMerchantId(), command.getAmount(), command.getCurrency());
@@ -117,8 +122,12 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
     }
 
     private Merchant validateMerchant(String merchantId) {
-        return merchantQueryPort.findById(merchantId)
+        Merchant merchant = merchantQueryPort.findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
+        if (!merchant.getStatus().canProcessPayments()) {
+            throw new BusinessException("Merchant is not active: " + merchant.getStatus());
+        }
+        return merchant;
     }
 
     private Payment checkIdempotency(String idempotencyKey) {
@@ -200,17 +209,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                     externalPaymentProviderPort.authorize(request).join();
 
             if (!result.success()) {
-                log.error("Payment authorization failed: {} - {}", result.errorCode(), result.errorMessage());
-                payment.fail();
-                metricsPort.recordPaymentFailed();
-                auditPort.logPaymentOperation(
-                        payment.getId(),
-                        payment.getMerchantId(),
-                        "AUTHORIZE",
-                        "FAILED",
-                        payment.getAmount().getAmountInCents()
-                );
-                throw new BusinessException("Payment authorization failed: " + result.errorMessage());
+                handleDecline(payment, result.errorCode(), result.errorMessage());
             }
         } catch (BusinessException e) {
             // Re-throw business exceptions (already handled)
@@ -221,6 +220,38 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
             metricsPort.recordPaymentFailed();
             throw new BusinessException("Payment authorization failed: " + e.getMessage());
         }
+    }
+
+    /**
+     * Handle a provider decline: persist the FAILED payment and its PAYMENT_FAILED
+     * outbox event, then throw {@link PaymentDeclinedException}. The exception is
+     * declared {@code noRollbackFor} on {@link #processPayment}, so the FAILED row
+     * and the outbox event survive the transaction.
+     */
+    private void handleDecline(Payment payment, String errorCode, String errorMessage) {
+        log.warn("Payment {} declined by provider: {} - {}", payment.getId(), errorCode, errorMessage);
+        payment.fail();
+        paymentQueryPort.savePayment(payment);
+        outboxEventService.publish(
+                payment.getId(),
+                "PAYMENT",
+                EventType.PAYMENT_FAILED,
+                new PaymentFailedEvent(
+                        payment.getId(),
+                        payment.getMerchantId(),
+                        String.valueOf(payment.getAmount().getAmountInCents()),
+                        payment.getCurrency(),
+                        errorCode,
+                        errorMessage));
+        metricsPort.recordPaymentFailed();
+        auditPort.logPaymentOperation(
+                payment.getId(),
+                payment.getMerchantId(),
+                "AUTHORIZE",
+                "FAILED",
+                payment.getAmount().getAmountInCents()
+        );
+        throw new PaymentDeclinedException(errorCode, errorMessage);
     }
 
     private void createTransaction(Payment payment) {
@@ -245,6 +276,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
                 .paymentMethodId(payment.getPaymentMethodId())
+                .transactionId(transactionQueryPort.findLatestByPaymentId(payment.getId()).map(t -> t.getId()).orElse(null))
                 .amount(payment.getAmount().getAmountInCents())
                 .currency(payment.getCurrency())
                 .status(payment.getStatus().name())

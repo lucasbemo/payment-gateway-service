@@ -37,6 +37,9 @@ class OutboxEventE2ETest extends E2ETestBase {
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
 
+        // Activate merchant so it can process payments
+        getApiClient().activateMerchant(merchantId);
+
         // Create a payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentResponse = getApiClient().processPayment(

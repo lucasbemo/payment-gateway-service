@@ -4,14 +4,18 @@ import com.payment.gateway.application.reconciliation.dto.SettlementReportDTO;
 import com.payment.gateway.application.reconciliation.port.in.GenerateSettlementReportUseCase;
 import com.payment.gateway.application.reconciliation.port.out.ReportGeneratorPort;
 import com.payment.gateway.application.reconciliation.port.out.SettlementReportPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
+import com.payment.gateway.domain.transaction.model.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,11 +28,14 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
 
     private final ReportGeneratorPort reportGeneratorPort;
     private final SettlementReportPort settlementReportPort;
+    private final TransactionQueryPort transactionQueryPort;
 
     public GenerateSettlementReportService(ReportGeneratorPort reportGeneratorPort,
-                                           SettlementReportPort settlementReportPort) {
+                                           SettlementReportPort settlementReportPort,
+                                           TransactionQueryPort transactionQueryPort) {
         this.reportGeneratorPort = reportGeneratorPort;
         this.settlementReportPort = settlementReportPort;
+        this.transactionQueryPort = transactionQueryPort;
     }
 
     @Override
@@ -44,6 +51,18 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
             throw new BusinessException("Start date must be before end date");
         }
 
+        // Load the period's transactions (start 00:00 UTC inclusive to end-of-period 24:00 UTC)
+        List<Transaction> transactions = transactionQueryPort.findByMerchantIdAndCreatedAtBetween(
+                merchantId,
+                start.atStartOfDay(ZoneOffset.UTC).toInstant(),
+                end.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
+
+        long totalAmount = transactions.stream()
+                .filter(t -> t.getAmount() != null)
+                .mapToLong(t -> t.getAmount().getAmountInCents())
+                .sum();
+        int transactionCount = transactions.size();
+
         // Generate report file
         String filePath = reportGeneratorPort.generateReport(merchantId, startDate, endDate, format);
 
@@ -55,6 +74,7 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
                 .gatewayName("DEFAULT_GATEWAY")
                 .settlementDate(end)
                 .currency("USD")
+                .transactionCount(transactionCount)
                 .filePath(filePath)
                 .status("GENERATED")
                 .createdAt(now)
@@ -63,12 +83,13 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
 
         SettlementReport savedReport = settlementReportPort.saveReport(report);
 
-        log.info("Settlement report generated: {}", savedReport.getId());
+        log.info("Settlement report generated: {} ({} transactions, {} cents)",
+                savedReport.getId(), transactionCount, totalAmount);
 
-        return mapToResponse(savedReport);
+        return mapToResponse(savedReport, totalAmount);
     }
 
-    private SettlementReportDTO mapToResponse(SettlementReport report) {
+    private SettlementReportDTO mapToResponse(SettlementReport report, Long totalAmount) {
         return SettlementReportDTO.builder()
                 .id(report.getId())
                 .merchantId(report.getMerchantId())
@@ -79,9 +100,10 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
                 .feeAmount(report.getFeeAmount() != null ? report.getFeeAmount().getAmountInCents() : null)
                 .netAmount(report.getNetAmount() != null ? report.getNetAmount().getAmountInCents() : null)
                 .currency(report.getCurrency())
+                .totalAmount(totalAmount)
                 .transactionCount(report.getTransactionCount())
                 .filePath(report.getFilePath())
-                
+
                 .createdAt(report.getCreatedAt())
                 .build();
     }

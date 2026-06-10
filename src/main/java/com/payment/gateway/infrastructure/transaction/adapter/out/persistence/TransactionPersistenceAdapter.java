@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,18 @@ public class TransactionPersistenceAdapter implements TransactionQueryPort, Tran
     @Override
     public Optional<Transaction> findByIdAndMerchantId(String id, String merchantId) {
         return transactionJpaRepository.findByIdAndMerchantId(id, merchantId).map(transactionMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Transaction> findLatestByPaymentId(String paymentId) {
+        return transactionJpaRepository.findLatestByPaymentId(paymentId).map(transactionMapper::toDomain);
+    }
+
+    @Override
+    public List<Transaction> findByMerchantIdAndCreatedAtBetween(String merchantId, Instant start, Instant end) {
+        return transactionJpaRepository.findByMerchantIdAndCreatedAtBetween(merchantId, start, end).stream()
+                .map(transactionMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override

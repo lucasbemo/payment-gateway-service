@@ -2,6 +2,7 @@ package com.payment.gateway.infrastructure.payment.adapter.in.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
 import com.payment.gateway.domain.payment.port.PaymentEventPublisherPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,8 +19,12 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -42,6 +47,7 @@ class PaymentEventListenersTest {
     private PaymentQueryPort paymentQueryPort;
     private PaymentEventPublisherPort paymentEventPublisher;
     private ObjectMapper objectMapper;
+    private WebhookDeliveryPort webhookDeliveryPort;
     private PaymentEventListeners listeners;
     private TestMessageHandler messageHandler;
 
@@ -50,9 +56,11 @@ class PaymentEventListenersTest {
         paymentQueryPort = mock(PaymentQueryPort.class);
         paymentEventPublisher = mock(PaymentEventPublisherPort.class);
         objectMapper = new ObjectMapper();
+        webhookDeliveryPort = mock(WebhookDeliveryPort.class);
         messageHandler = new TestMessageHandler();
 
-        listeners = new PaymentEventListeners(paymentQueryPort, paymentEventPublisher, objectMapper);
+        listeners = new PaymentEventListeners(paymentQueryPort, paymentEventPublisher, objectMapper,
+                webhookDeliveryPort);
     }
 
     @Nested
@@ -72,8 +80,8 @@ class PaymentEventListenersTest {
 
             listeners.onPaymentCreated(event, null);
 
-            // Verify no exception thrown (successful processing)
-            assertThat(true).isTrue();
+            // payment.created does not trigger merchant webhooks
+            verifyNoInteractions(webhookDeliveryPort);
         }
 
         @Test
@@ -109,7 +117,7 @@ class PaymentEventListenersTest {
 
             listeners.onPaymentCompleted(event, null);
 
-            assertThat(true).isTrue();
+            verify(webhookDeliveryPort).deliver(eq("merchant_123"), eq("payment.completed"), anyString());
         }
 
         @Test
@@ -122,7 +130,25 @@ class PaymentEventListenersTest {
 
             listeners.onPaymentCompleted(event, null);
 
-            assertThat(true).isTrue();
+            verify(webhookDeliveryPort).deliver(eq("merchant_123"), eq("payment.completed"), anyString());
+        }
+
+        @Test
+        @DisplayName("Should not break consumption when webhook delivery throws")
+        void shouldNotBreakConsumptionWhenWebhookDeliveryThrows() {
+            doThrow(new RuntimeException("webhook endpoint down"))
+                    .when(webhookDeliveryPort).deliver(anyString(), anyString(), anyString());
+
+            Map<String, Object> event = Map.of(
+                    "aggregateId", "pay_123",
+                    "merchantId", "merchant_123",
+                    "providerTransactionId", "txn_abc"
+            );
+
+            // Listener must not propagate webhook failures (the message must still be acked)
+            listeners.onPaymentCompleted(event, null);
+
+            verify(webhookDeliveryPort).deliver(eq("merchant_123"), eq("payment.completed"), anyString());
         }
     }
 
@@ -158,7 +184,8 @@ class PaymentEventListenersTest {
 
             listeners.onPaymentFailed(event, null);
 
-            assertThat(true).isTrue();
+            // No merchantId on the event: delivery is invoked with null and skipped downstream
+            verify(webhookDeliveryPort).deliver(eq(null), eq("payment.failed"), anyString());
         }
     }
 
@@ -177,7 +204,7 @@ class PaymentEventListenersTest {
 
             listeners.onPaymentCancelled(event, null);
 
-            assertThat(true).isTrue();
+            verify(webhookDeliveryPort).deliver(eq("merchant_123"), eq("payment.cancelled"), anyString());
         }
 
         @Test
@@ -190,7 +217,7 @@ class PaymentEventListenersTest {
 
             listeners.onPaymentCancelled(event, null);
 
-            assertThat(true).isTrue();
+            verify(webhookDeliveryPort).deliver(eq("merchant_123"), eq("payment.cancelled"), anyString());
         }
     }
 

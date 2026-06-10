@@ -107,6 +107,11 @@ public class ReconciliationBatch {
         this.updatedAt = Instant.now();
     }
 
+    public void updateDiscrepancyCount(int discrepancyCount) {
+        this.discrepancyCount = discrepancyCount;
+        this.updatedAt = Instant.now();
+    }
+
     public void incrementDiscrepancyCount() {
         this.discrepancyCount = this.discrepancyCount != null ? this.discrepancyCount + 1 : 1;
         this.updatedAt = Instant.now();

@@ -249,7 +249,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Test Merchant\",\n    \"email\": \"updated-merchant@test.com\",\n    \"webhookUrl\": \"https://webhook.site/updated\"\n}"
+							"raw": "{\n    \"name\": \"Updated Test Merchant\",\n    \"email\": \"updated-{{$guid}}@test.com\",\n    \"webhookUrl\": \"https://webhook.site/updated\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/merchants/{{merchantId}}",
@@ -287,6 +287,43 @@
 							"raw": "{{baseUrl}}/api/v1/merchants/{{merchantId}}/suspend",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "v1", "merchants", "{{merchantId}}", "suspend"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Merchant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message', 'Merchant activated successfully');",
+									"});",
+									"",
+									"pm.test(\"Merchant status is ACTIVE\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('status', 'ACTIVE');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/merchants/{{merchantId}}/activate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "merchants", "{{merchantId}}", "activate"]
 						}
 					},
 					"response": []
@@ -443,13 +480,9 @@
 									"",
 									"pm.test(\"Extract payment method ID from response\", function () {",
 									"    const json = pm.response.json();",
-									"    if (json.data && json.data.paymentMethods && json.data.paymentMethods.length > 0) {",
-									"        const pm = json.data.paymentMethods.find(p => p.isDefault);",
-									"        if (pm && pm.id) {",
-									"            pm.environment.set('paymentMethodId', pm.id);",
-									"            console.log('Payment Method ID saved:', pm.id);",
-									"        }",
-									"    }",
+									"    pm.expect(json.data).to.have.property('paymentMethodId');",
+									"    pm.environment.set('paymentMethodId', json.data.paymentMethodId);",
+									"    console.log('Payment Method ID saved:', json.data.paymentMethodId);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -706,8 +739,8 @@
 									"pm.test(\"Extract transaction ID\", function () {",
 									"    const json = pm.response.json();",
 									"    if (json.data && json.data.id) {",
-									"        pm.environment.set('transactionId', json.data.id);",
-									"        console.log('Transaction ID saved:', json.data.id);",
+									"        pm.environment.set('transactionId', json.data.transactionId);",
+									"        console.log('Transaction ID saved:', json.data.transactionId);",
 									"    }",
 									"});"
 								],
@@ -728,6 +761,61 @@
 									"value": "{{merchantId}}"
 								}
 							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment (To Cancel)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const idempotencyKey = pm.variables.replaceIn('{{$guid}}');",
+									"pm.environment.set('cancelIdempotencyKey', idempotencyKey);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Extract cancel payment ID\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('id');",
+									"    pm.environment.set('cancelPaymentId', json.data.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{cancelIdempotencyKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"amountInCents\": 7500,\n    \"currency\": \"USD\",\n    \"customerId\": \"{{customerId}}\",\n    \"description\": \"Payment to be cancelled\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments"]
 						}
 					},
 					"response": []
@@ -757,9 +845,9 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/payments/{{paymentId}}/cancel?merchantId={{merchantId}}",
+							"raw": "{{baseUrl}}/api/v1/payments/{{cancelPaymentId}}/cancel?merchantId={{merchantId}}",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "payments", "{{paymentId}}", "cancel"],
+							"path": ["api", "v1", "payments", "{{cancelPaymentId}}", "cancel"],
 							"query": [
 								{
 									"key": "merchantId",
@@ -853,6 +941,61 @@
 					"response": []
 				},
 				{
+					"name": "Process Payment (To Void)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const idempotencyKey = pm.variables.replaceIn('{{$guid}}');",
+									"pm.environment.set('voidIdempotencyKey', idempotencyKey);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Extract authorized transaction id to void\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('transactionId');",
+									"    pm.environment.set('voidTransactionId', json.data.transactionId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{voidIdempotencyKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"merchantId\": \"{{merchantId}}\",\n    \"amountInCents\": 6500,\n    \"currency\": \"USD\",\n    \"customerId\": \"{{customerId}}\",\n    \"description\": \"Authorized payment to be voided\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "payments"]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Void Transaction",
 					"event": [
 						{
@@ -877,9 +1020,9 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/transactions/{{transactionId}}/void?merchantId={{merchantId}}",
+							"raw": "{{baseUrl}}/api/v1/transactions/{{voidTransactionId}}/void?merchantId={{merchantId}}",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "transactions", "{{transactionId}}", "void"],
+							"path": ["api", "v1", "transactions", "{{voidTransactionId}}", "void"],
 							"query": [
 								{
 									"key": "merchantId",
@@ -1017,14 +1160,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
+									"// ProcessRefund completes refunds synchronously (terminal COMPLETED),",
+									"// so a completed refund cannot be cancelled — the API rejects it with 400.",
+									"pm.test(\"Status code is 400 (completed refund cannot be cancelled)\", function () {",
+									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Response has valid ApiResponse structure\", function () {",
+									"pm.test(\"Response reports a terminal-state rejection\", function () {",
 									"    const json = pm.response.json();",
-									"    pm.expect(json).to.have.property('success', true);",
-									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json).to.have.property('success', false);",
+									"    pm.expect(json.message).to.include('terminal state');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1092,7 +1237,7 @@
 									"pm.test(\"Reconciliation response has required fields\", function () {",
 									"    const json = pm.response.json();",
 									"    pm.expect(json.data).to.have.property('matchedCount');",
-									"    pm.expect(json.data).to.have.property('unmatchedCount');",
+									"    pm.expect(json.data).to.have.property('discrepancyCount');",
 									"});"
 								],
 								"type": "text/javascript"

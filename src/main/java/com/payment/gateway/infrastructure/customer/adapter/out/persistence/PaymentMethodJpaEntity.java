@@ -57,7 +57,9 @@ public class PaymentMethodJpaEntity {
     @Column(name = "token", nullable = false, length = 255, unique = true)
     private String token;
 
-    @Column(name = "status", nullable = false, length = 50)
+    // Stored as the enum name (V17 converted the column from ordinal SMALLINT to VARCHAR)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
     private PaymentMethodStatus status;
 
     @Column(name = "expiry_month", length = 2)

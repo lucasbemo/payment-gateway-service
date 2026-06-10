@@ -37,12 +37,14 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
 
     @Override
     public Optional<PaymentMethod> findPaymentMethodById(String paymentMethodId) {
-        return paymentMethodJpaRepository.findById(paymentMethodId).map(paymentMethodMapper::toDomain);
+        return paymentMethodJpaRepository.findByIdAndStatusNot(paymentMethodId, PaymentMethodStatus.INACTIVE)
+                .map(paymentMethodMapper::toDomain);
     }
 
     @Override
     public Optional<PaymentMethod> findPaymentMethodByToken(String token) {
-        return paymentMethodJpaRepository.findByToken(token).map(paymentMethodMapper::toDomain);
+        return paymentMethodJpaRepository.findByTokenAndStatusNot(token, PaymentMethodStatus.INACTIVE)
+                .map(paymentMethodMapper::toDomain);
     }
 
     @Override
@@ -58,10 +60,11 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
                 ? customer.getPaymentMethods().stream().map(PaymentMethod::getId).collect(Collectors.toList())
                 : List.of();
 
-        // Delete payment methods that are no longer in the domain model
+        // Soft-delete payment methods that are no longer in the domain model
         for (PaymentMethodJpaEntity existingPm : existingPaymentMethods) {
-            if (!currentPaymentMethodIds.contains(existingPm.getId())) {
-                // Soft delete by setting status to INACTIVE
+            if (!currentPaymentMethodIds.contains(existingPm.getId())
+                    && existingPm.getStatus() != PaymentMethodStatus.INACTIVE) {
+                // Soft delete by setting status to INACTIVE; the row is kept for audit
                 existingPm.setStatus(PaymentMethodStatus.INACTIVE);
                 paymentMethodJpaRepository.save(existingPm);
             }
@@ -87,8 +90,9 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
         return customerJpaRepository.findById(id)
                 .map(entity -> {
                     Customer customer = customerMapper.toDomain(entity);
-                    // Load payment methods from database
-                    List<PaymentMethod> paymentMethods = paymentMethodJpaRepository.findByCustomerId(id).stream()
+                    // Load payment methods from database, excluding soft-deleted (INACTIVE) ones
+                    List<PaymentMethod> paymentMethods = paymentMethodJpaRepository
+                            .findByCustomerIdAndStatusNot(id, PaymentMethodStatus.INACTIVE).stream()
                             .map(paymentMethodMapper::toDomain)
                             .collect(Collectors.toList());
                     // Set payment methods using reflection since there's no setter
@@ -108,8 +112,9 @@ public class CustomerPersistenceAdapter implements CustomerQueryPort, CustomerCo
         return customerJpaRepository.findByIdAndMerchantId(id, merchantId)
                 .map(entity -> {
                     Customer customer = customerMapper.toDomain(entity);
-                    // Load payment methods from database
-                    List<PaymentMethod> paymentMethods = paymentMethodJpaRepository.findByCustomerId(id).stream()
+                    // Load payment methods from database, excluding soft-deleted (INACTIVE) ones
+                    List<PaymentMethod> paymentMethods = paymentMethodJpaRepository
+                            .findByCustomerIdAndStatusNot(id, PaymentMethodStatus.INACTIVE).stream()
                             .map(paymentMethodMapper::toDomain)
                             .collect(Collectors.toList());
                     // Set payment methods using reflection

@@ -4,6 +4,7 @@ import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.in.CapturePaymentUseCase;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
@@ -30,6 +31,7 @@ public class CapturePaymentService implements CapturePaymentUseCase {
     private final PaymentQueryPort paymentQueryPort;
     private final ExternalPaymentProviderPort externalPaymentProviderPort;
     private final OutboxEventDomainService outboxEventService;
+    private final TransactionQueryPort transactionQueryPort;
 
     @Override
     public PaymentResponse capturePayment(String paymentId, String merchantId) {
@@ -106,6 +108,7 @@ public class CapturePaymentService implements CapturePaymentUseCase {
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
                 .paymentMethodId(payment.getPaymentMethodId())
+                .transactionId(transactionQueryPort.findLatestByPaymentId(payment.getId()).map(t -> t.getId()).orElse(null))
                 .amount(payment.getAmount().getAmountInCents())
                 .currency(payment.getCurrency())
                 .status(payment.getStatus().name())

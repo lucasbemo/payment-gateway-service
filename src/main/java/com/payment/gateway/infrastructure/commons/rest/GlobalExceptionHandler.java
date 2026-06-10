@@ -3,6 +3,7 @@ package com.payment.gateway.infrastructure.commons.rest;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.exception.ExternalServiceException;
 import com.payment.gateway.commons.exception.NotFoundException;
+import com.payment.gateway.commons.exception.PaymentDeclinedException;
 import com.payment.gateway.commons.exception.ValidationException;
 import com.payment.gateway.domain.payment.exception.PaymentNotFoundException;
 import com.payment.gateway.domain.merchant.exception.MerchantNotFoundException;
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
         log.warn("Validation exception: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentDeclinedException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePaymentDeclined(PaymentDeclinedException ex) {
+        log.warn("Payment declined [{}]: {}", ex.getErrorCode(), ex.getErrorMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getErrorCode() + ": " + ex.getErrorMessage()));
     }
 
     @ExceptionHandler(BusinessException.class)

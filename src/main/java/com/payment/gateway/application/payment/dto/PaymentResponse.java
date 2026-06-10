@@ -17,6 +17,7 @@ public class PaymentResponse {
     private final String merchantId;
     private final String customerId;
     private final String paymentMethodId;
+    private final String transactionId;
     private final Long amount;
     private final String currency;
     private final String status;

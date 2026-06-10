@@ -2,6 +2,8 @@ package com.payment.gateway.application.payment.service;
 
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
+import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.Payment;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -32,11 +35,14 @@ class GetPaymentServiceTest {
     @Mock
     private PaymentQueryPort paymentQueryPort;
 
+    @Mock
+    private TransactionQueryPort transactionQueryPort;
+
     private GetPaymentService getPaymentService;
 
     @BeforeEach
     void setUp() {
-        getPaymentService = new GetPaymentService(paymentQueryPort);
+        getPaymentService = new GetPaymentService(paymentQueryPort, transactionQueryPort);
     }
 
     @Nested
@@ -52,6 +58,9 @@ class GetPaymentServiceTest {
             Payment payment = createPayment(paymentId, merchantId);
 
             given(paymentQueryPort.findById(paymentId)).willReturn(Optional.of(payment));
+            Transaction transaction = org.mockito.Mockito.mock(Transaction.class);
+            given(transaction.getId()).willReturn("txn_abc123");
+            given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.of(transaction));
 
             // When
             PaymentResponse response = getPaymentService.getPaymentById(paymentId, merchantId);

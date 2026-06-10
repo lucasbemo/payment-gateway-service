@@ -154,6 +154,39 @@ class MerchantManagementE2ETest extends E2ETestBase {
     }
 
     @Test
+    @DisplayName("E2E: Activate Merchant")
+    void testActivateMerchant() {
+        // Given: A registered merchant (status PENDING)
+        var merchantData = TestDataFactory.MerchantData.create();
+        var registerResponse = getApiClient().registerMerchant(
+            merchantData.name,
+            merchantData.email,
+            merchantData.webhookUrl
+        );
+
+        Map<String, Object> merchant = (Map<String, Object>) registerResponse.getBody().get("data");
+        String merchantId = (String) merchant.get("id");
+        assertThat(merchant.get("status")).isEqualTo("PENDING");
+
+        // When: Activating the merchant
+        var activateResponse = getApiClient().activateMerchant(merchantId);
+
+        // Then: Merchant is activated
+        assertThat(activateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Map<String, Object> activatedMerchant = (Map<String, Object>) activateResponse.getBody().get("data");
+        assertThat(activatedMerchant.get("status")).isEqualTo("ACTIVE");
+
+        // Verify in database
+        String dbStatus = jdbcTemplate.queryForObject(
+            "SELECT status FROM merchants WHERE id = ?",
+            String.class,
+            merchantId
+        );
+        assertThat(dbStatus).isEqualTo("ACTIVE");
+    }
+
+    @Test
     @DisplayName("E2E: Merchant API Key Generated")
     void testMerchantApiKeyGenerated() {
         // Given: A merchant registration request

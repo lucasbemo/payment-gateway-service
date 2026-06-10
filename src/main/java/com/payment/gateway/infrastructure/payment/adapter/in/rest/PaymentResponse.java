@@ -28,6 +28,9 @@ public class PaymentResponse {
     @Schema(description = "Payment method ID used", example = "pm_card_visa123")
     private String paymentMethodId;
 
+    @Schema(description = "Transaction ID for the payment authorization", example = "txn_abc123def456")
+    private String transactionId;
+
     @Schema(description = "Payment amount in cents", example = "10000")
     private Long amountInCents;
 

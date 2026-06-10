@@ -6,6 +6,7 @@ import com.payment.gateway.domain.refund.model.RefundStatus;
 import com.payment.gateway.domain.refund.model.RefundType;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
 
@@ -20,8 +21,8 @@ public class RefundMapper {
                 .merchantId(refund.getMerchantId())
                 .refundIdempotencyKey(refund.getRefundIdempotencyKey())
                 .type(refund.getType() != null ? refund.getType().name() : null)
-                .amount(refund.getAmount() != null ? refund.getAmount().getAmount() : null)
-                .refundedAmount(refund.getRefundedAmount() != null ? refund.getRefundedAmount().getAmount() : null)
+                .amount(refund.getAmount() != null ? BigDecimal.valueOf(refund.getAmount().getAmountInCents()) : null)
+                .refundedAmount(refund.getRefundedAmount() != null ? BigDecimal.valueOf(refund.getRefundedAmount().getAmountInCents()) : null)
                 .currency(refund.getCurrency())
                 .status(refund.getStatus() != null ? refund.getStatus().name() : null)
                 .reason(refund.getReason())
@@ -37,11 +38,12 @@ public class RefundMapper {
 
     public Refund toDomain(RefundJpaEntity entity) {
         Currency currency = Currency.getInstance(entity.getCurrency());
+        // DB stores cents (same convention as payments) — load via the cents overload
         Money amount = entity.getAmount() != null
-                ? Money.of(entity.getAmount(), currency)
+                ? Money.of(entity.getAmount().longValueExact(), currency)
                 : Money.zero(currency);
         Money refundedAmount = entity.getRefundedAmount() != null
-                ? Money.of(entity.getRefundedAmount(), currency)
+                ? Money.of(entity.getRefundedAmount().longValueExact(), currency)
                 : Money.zero(currency);
 
         return Refund.builder()

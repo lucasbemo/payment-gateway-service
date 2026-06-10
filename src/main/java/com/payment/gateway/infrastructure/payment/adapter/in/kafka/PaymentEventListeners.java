@@ -3,6 +3,7 @@ package com.payment.gateway.infrastructure.payment.adapter.in.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.port.PaymentEventPublisherPort;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class PaymentEventListeners {
     private final PaymentQueryPort paymentQueryPort;
     private final PaymentEventPublisherPort paymentEventPublisher;
     private final ObjectMapper objectMapper;
+    private final WebhookDeliveryPort webhookDeliveryPort;
 
     @Value("${kafka.topics.payment-created:payment.created}")
     private String paymentCreatedTopic;
@@ -75,7 +77,7 @@ public class PaymentEventListeners {
             String providerTransactionId = (String) event.get("providerTransactionId");
 
             // Process the payment completed event
-            handlePaymentCompleted(paymentId, providerTransactionId);
+            handlePaymentCompleted(paymentId, providerTransactionId, event);
 
             log.info("Successfully processed payment.completed event for payment: {}", paymentId);
         } catch (Exception e) {
@@ -98,7 +100,7 @@ public class PaymentEventListeners {
             String errorMessage = (String) event.get("errorMessage");
 
             // Process the payment failed event
-            handlePaymentFailed(paymentId, errorCode, errorMessage);
+            handlePaymentFailed(paymentId, errorCode, errorMessage, event);
 
             log.info("Successfully processed payment.failed event for payment: {}", paymentId);
         } catch (Exception e) {
@@ -120,7 +122,7 @@ public class PaymentEventListeners {
             String reason = (String) event.get("reason");
 
             // Process the payment cancelled event
-            handlePaymentCancelled(paymentId, reason);
+            handlePaymentCancelled(paymentId, reason, event);
 
             log.info("Successfully processed payment.cancelled event for payment: {}", paymentId);
         } catch (Exception e) {
@@ -134,20 +136,39 @@ public class PaymentEventListeners {
         // Add business logic here (e.g., send notification, update analytics, etc.)
     }
 
-    private void handlePaymentCompleted(String paymentId, String providerTransactionId) {
+    private void handlePaymentCompleted(String paymentId, String providerTransactionId,
+                                         Map<String, Object> event) {
         log.info("Handling payment completed: paymentId={}, providerTransactionId={}",
                  paymentId, providerTransactionId);
-        // Add business logic here (e.g., trigger settlement, send confirmation, etc.)
+        deliverMerchantWebhook("payment.completed", event);
     }
 
-    private void handlePaymentFailed(String paymentId, String errorCode, String errorMessage) {
+    private void handlePaymentFailed(String paymentId, String errorCode, String errorMessage,
+                                      Map<String, Object> event) {
         log.info("Handling payment failed: paymentId={}, errorCode={}, errorMessage={}",
                  paymentId, errorCode, errorMessage);
-        // Add business logic here (e.g., notify merchant, trigger retry, etc.)
+        deliverMerchantWebhook("payment.failed", event);
     }
 
-    private void handlePaymentCancelled(String paymentId, String reason) {
+    private void handlePaymentCancelled(String paymentId, String reason, Map<String, Object> event) {
         log.info("Handling payment cancelled: paymentId={}, reason={}", paymentId, reason);
-        // Add business logic here (e.g., release reserved funds, notify customer, etc.)
+        deliverMerchantWebhook("payment.cancelled", event);
+    }
+
+    /**
+     * Deliver the event to the merchant's webhook. Never throws: webhook delivery
+     * problems must not break Kafka consumption (the listener must still ack).
+     */
+    private void deliverMerchantWebhook(String fallbackEventType, Map<String, Object> event) {
+        try {
+            String merchantId = (String) event.get("merchantId");
+            String eventType = event.get("eventType") instanceof String type && !type.isBlank()
+                    ? type
+                    : fallbackEventType;
+            String payloadJson = objectMapper.writeValueAsString(event);
+            webhookDeliveryPort.deliver(merchantId, eventType, payloadJson);
+        } catch (Exception e) {
+            log.error("Webhook delivery failed for {} event: {}", fallbackEventType, event, e);
+        }
     }
 }

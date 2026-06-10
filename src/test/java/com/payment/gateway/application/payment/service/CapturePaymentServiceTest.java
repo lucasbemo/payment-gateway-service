@@ -3,6 +3,8 @@ package com.payment.gateway.application.payment.service;
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
+import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.Payment;
@@ -42,11 +44,14 @@ class CapturePaymentServiceTest {
     @Mock
     private com.payment.gateway.domain.outbox.service.OutboxEventDomainService outboxEventService;
 
+    @Mock
+    private TransactionQueryPort transactionQueryPort;
+
     private CapturePaymentService capturePaymentService;
 
     @BeforeEach
     void setUp() {
-        capturePaymentService = new CapturePaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService);
+        capturePaymentService = new CapturePaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService, transactionQueryPort);
     }
 
     @Nested
@@ -66,6 +71,9 @@ class CapturePaymentServiceTest {
                     CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_123", null, null))
             );
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
+            Transaction transaction = org.mockito.Mockito.mock(Transaction.class);
+            given(transaction.getId()).willReturn("txn_abc123");
+            given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.of(transaction));
 
             // When
             PaymentResponse response = capturePaymentService.capturePayment(paymentId, merchantId);
@@ -94,6 +102,7 @@ class CapturePaymentServiceTest {
                     CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "capture_txn_456", null, null))
             );
             given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> invocation.getArgument(0));
+            given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.empty());
 
             // When
             PaymentResponse response = capturePaymentService.capturePayment(paymentId, merchantId);

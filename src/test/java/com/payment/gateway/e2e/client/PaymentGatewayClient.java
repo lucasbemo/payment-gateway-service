@@ -76,6 +76,14 @@ public class PaymentGatewayClient {
         return post("/api/v1/merchants/" + merchantId + "/suspend", Map.of());
     }
 
+    /**
+     * Activate merchant.
+     * POST /api/v1/merchants/{id}/activate
+     */
+    public ResponseEntity<Map<String, Object>> activateMerchant(String merchantId) {
+        return post("/api/v1/merchants/" + merchantId + "/activate", Map.of());
+    }
+
     // ==================== CUSTOMER ENDPOINTS ====================
 
     /**

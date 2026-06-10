@@ -8,7 +8,10 @@ import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.application.payment.port.out.TokenizationServicePort;
 import com.payment.gateway.application.payment.port.out.TransactionCommandPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
+import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.commons.exception.BusinessException;
+import com.payment.gateway.commons.exception.PaymentDeclinedException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.commons.utils.IdGenerator;
 import com.payment.gateway.domain.customer.model.Customer;
@@ -25,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -37,6 +41,8 @@ import java.util.concurrent.CompletableFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -65,6 +71,9 @@ class ProcessPaymentServiceTest {
     private TransactionCommandPort transactionCommandPort;
 
     @Mock
+    private TransactionQueryPort transactionQueryPort;
+
+    @Mock
     private IdGenerator idGenerator;
 
     @Mock
@@ -87,6 +96,7 @@ class ProcessPaymentServiceTest {
                 externalPaymentProviderPort,
                 tokenizationServicePort,
                 transactionCommandPort,
+                transactionQueryPort,
                 idGenerator,
                 metricsPort,
                 auditPort,
@@ -121,6 +131,9 @@ class ProcessPaymentServiceTest {
             given(externalPaymentProviderPort.authorize(any())).willReturn(
                     CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(true, "txn_xyz", null, null))
             );
+            Transaction transaction = org.mockito.Mockito.mock(Transaction.class);
+            given(transaction.getId()).willReturn("txn_abc123");
+            given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.of(transaction));
 
             // When
             PaymentResponse response = processPaymentService.processPayment(command);
@@ -151,6 +164,7 @@ class ProcessPaymentServiceTest {
 
             given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
             given(paymentQueryPort.findByIdempotencyKey(idempotencyKey)).willReturn(Optional.of(existingPayment));
+            given(transactionQueryPort.findLatestByPaymentId(any())).willReturn(Optional.empty());
 
             // When
             PaymentResponse response = processPaymentService.processPayment(command);
@@ -182,6 +196,48 @@ class ProcessPaymentServiceTest {
             assertThatThrownBy(() -> processPaymentService.processPayment(command))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Merchant not found");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when merchant is PENDING")
+        void shouldThrowExceptionWhenMerchantIsPending() {
+            // Given
+            String merchantId = "merchant-123";
+            ProcessPaymentCommand command = createPaymentCommand(merchantId, "idem-key");
+
+            Merchant merchant = createMerchant(merchantId);
+            setStatus(merchant, MerchantStatus.PENDING);
+
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
+
+            // When & Then
+            assertThatThrownBy(() -> processPaymentService.processPayment(command))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Merchant is not active: PENDING");
+
+            then(paymentQueryPort).should(never()).savePayment(any());
+            then(externalPaymentProviderPort).should(never()).authorize(any());
+        }
+
+        @Test
+        @DisplayName("Should throw exception when merchant is SUSPENDED")
+        void shouldThrowExceptionWhenMerchantIsSuspended() {
+            // Given
+            String merchantId = "merchant-123";
+            ProcessPaymentCommand command = createPaymentCommand(merchantId, "idem-key");
+
+            Merchant merchant = createMerchant(merchantId);
+            setStatus(merchant, MerchantStatus.SUSPENDED);
+
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
+
+            // When & Then
+            assertThatThrownBy(() -> processPaymentService.processPayment(command))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Merchant is not active: SUSPENDED");
+
+            then(paymentQueryPort).should(never()).savePayment(any());
+            then(externalPaymentProviderPort).should(never()).authorize(any());
         }
 
         @Test
@@ -230,6 +286,64 @@ class ProcessPaymentServiceTest {
             assertThatThrownBy(() -> processPaymentService.processPayment(command))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Authorization declined");
+        }
+    }
+
+    @Nested
+    @DisplayName("Declined Payment Tests")
+    class DeclinedPaymentTests {
+
+        @Test
+        @DisplayName("Should persist FAILED payment and publish PAYMENT_FAILED event when provider declines")
+        void shouldPersistFailedPaymentAndPublishEventWhenDeclined() {
+            // Given
+            String merchantId = "merchant-123";
+            String idempotencyKey = "idem-key-decline";
+            String paymentId = "pay_declined";
+
+            Merchant merchant = createMerchant(merchantId);
+            ProcessPaymentCommand command = createPaymentCommand(merchantId, idempotencyKey);
+
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
+            given(paymentQueryPort.findByIdempotencyKey(idempotencyKey)).willReturn(Optional.empty());
+            given(tokenizationServicePort.tokenize(any(), any(), any(), any())).willReturn("tok_xyz");
+            given(paymentQueryPort.savePayment(any(Payment.class))).willAnswer(invocation -> {
+                Payment payment = invocation.getArgument(0);
+                setId(payment, paymentId);
+                return payment;
+            });
+            given(externalPaymentProviderPort.authorize(any())).willReturn(
+                    CompletableFuture.completedFuture(new ExternalPaymentProviderPort.PaymentProviderResult(
+                            false, null, "card_declined", "Insufficient funds (test decline: amount ends in 99)"))
+            );
+
+            // When & Then
+            assertThatThrownBy(() -> processPaymentService.processPayment(command))
+                    .isInstanceOf(PaymentDeclinedException.class)
+                    .hasMessageContaining("Insufficient funds")
+                    .satisfies(ex -> assertThat(((PaymentDeclinedException) ex).getErrorCode())
+                            .isEqualTo("card_declined"));
+
+            // Payment was saved twice: once on creation, once after fail()
+            ArgumentCaptor<Payment> paymentCaptor = ArgumentCaptor.forClass(Payment.class);
+            then(paymentQueryPort).should(times(2)).savePayment(paymentCaptor.capture());
+            assertThat(paymentCaptor.getValue().getStatus()).isEqualTo(PaymentStatus.FAILED);
+
+            // PAYMENT_FAILED outbox event was published
+            then(outboxEventService).should().publish(
+                    eq(paymentId),
+                    eq("PAYMENT"),
+                    eq(com.payment.gateway.domain.outbox.model.EventType.PAYMENT_FAILED),
+                    any(com.payment.gateway.domain.payment.event.PaymentFailedEvent.class));
+
+            // Metrics and audit recorded
+            then(metricsPort).should().recordPaymentFailed();
+            then(auditPort).should().logPaymentOperation(
+                    eq(paymentId), eq(merchantId), eq("AUTHORIZE"), eq("FAILED"), anyLong());
+
+            // No transaction created, no PAYMENT_CREATED event
+            then(transactionCommandPort).should(never()).createTransaction(any());
+            then(metricsPort).should(never()).recordPaymentApproved();
         }
     }
 

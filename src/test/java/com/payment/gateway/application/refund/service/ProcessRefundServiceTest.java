@@ -1,10 +1,14 @@
 package com.payment.gateway.application.refund.service;
 
+import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.out.RefundPaymentQueryPort;
 import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
+import com.payment.gateway.domain.merchant.model.Merchant;
+import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
+import com.payment.gateway.domain.merchant.model.MerchantStatus;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentMethod;
@@ -35,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 @DisplayName("Process Refund Service Tests")
@@ -46,6 +51,9 @@ class ProcessRefundServiceTest {
 
     @Mock
     private RefundPaymentQueryPort refundPaymentQueryPort;
+
+    @Mock
+    private MerchantQueryPort merchantQueryPort;
 
     @Mock
     private MetricsPort metricsPort;
@@ -60,7 +68,7 @@ class ProcessRefundServiceTest {
 
     @BeforeEach
     void setUp() {
-        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, metricsPort, auditPort, outboxEventService);
+        processRefundService = new ProcessRefundService(refundQueryPort, refundPaymentQueryPort, merchantQueryPort, metricsPort, auditPort, outboxEventService);
     }
 
     @Nested
@@ -79,9 +87,11 @@ class ProcessRefundServiceTest {
 
             Payment payment = createPayment(paymentId, merchantId);
             Transaction transaction = createTransaction(transactionId, paymentId);
+            Merchant merchant = createMerchant(merchantId, MerchantStatus.ACTIVE);
 
             given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
             given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)).willReturn(Optional.of(transaction));
             given(refundQueryPort.saveRefund(any(Refund.class))).willAnswer(invocation -> {
                 Refund refund = invocation.getArgument(0);
@@ -114,9 +124,11 @@ class ProcessRefundServiceTest {
 
             Payment payment = createPayment(paymentId, merchantId);
             Transaction transaction = createTransaction(transactionId, paymentId);
+            Merchant merchant = createMerchant(merchantId, MerchantStatus.ACTIVE);
 
             given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
             given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)).willReturn(Optional.of(transaction));
             given(refundQueryPort.saveRefund(any(Refund.class))).willAnswer(invocation -> {
                 Refund refund = invocation.getArgument(0);
@@ -203,6 +215,29 @@ class ProcessRefundServiceTest {
         }
 
         @Test
+        @DisplayName("Should throw exception when merchant is SUSPENDED")
+        void shouldThrowExceptionWhenMerchantIsSuspended() {
+            // Given
+            String paymentId = "pay_123";
+            String merchantId = "merchant_123";
+            String refundIdempotencyKey = "refund_idem_456";
+
+            Payment payment = createPayment(paymentId, merchantId);
+            Merchant merchant = createMerchant(merchantId, MerchantStatus.SUSPENDED);
+
+            given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
+            given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
+
+            // When & Then
+            assertThatThrownBy(() -> processRefundService.processRefund(paymentId, merchantId, null, refundIdempotencyKey, "Reason"))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Merchant is not active: SUSPENDED");
+
+            then(refundQueryPort).should(never()).saveRefund(any());
+        }
+
+        @Test
         @DisplayName("Should throw exception when transaction not found")
         void shouldThrowExceptionWhenTransactionNotFound() {
             // Given
@@ -211,9 +246,11 @@ class ProcessRefundServiceTest {
             String refundIdempotencyKey = "refund_idem_456";
 
             Payment payment = createPayment(paymentId, merchantId);
+            Merchant merchant = createMerchant(merchantId, MerchantStatus.ACTIVE);
 
             given(refundQueryPort.existsByIdempotencyKey(refundIdempotencyKey)).willReturn(false);
             given(refundPaymentQueryPort.findPaymentById(paymentId)).willReturn(Optional.of(payment));
+            given(merchantQueryPort.findById(merchantId)).willReturn(Optional.of(merchant));
             given(refundPaymentQueryPort.findLatestTransactionByPaymentId(paymentId)).willReturn(Optional.empty());
 
             // When & Then
@@ -224,6 +261,21 @@ class ProcessRefundServiceTest {
     }
 
     // Helper methods
+
+    private Merchant createMerchant(String id, MerchantStatus status) {
+        Merchant merchant = Merchant.register(
+                "Test Merchant",
+                "test@merchant.com",
+                "test-api-key",
+                "hashed_key",
+                "hashed_secret",
+                "https://webhook.example.com",
+                MerchantConfiguration.empty()
+        );
+        setId(merchant, id);
+        setStatus(merchant, status);
+        return merchant;
+    }
 
     private Payment createPayment(String id, String merchantId) {
         Payment payment = Payment.create(

@@ -42,6 +42,18 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+  cloud:
+    aws:
+      region:
+        static: ${AWS_REGION:us-east-1}
+      credentials:
+        access-key: ${SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY:minioadmin}
+        secret-key: ${SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY:minioadmin}
+      s3:
+        endpoint: ${SPRING_CLOUD_AWS_S3_ENDPOINT:http://localhost:9000}
+        # MinIO requires path-style access (spring-cloud-aws 3.0.x property)
+        path-style-access-enabled: true
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:
