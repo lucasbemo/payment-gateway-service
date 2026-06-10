@@ -64,7 +64,7 @@ class ReconcileTransactionsServiceTest {
 
             ReconciliationBatch batch = createReconciliationBatch(batchId, merchantId);
 
-            given(reconciliationDomainService.createReconciliationBatch(any(), any(), any(), any()))
+            given(reconciliationDomainService.findOrCreateReconciliationBatch(any(), any(), any(), any()))
                     .willReturn(batch);
             given(reconciliationDomainService.startReconciliation(batchId)).willReturn(batch);
             given(transactionQueryPort.findByMerchantIdAndCreatedAtBetween(eq(merchantId), any(), any()))
@@ -81,7 +81,7 @@ class ReconcileTransactionsServiceTest {
             assertThat(response).isNotNull();
             assertThat(response.getBatchId()).isEqualTo(batchId);
 
-            then(reconciliationDomainService).should().createReconciliationBatch(any(), any(), any(), any());
+            then(reconciliationDomainService).should().findOrCreateReconciliationBatch(any(), any(), any(), any());
             then(reconciliationDomainService).should().startReconciliation(batchId);
             // total=3, matched=2 (CAPTURED+SETTLED), discrepancies=1 (FAILED),
             // totalAmount=4000 cents, matchedAmount=3500 cents
@@ -102,7 +102,7 @@ class ReconcileTransactionsServiceTest {
 
             ReconciliationBatch batch = createReconciliationBatch(batchId, merchantId);
 
-            given(reconciliationDomainService.createReconciliationBatch(any(), any(), any(), any()))
+            given(reconciliationDomainService.findOrCreateReconciliationBatch(any(), any(), any(), any()))
                     .willReturn(batch);
             given(reconciliationDomainService.startReconciliation(batchId)).willReturn(batch);
             given(transactionQueryPort.findByMerchantIdAndCreatedAtBetween(eq(merchantId), any(), any()))

@@ -50,11 +50,12 @@ public class ReconcileTransactionsService implements ReconcileTransactionsUseCas
 
         LocalDate reconciliationDate = LocalDate.parse(date);
 
-        // Create and start reconciliation batch
-        ReconciliationBatch batch = reconciliationDomainService.createReconciliationBatch(
+        // Find or create the batch (reconciliation is idempotent per merchant per date —
+        // re-running the same day reuses the existing batch and recomputes its results)
+        ReconciliationBatch batch = reconciliationDomainService.findOrCreateReconciliationBatch(
                 merchantId, reconciliationDate, "DEFAULT_GATEWAY", "system");
 
-        // Start processing
+        // Start processing (resets a re-run batch back to PROCESSING)
         batch = reconciliationDomainService.startReconciliation(batch.getId());
 
         // Load the merchant's transactions for the reconciliation date (00:00-24:00 UTC)
