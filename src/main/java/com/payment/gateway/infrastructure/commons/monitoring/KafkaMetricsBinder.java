@@ -132,10 +132,12 @@ public class KafkaMetricsBinder implements MeterBinder {
         }
 
         messagesProducedPerTopic
-                .computeIfAbsent(topic, t -> Counter.builder("kafka.producer.messages.sent.topic")
-                        .description("Messages sent per topic")
-                        .tag("topic", t)
-                        .register(registry))
+                .computeIfAbsent(
+                        topic,
+                        t -> Counter.builder("kafka.producer.messages.sent.topic")
+                                .description("Messages sent per topic")
+                                .tag("topic", t)
+                                .register(registry))
                 .increment();
     }
 
@@ -158,11 +160,13 @@ public class KafkaMetricsBinder implements MeterBinder {
         }
 
         messagesConsumedPerTopic
-                .computeIfAbsent(topic, t -> Counter.builder("kafka.consumer.messages.consumed.topic")
-                        .description("Messages consumed per topic")
-                        .tag("topic", t)
-                        .tag("group", kafkaLagMonitor.getConsumerGroupId())
-                        .register(registry))
+                .computeIfAbsent(
+                        topic,
+                        t -> Counter.builder("kafka.consumer.messages.consumed.topic")
+                                .description("Messages consumed per topic")
+                                .tag("topic", t)
+                                .tag("group", kafkaLagMonitor.getConsumerGroupId())
+                                .register(registry))
                 .increment();
     }
 

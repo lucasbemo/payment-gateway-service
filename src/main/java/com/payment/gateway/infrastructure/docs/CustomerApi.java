@@ -14,10 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
-@Tag(
-        name = "Customer Management",
-        description =
-                """
+@Tag(name = "Customer Management", description = """
         Customer registration and payment method management.
 
         ## Customer Lifecycle
@@ -45,11 +42,7 @@ public interface CustomerApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Successful Registration",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Successful Registration", value = """
                         {
                           "success": true,
                           "message": "Customer registered successfully",
@@ -73,11 +66,7 @@ public interface CustomerApi {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            examples =
-                                                    @ExampleObject(
-                                                            name = "Register Customer Request",
-                                                            value =
-                                                                    """
+                                            examples = @ExampleObject(name = "Register Customer Request", value = """
                             {
                               "merchantId": "merch_xyz789",
                               "email": "customer@test.com",
@@ -101,11 +90,7 @@ public interface CustomerApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Customer Details",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Customer Details", value = """
                         {
                           "success": true,
                           "message": "Success",
@@ -144,11 +129,7 @@ public interface CustomerApi {
                             example = "merch_xyz789")
                     String merchantId);
 
-    @Operation(
-            operationId = "addPaymentMethod",
-            summary = "Add a payment method to customer",
-            description =
-                    """
+    @Operation(operationId = "addPaymentMethod", summary = "Add a payment method to customer", description = """
             Adds a payment method (credit card) to a customer. The card will be tokenized.
 
             **Test Cards:**
@@ -164,11 +145,7 @@ public interface CustomerApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Payment Method Added",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Payment Method Added", value = """
                         {
                           "success": true,
                           "message": "Payment method added successfully",
@@ -205,10 +182,7 @@ public interface CustomerApi {
                                     @Content(
                                             mediaType = "application/json",
                                             examples =
-                                                    @ExampleObject(
-                                                            name = "Add Payment Method Request",
-                                                            value =
-                                                                    """
+                                                    @ExampleObject(name = "Add Payment Method Request", value = """
                             {
                               "merchantId": "merch_xyz789",
                               "cardNumber": "4111111111111111",
@@ -234,11 +208,7 @@ public interface CustomerApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Payment Method Removed",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Payment Method Removed", value = """
                         {
                           "success": true,
                           "message": "Payment method removed successfully",

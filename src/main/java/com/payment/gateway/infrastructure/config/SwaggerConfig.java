@@ -32,8 +32,7 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("Payment Gateway API")
-                .description(
-                        """
+                .description("""
                     Production-ready Payment Gateway Service REST API.
 
                     ## Features

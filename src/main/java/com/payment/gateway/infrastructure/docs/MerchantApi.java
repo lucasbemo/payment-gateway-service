@@ -14,10 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
-@Tag(
-        name = "Merchant Management",
-        description =
-                """
+@Tag(name = "Merchant Management", description = """
         Merchant registration, updates, and suspension operations.
 
         ## Merchant Lifecycle
@@ -40,11 +37,7 @@ public interface MerchantApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Successful Registration",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Successful Registration", value = """
                         {
                           "success": true,
                           "message": "Merchant registered successfully",
@@ -67,11 +60,7 @@ public interface MerchantApi {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            examples =
-                                                    @ExampleObject(
-                                                            name = "Register Merchant Request",
-                                                            value =
-                                                                    """
+                                            examples = @ExampleObject(name = "Register Merchant Request", value = """
                             {
                               "name": "Test Merchant",
                               "email": "merchant@test.com",
@@ -93,11 +82,7 @@ public interface MerchantApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Merchant Details",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Merchant Details", value = """
                         {
                           "success": true,
                           "message": "Success",
@@ -133,11 +118,7 @@ public interface MerchantApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Updated Merchant",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Updated Merchant", value = """
                         {
                           "success": true,
                           "message": "Merchant updated successfully",
@@ -165,11 +146,7 @@ public interface MerchantApi {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            examples =
-                                                    @ExampleObject(
-                                                            name = "Update Request",
-                                                            value =
-                                                                    """
+                                            examples = @ExampleObject(name = "Update Request", value = """
                             {
                               "name": "Updated Merchant Name",
                               "email": "updated@test.com",
@@ -191,11 +168,7 @@ public interface MerchantApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Suspended Merchant",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Suspended Merchant", value = """
                         {
                           "success": true,
                           "message": "Merchant suspended successfully",
@@ -228,11 +201,7 @@ public interface MerchantApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Activated Merchant",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Activated Merchant", value = """
                         {
                           "success": true,
                           "message": "Merchant activated successfully",

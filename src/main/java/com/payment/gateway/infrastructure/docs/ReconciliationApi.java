@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
-@Tag(
-        name = "Reconciliation",
-        description =
-                """
+@Tag(name = "Reconciliation", description = """
         Transaction reconciliation and settlement report generation.
 
         ## Reconciliation Process
@@ -27,11 +24,7 @@ import org.springframework.http.ResponseEntity;
         """)
 public interface ReconciliationApi {
 
-    @Operation(
-            operationId = "reconcileTransactions",
-            summary = "Reconcile transactions",
-            description =
-                    """
+    @Operation(operationId = "reconcileTransactions", summary = "Reconcile transactions", description = """
             Reconciles internal transactions with payment gateway records for a specific date.
             Returns counts of matched and unmatched transactions, plus any discrepancies found.
             """)
@@ -43,11 +36,7 @@ public interface ReconciliationApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Reconciliation Result",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Reconciliation Result", value = """
                         {
                           "success": true,
                           "message": "Reconciliation completed",
@@ -86,11 +75,7 @@ public interface ReconciliationApi {
                                     example = "2026-03-20")
                             String date);
 
-    @Operation(
-            operationId = "generateSettlementReport",
-            summary = "Generate settlement report",
-            description =
-                    """
+    @Operation(operationId = "generateSettlementReport", summary = "Generate settlement report", description = """
             Generates a settlement report for a date range.
             Includes total amounts, transaction counts, and breakdown by status.
             """)
@@ -102,11 +87,7 @@ public interface ReconciliationApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Settlement Report",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Settlement Report", value = """
                         {
                           "success": true,
                           "message": "Settlement report generated",

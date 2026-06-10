@@ -40,26 +40,34 @@ public class Resilience4jMetricsBinder implements MeterBinder {
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.failure.rate", circuitBreaker, cb -> cb.getMetrics()
-                            .getFailureRate())
+            Gauge.builder(
+                            "resilience4j.circuitbreaker.failure.rate",
+                            circuitBreaker,
+                            cb -> cb.getMetrics().getFailureRate())
                     .description("Failure rate percentage")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.slow.call.rate", circuitBreaker, cb -> cb.getMetrics()
-                            .getSlowCallRate())
+            Gauge.builder(
+                            "resilience4j.circuitbreaker.slow.call.rate",
+                            circuitBreaker,
+                            cb -> cb.getMetrics().getSlowCallRate())
                     .description("Slow call rate percentage")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.buffered.calls", circuitBreaker, cb -> cb.getMetrics()
-                            .getNumberOfBufferedCalls())
+            Gauge.builder(
+                            "resilience4j.circuitbreaker.buffered.calls",
+                            circuitBreaker,
+                            cb -> cb.getMetrics().getNumberOfBufferedCalls())
                     .description("Number of buffered calls")
                     .tag("name", name)
                     .register(registry);
 
-            Gauge.builder("resilience4j.circuitbreaker.failed.calls", circuitBreaker, cb -> cb.getMetrics()
-                            .getNumberOfFailedCalls())
+            Gauge.builder(
+                            "resilience4j.circuitbreaker.failed.calls",
+                            circuitBreaker,
+                            cb -> cb.getMetrics().getNumberOfFailedCalls())
                     .description("Number of failed calls")
                     .tag("name", name)
                     .register(registry);
