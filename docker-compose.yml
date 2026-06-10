@@ -93,6 +93,14 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:19092
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      # Broker is "healthy" only once it answers API requests on the INTERNAL listener,
+      # which is also when in-network clients (the app) can resolve and connect to it.
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:29092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
@@ -210,7 +218,7 @@ services:
       postgres:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_healthy
     environment:

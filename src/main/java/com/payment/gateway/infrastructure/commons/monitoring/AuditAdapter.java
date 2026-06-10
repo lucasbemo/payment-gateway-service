@@ -29,4 +29,9 @@ public class AuditAdapter implements AuditPort {
     public void logDataAccess(String entityType, String entityId, String operation, String userId) {
         auditLogger.logDataAccess(entityType, entityId, operation, userId);
     }
+
+    @Override
+    public void logWebhookDelivery(String merchantId, String eventType, String webhookUrl, String outcome, int attempts) {
+        auditLogger.logWebhookDelivery(merchantId, eventType, webhookUrl, outcome, attempts);
+    }
 }

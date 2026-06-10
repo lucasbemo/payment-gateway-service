@@ -67,8 +67,9 @@ class RefundMapperTest {
             assertThat(entity.getMerchantId()).isEqualTo("merchant-001");
             assertThat(entity.getRefundIdempotencyKey()).isEqualTo("refund-idem-001");
             assertThat(entity.getType()).isEqualTo("FULL");
-            assertThat(entity.getAmount()).isEqualByComparingTo(new BigDecimal("50.00"));
-            assertThat(entity.getRefundedAmount()).isEqualByComparingTo(new BigDecimal("25.00"));
+            // DB stores cents (same convention as payments/transactions)
+            assertThat(entity.getAmount()).isEqualByComparingTo(new BigDecimal("5000"));
+            assertThat(entity.getRefundedAmount()).isEqualByComparingTo(new BigDecimal("2500"));
             assertThat(entity.getCurrency()).isEqualTo("USD");
             assertThat(entity.getStatus()).isEqualTo("PENDING");
             assertThat(entity.getReason()).isEqualTo("Customer request");
@@ -119,8 +120,8 @@ class RefundMapperTest {
                     .merchantId("merchant-entity-001")
                     .refundIdempotencyKey("refund-idem-entity-001")
                     .type("PARTIAL")
-                    .amount(new BigDecimal("30.00"))
-                    .refundedAmount(new BigDecimal("10.00"))
+                    .amount(new BigDecimal("3000")) // cents
+                    .refundedAmount(new BigDecimal("1000")) // cents
                     .currency("USD")
                     .status("COMPLETED")
                     .reason("Partial return")
@@ -182,7 +183,7 @@ class RefundMapperTest {
             RefundJpaEntity entity = RefundJpaEntity.builder()
                     .id("refund-null")
                     .paymentId("pay-null")
-                    .amount(new BigDecimal("10.00"))
+                    .amount(new BigDecimal("1000")) // cents
                     .currency("USD")
                     .type(null)
                     .status(null)
@@ -217,6 +218,7 @@ class RefundMapperTest {
             assertThat(restored.getPaymentId()).isEqualTo(original.getPaymentId());
             assertThat(restored.getMerchantId()).isEqualTo(original.getMerchantId());
             assertThat(restored.getType()).isEqualTo(original.getType());
+            assertThat(restored.getAmount()).isEqualTo(original.getAmount());
             assertThat(restored.getCurrency()).isEqualTo(original.getCurrency());
             assertThat(restored.getStatus()).isEqualTo(original.getStatus());
             assertThat(restored.getReason()).isEqualTo(original.getReason());

@@ -39,6 +39,11 @@ public class AuditLogger {
                 entityType, entityId, operation, userId);
     }
 
+    public void logWebhookDelivery(String merchantId, String eventType, String webhookUrl, String outcome, int attempts) {
+        AUDIT_LOG.info("WEBHOOK_DELIVERY | merchantId={} | eventType={} | webhookUrl={} | outcome={} | attempts={}",
+                merchantId, eventType, webhookUrl, outcome, attempts);
+    }
+
     public void logAuthenticationEvent(String principal, String outcome, String reason) {
         AUDIT_LOG.info("AUTHENTICATION | principal={} | outcome={} | reason={}",
                 principal, outcome, reason);

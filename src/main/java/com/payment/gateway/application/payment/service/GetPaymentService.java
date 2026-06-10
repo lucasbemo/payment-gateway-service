@@ -3,6 +3,7 @@ package com.payment.gateway.application.payment.service;
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
+import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.payment.model.Payment;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class GetPaymentService implements GetPaymentUseCase {
 
     private final PaymentQueryPort paymentQueryPort;
+    private final TransactionQueryPort transactionQueryPort;
 
     @Override
     public PaymentResponse getPaymentById(String paymentId, String merchantId) {
@@ -54,6 +56,7 @@ public class GetPaymentService implements GetPaymentUseCase {
                 .merchantId(payment.getMerchantId())
                 .customerId(payment.getCustomerId())
                 .paymentMethodId(payment.getPaymentMethodId())
+                .transactionId(transactionQueryPort.findLatestByPaymentId(payment.getId()).map(t -> t.getId()).orElse(null))
                 .amount(payment.getAmount().getAmountInCents())
                 .currency(payment.getCurrency())
                 .status(payment.getStatus().name())

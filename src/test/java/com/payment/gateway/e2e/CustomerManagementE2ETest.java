@@ -182,14 +182,15 @@ class CustomerManagementE2ETest extends E2ETestBase {
         // Then: Payment method is removed (or soft-deleted)
         assertThat(removeResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        // Verify payment method is soft-deleted (status = INACTIVE)
+        // Verify payment method is soft-deleted (status = INACTIVE).
+        // status is a VARCHAR enum name since V17 (was a SMALLINT ordinal before).
         Integer pmCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ? AND status = 1",
+            "SELECT COUNT(*) FROM payment_methods WHERE customer_id = ? AND status = 'INACTIVE'",
             Integer.class,
             customerId
         );
-        // Either soft-deleted or removed
-        assertThat(pmCount).isGreaterThanOrEqualTo(0);
+        // The removed method is retained as a soft-deleted (INACTIVE) row.
+        assertThat(pmCount).isGreaterThanOrEqualTo(1);
     }
 
     @Test

@@ -22,7 +22,9 @@ class RefundEventListenersTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        listeners = new RefundEventListeners(objectMapper);
+        com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort webhookDeliveryPort =
+                org.mockito.Mockito.mock(com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort.class);
+        listeners = new RefundEventListeners(objectMapper, webhookDeliveryPort);
     }
 
     @Nested

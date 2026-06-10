@@ -80,7 +80,7 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
         Customer savedCustomer = customerCommandPort.saveCustomer(customer);
         log.info("Payment method added to customer: {}", command.getCustomerId());
 
-        return mapToResponse(savedCustomer);
+        return mapToResponse(savedCustomer, paymentMethod.getId());
     }
 
     private String cardBrandFromNumber(String cardNumber) {
@@ -94,7 +94,7 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
         return "UNKNOWN";
     }
 
-    private CustomerResponse mapToResponse(Customer customer) {
+    private CustomerResponse mapToResponse(Customer customer, String paymentMethodId) {
         return CustomerResponse.builder()
                 .id(customer.getId())
                 .merchantId(customer.getMerchantId())
@@ -104,6 +104,7 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
                 .externalId(customer.getExternalId())
                 .status(customer.getStatus().name())
                 .createdAt(customer.getCreatedAt())
+                .paymentMethodId(paymentMethodId)
                 .build();
     }
 }

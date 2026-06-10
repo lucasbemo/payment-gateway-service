@@ -38,4 +38,8 @@ public class CustomerResponse {
 
     @Schema(description = "Account creation timestamp", example = "2026-03-20T10:00:00Z")
     private final Instant createdAt;
+
+    @Schema(description = "Id of the payment method just added (only set on add-payment-method responses)",
+            example = "pm_abc123")
+    private final String paymentMethodId;
 }

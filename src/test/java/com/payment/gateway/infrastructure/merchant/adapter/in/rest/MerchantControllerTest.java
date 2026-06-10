@@ -2,6 +2,7 @@ package com.payment.gateway.infrastructure.merchant.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.merchant.dto.MerchantResponse;
+import com.payment.gateway.application.merchant.port.in.ActivateMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.GetMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.RegisterMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.SuspendMerchantUseCase;
@@ -46,6 +47,9 @@ class MerchantControllerTest {
 
     @MockBean
     private SuspendMerchantUseCase suspendMerchantUseCase;
+
+    @MockBean
+    private ActivateMerchantUseCase activateMerchantUseCase;
 
     @Test
     @DisplayName("POST /api/v1/merchants - should register merchant")
@@ -127,6 +131,25 @@ class MerchantControllerTest {
         mockMvc.perform(post("/api/v1/merchants/m-123/suspend"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("SUSPENDED"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/merchants/{id}/activate - should activate merchant")
+    @WithMockUser
+    void shouldActivateMerchant() throws Exception {
+        var response = MerchantResponse.builder()
+                .id("m-123")
+                .name("Test Merchant")
+                .email("test@merchant.com")
+                .status("ACTIVE")
+                .createdAt(Instant.now())
+                .build();
+
+        given(activateMerchantUseCase.activateMerchant("m-123")).willReturn(response);
+
+        mockMvc.perform(post("/api/v1/merchants/m-123/activate"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("ACTIVE"));
     }
 
     @Test

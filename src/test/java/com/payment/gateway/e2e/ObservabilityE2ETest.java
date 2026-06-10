@@ -141,6 +141,9 @@ class ObservabilityE2ETest extends E2ETestBase {
         String apiKey = (String) merchant.get("apiKey");
         setApiKey(apiKey);
 
+        // Activate merchant so it can process payments
+        getApiClient().activateMerchant(merchantId);
+
         // When: Processing a payment
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentResponse = getApiClient().processPayment(
@@ -169,6 +172,9 @@ class ObservabilityE2ETest extends E2ETestBase {
         );
         Map<String, Object> merchant = (Map<String, Object>) merchantResponse.getBody().get("data");
         setApiKey((String) merchant.get("apiKey"));
+
+        // Activate merchant so it can process payments
+        getApiClient().activateMerchant((String) merchant.get("id"));
 
         getApiClient().processPayment(
             (String) merchant.get("id"),

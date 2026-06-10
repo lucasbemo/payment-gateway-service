@@ -34,6 +34,9 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         merchantId = (String) merchantData.get("id");
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
+
+        // Activate merchant so it can process payments
+        getApiClient().activateMerchant(merchantId);
     }
 
     @Test

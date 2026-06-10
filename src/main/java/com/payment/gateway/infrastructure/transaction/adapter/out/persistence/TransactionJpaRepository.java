@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ public interface TransactionJpaRepository extends JpaRepository<TransactionJpaEn
     Optional<TransactionJpaEntity> findByPaymentIdAndType(String paymentId, String type);
 
     List<TransactionJpaEntity> findByMerchantId(String merchantId);
+
+    List<TransactionJpaEntity> findByMerchantIdAndCreatedAtBetween(String merchantId, Instant start, Instant end);
 
     List<TransactionJpaEntity> findByStatus(String status);
 

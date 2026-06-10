@@ -1,11 +1,13 @@
 package com.payment.gateway.application.refund.service;
 
+import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.in.ProcessRefundUseCase;
 import com.payment.gateway.application.refund.port.out.RefundPaymentQueryPort;
 import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
+import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.service.OutboxEventDomainService;
 import com.payment.gateway.domain.payment.event.RefundProcessedEvent;
@@ -34,6 +36,7 @@ public class ProcessRefundService implements ProcessRefundUseCase {
 
     private final RefundQueryPort refundQueryPort;
     private final RefundPaymentQueryPort refundPaymentQueryPort;
+    private final MerchantQueryPort merchantQueryPort;
     private final MetricsPort metricsPort;
     private final AuditPort auditPort;
     private final OutboxEventDomainService outboxEventService;
@@ -57,6 +60,13 @@ public class ProcessRefundService implements ProcessRefundUseCase {
         // Validate merchant ownership
         if (!payment.getMerchantId().equals(merchantId)) {
             throw new BusinessException("Payment does not belong to merchant: " + merchantId);
+        }
+
+        // Validate merchant is active
+        Merchant merchant = merchantQueryPort.findById(merchantId)
+                .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
+        if (!merchant.getStatus().canProcessPayments()) {
+            throw new BusinessException("Merchant is not active: " + merchant.getStatus());
         }
 
         // Validate refund amount doesn't exceed payment amount

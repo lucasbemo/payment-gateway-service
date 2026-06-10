@@ -34,6 +34,9 @@ class ResilienceE2ETest extends E2ETestBase {
         merchantId = (String) merchantData.get("id");
         apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
+
+        // Activate merchant so it can process payments
+        getApiClient().activateMerchant(merchantId);
     }
 
     @Test

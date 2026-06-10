@@ -37,6 +37,9 @@ class PaymentProcessingE2ETest extends E2ETestBase {
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
 
+        // Activate merchant so it can process payments
+        getApiClient().activateMerchant(merchantId);
+
         // Register a customer
         var customerData = TestDataFactory.CustomerData.create(merchantId);
         var customerResponse = getApiClient().registerCustomer(
@@ -295,6 +298,38 @@ class PaymentProcessingE2ETest extends E2ETestBase {
 
         Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
         assertThat(((Number) payment.get("amountInCents")).longValue()).isEqualTo(10000L);
+    }
+
+    @Test
+    @DisplayName("E2E: Process payment - Deterministic decline (amount ends in 99)")
+    void testProcessPayment_DeterministicDecline() {
+        // Given: A payment whose amount triggers the stub provider's magic decline rule
+        String idempotencyKey = TestDataFactory.generateIdempotencyKey();
+
+        // When: Processing the payment with amount ending in 99
+        var response = getApiClient().processPayment(
+            merchantId,
+            1099L,
+            "USD",
+            idempotencyKey
+        );
+
+        // Then: The request is rejected with 400
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // And: The FAILED payment was persisted (no rollback for declines)
+        Map<String, Object> paymentRow = jdbcTemplate.queryForMap(
+            "SELECT id, status FROM payments WHERE idempotency_key = ?", idempotencyKey
+        );
+        assertThat(paymentRow.get("status")).isEqualTo("FAILED");
+
+        // And: A PAYMENT_FAILED outbox event was written for the payment
+        String paymentId = (String) paymentRow.get("id");
+        Integer failedEvents = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM outbox_events WHERE aggregate_id = ? AND event_type = 'PAYMENT_FAILED'",
+            Integer.class, paymentId
+        );
+        assertThat(failedEvents).isEqualTo(1);
     }
 
     @Test

@@ -38,6 +38,9 @@ public class SettlementReportDTO {
     @Schema(description = "ISO 4217 currency code", example = "USD")
     private final String currency;
 
+    @Schema(description = "Total transaction amount in cents for the period", example = "100000")
+    private final Long totalAmount;
+
     @Schema(description = "Number of transactions", example = "50")
     private final Integer transactionCount;
 

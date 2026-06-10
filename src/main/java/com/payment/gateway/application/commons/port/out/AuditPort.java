@@ -9,4 +9,6 @@ public interface AuditPort {
     void logSecurityEvent(String eventType, String principal, String resource, String outcome);
     
     void logDataAccess(String entityType, String entityId, String operation, String userId);
+
+    void logWebhookDelivery(String merchantId, String eventType, String webhookUrl, String outcome, int attempts);
 }

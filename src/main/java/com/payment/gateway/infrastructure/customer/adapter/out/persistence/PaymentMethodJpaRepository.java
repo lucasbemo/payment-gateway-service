@@ -18,4 +18,11 @@ public interface PaymentMethodJpaRepository extends JpaRepository<PaymentMethodJ
     Optional<PaymentMethodJpaEntity> findByToken(String token);
 
     List<PaymentMethodJpaEntity> findByCustomerId(String customerId);
+
+    // Read-path variants that exclude soft-deleted (INACTIVE) payment methods
+    Optional<PaymentMethodJpaEntity> findByIdAndStatusNot(String id, PaymentMethodStatus status);
+
+    Optional<PaymentMethodJpaEntity> findByTokenAndStatusNot(String token, PaymentMethodStatus status);
+
+    List<PaymentMethodJpaEntity> findByCustomerIdAndStatusNot(String customerId, PaymentMethodStatus status);
 }

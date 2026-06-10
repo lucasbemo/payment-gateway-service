@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -49,6 +50,18 @@ public class ReconciliationDomainService {
 
         ReconciliationBatch batch = getBatchOrThrow(batchId);
         batch.updateCounts(total, matched, unmatched);
+        return batchRepository.save(batch);
+    }
+
+    public ReconciliationBatch recordReconciliationResults(String batchId, int total, int matched, int discrepancies,
+                                                            BigDecimal totalAmount, BigDecimal matchedAmount) {
+        log.info("Recording reconciliation results for batch {}: total={}, matched={}, discrepancies={}, totalAmount={}, matchedAmount={}",
+                batchId, total, matched, discrepancies, totalAmount, matchedAmount);
+
+        ReconciliationBatch batch = getBatchOrThrow(batchId);
+        batch.updateCounts(total, matched, total - matched);
+        batch.updateAmounts(totalAmount, matchedAmount, totalAmount.subtract(matchedAmount));
+        batch.updateDiscrepancyCount(discrepancies);
         return batchRepository.save(batch);
     }
 

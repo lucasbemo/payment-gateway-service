@@ -130,6 +130,7 @@ public class PaymentRestMapper {
                 .merchantId(response.getMerchantId())
                 .customerId(response.getCustomerId())
                 .paymentMethodId(response.getPaymentMethodId())
+                .transactionId(response.getTransactionId())
                 .amountInCents(response.getAmount())
                 .currency(response.getCurrency())
                 .status(response.getStatus())

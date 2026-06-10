@@ -222,4 +222,43 @@ public interface MerchantApi {
             )
             String id
     );
+
+    @Operation(
+        operationId = "activateMerchant",
+        summary = "Activate merchant",
+        description = "Activates a merchant account. Only active merchants can process payments."
+    )
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Merchant activated successfully",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    name = "Activated Merchant",
+                    value = """
+                        {
+                          "success": true,
+                          "message": "Merchant activated successfully",
+                          "data": {
+                            "id": "merch_abc123",
+                            "status": "ACTIVE"
+                          },
+                          "timestamp": "2026-03-20T12:00:00Z"
+                        }
+                        """
+                )
+            )
+        )
+    })
+    @SecurityRequirement(name = "api-key")
+    ResponseEntity<ApiResponse<MerchantResponse>> activateMerchant(
+            @Parameter(
+                name = "id",
+                description = "Unique merchant identifier",
+                required = true,
+                example = "merch_abc123"
+            )
+            String id
+    );
 }

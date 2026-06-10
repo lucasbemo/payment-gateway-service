@@ -2,6 +2,7 @@ package com.payment.gateway.infrastructure.merchant.adapter.in.rest;
 
 import com.payment.gateway.application.merchant.dto.MerchantResponse;
 import com.payment.gateway.application.merchant.dto.RegisterMerchantCommand;
+import com.payment.gateway.application.merchant.port.in.ActivateMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.GetMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.RegisterMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.SuspendMerchantUseCase;
@@ -31,6 +32,7 @@ public class MerchantController implements MerchantApi {
     private final GetMerchantUseCase getMerchantUseCase;
     private final UpdateMerchantUseCase updateMerchantUseCase;
     private final SuspendMerchantUseCase suspendMerchantUseCase;
+    private final ActivateMerchantUseCase activateMerchantUseCase;
 
     @Override
     @PostMapping
@@ -71,6 +73,14 @@ public class MerchantController implements MerchantApi {
         log.info("Suspending merchant: {}", id);
         var response = suspendMerchantUseCase.suspendMerchant(id);
         return ResponseEntity.ok(ApiResponse.success("Merchant suspended successfully", response));
+    }
+
+    @Override
+    @PostMapping("/{id}/activate")
+    public ResponseEntity<ApiResponse<MerchantResponse>> activateMerchant(@PathVariable String id) {
+        log.info("Activating merchant: {}", id);
+        var response = activateMerchantUseCase.activateMerchant(id);
+        return ResponseEntity.ok(ApiResponse.success("Merchant activated successfully", response));
     }
 
     @Getter
