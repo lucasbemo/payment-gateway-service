@@ -33,8 +33,7 @@ public class MerchantMapper {
                 entity.getApiKeyHash(),
                 entity.getApiSecretHash(),
                 entity.getWebhookUrl(),
-                null
-        );
+                null);
         // Set the ID using reflection since Merchant doesn't have a setter
         try {
             java.lang.reflect.Field idField = Merchant.class.getDeclaredField("id");
@@ -43,7 +42,10 @@ public class MerchantMapper {
 
             java.lang.reflect.Field statusField = Merchant.class.getDeclaredField("status");
             statusField.setAccessible(true);
-            statusField.set(merchant, com.payment.gateway.domain.merchant.model.MerchantStatus.valueOf(entity.getStatus().name()));
+            statusField.set(
+                    merchant,
+                    com.payment.gateway.domain.merchant.model.MerchantStatus.valueOf(
+                            entity.getStatus().name()));
         } catch (Exception e) {
             throw new RuntimeException("Failed to set merchant fields", e);
         }

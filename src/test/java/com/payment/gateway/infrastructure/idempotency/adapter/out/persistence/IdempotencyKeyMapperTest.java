@@ -1,15 +1,14 @@
 package com.payment.gateway.infrastructure.idempotency.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.domain.idempotency.model.IdempotencyKey;
 import com.payment.gateway.domain.idempotency.model.IdempotencyStatus;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class IdempotencyKeyMapperTest {
 
@@ -199,10 +198,8 @@ class IdempotencyKeyMapperTest {
         @Test
         @DisplayName("should preserve key data through toEntity then toDomain")
         void shouldPreserveDataThroughRoundTrip() {
-            IdempotencyKey original = IdempotencyKey.create(
-                    "idem-rt-key", "merchant-rt", "POST",
-                    "request-hash-rt", 3600
-            );
+            IdempotencyKey original =
+                    IdempotencyKey.create("idem-rt-key", "merchant-rt", "POST", "request-hash-rt", 3600);
 
             IdempotencyKeyJpaEntity entity = mapper.toEntity(original);
             IdempotencyKey restored = mapper.toDomain(entity);

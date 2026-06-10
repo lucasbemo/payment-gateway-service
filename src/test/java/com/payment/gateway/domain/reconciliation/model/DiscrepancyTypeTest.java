@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.reconciliation.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("DiscrepancyType Enum Tests")
 class DiscrepancyTypeTest {
@@ -78,8 +78,7 @@ class DiscrepancyTypeTest {
         @Test
         @DisplayName("Should throw exception for invalid type")
         void shouldThrowExceptionForInvalidType() {
-            assertThatThrownBy(() -> DiscrepancyType.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> DiscrepancyType.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -92,16 +91,16 @@ class DiscrepancyTypeTest {
         void shouldReturnAllDiscrepancyTypes() {
             DiscrepancyType[] values = DiscrepancyType.values();
             assertThat(values).hasSize(8);
-            assertThat(values).containsExactlyInAnyOrder(
-                DiscrepancyType.MISSING_IN_GATEWAY,
-                DiscrepancyType.MISSING_IN_SYSTEM,
-                DiscrepancyType.AMOUNT_MISMATCH,
-                DiscrepancyType.STATUS_MISMATCH,
-                DiscrepancyType.CURRENCY_MISMATCH,
-                DiscrepancyType.FEE_MISMATCH,
-                DiscrepancyType.TIMING_DIFFERENCE,
-                DiscrepancyType.DUPLICATE_TRANSACTION
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            DiscrepancyType.MISSING_IN_GATEWAY,
+                            DiscrepancyType.MISSING_IN_SYSTEM,
+                            DiscrepancyType.AMOUNT_MISMATCH,
+                            DiscrepancyType.STATUS_MISMATCH,
+                            DiscrepancyType.CURRENCY_MISMATCH,
+                            DiscrepancyType.FEE_MISMATCH,
+                            DiscrepancyType.TIMING_DIFFERENCE,
+                            DiscrepancyType.DUPLICATE_TRANSACTION);
         }
     }
 }

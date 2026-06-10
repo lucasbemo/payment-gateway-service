@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.application.reconciliation.port.out.ReportGeneratorPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.domain.transaction.model.Transaction;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -16,12 +21,6 @@ import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Settlement report generator that uploads real JSON reports to S3-compatible storage (MinIO).
@@ -42,8 +41,12 @@ public class S3ReportGenerator implements ReportGeneratorPort {
 
     @Override
     public String generateReport(String merchantId, String startDate, String endDate, String format) {
-        log.info("Generating S3 settlement report: merchantId={}, startDate={}, endDate={}, format={}",
-                merchantId, startDate, endDate, format);
+        log.info(
+                "Generating S3 settlement report: merchantId={}, startDate={}, endDate={}, format={}",
+                merchantId,
+                startDate,
+                endDate,
+                format);
 
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
@@ -70,8 +73,8 @@ public class S3ReportGenerator implements ReportGeneratorPort {
         return location;
     }
 
-    private String buildReportContent(String merchantId, String startDate, String endDate,
-                                       List<Transaction> transactions) {
+    private String buildReportContent(
+            String merchantId, String startDate, String endDate, List<Transaction> transactions) {
         Map<String, Object> report = new LinkedHashMap<>();
         report.put("merchantId", merchantId);
 
@@ -80,7 +83,8 @@ public class S3ReportGenerator implements ReportGeneratorPort {
         period.put("endDate", endDate);
         report.put("period", period);
 
-        report.put("transactions", transactions.stream().map(this::toReportEntry).toList());
+        report.put(
+                "transactions", transactions.stream().map(this::toReportEntry).toList());
 
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(report);
@@ -94,16 +98,23 @@ public class S3ReportGenerator implements ReportGeneratorPort {
         entry.put("id", transaction.getId());
         entry.put("paymentId", transaction.getPaymentId());
         entry.put("type", transaction.getType() != null ? transaction.getType().name() : null);
-        entry.put("status", transaction.getStatus() != null ? transaction.getStatus().name() : null);
-        entry.put("amount", transaction.getAmount() != null ? transaction.getAmount().getAmountInCents() : null);
+        entry.put(
+                "status",
+                transaction.getStatus() != null ? transaction.getStatus().name() : null);
+        entry.put(
+                "amount",
+                transaction.getAmount() != null ? transaction.getAmount().getAmountInCents() : null);
         entry.put("currency", transaction.getCurrency());
-        entry.put("createdAt", transaction.getCreatedAt() != null ? transaction.getCreatedAt().toString() : null);
+        entry.put(
+                "createdAt",
+                transaction.getCreatedAt() != null ? transaction.getCreatedAt().toString() : null);
         return entry;
     }
 
     private void ensureBucketExists() {
         try {
-            s3Client.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build());
+            s3Client.createBucket(
+                    CreateBucketRequest.builder().bucket(BUCKET_NAME).build());
             log.info("Created S3 bucket {}", BUCKET_NAME);
         } catch (BucketAlreadyOwnedByYouException | BucketAlreadyExistsException e) {
             log.debug("S3 bucket {} already exists", BUCKET_NAME);

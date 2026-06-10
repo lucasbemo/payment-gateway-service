@@ -1,11 +1,6 @@
 package com.payment.gateway.infrastructure.security.tokenization;
 
 import com.payment.gateway.commons.exception.DomainException;
-import com.payment.gateway.commons.utils.CryptoUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +8,9 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * Service for tokenizing sensitive card data.
@@ -65,14 +63,13 @@ public class TokenizationService {
 
         // Store in vault
         TokenVaultEntity vaultEntry = new TokenVaultEntity(
-            token,
-            cardHash,
-            normalizedCardNumber,
-            extractLastFourDigits(normalizedCardNumber),
-            extractCardBrand(normalizedCardNumber),
-            Instant.now(),
-            true
-        );
+                token,
+                cardHash,
+                normalizedCardNumber,
+                extractLastFourDigits(normalizedCardNumber),
+                extractCardBrand(normalizedCardNumber),
+                Instant.now(),
+                true);
 
         tokenVault.put(token, vaultEntry);
 
@@ -130,12 +127,11 @@ public class TokenizationService {
         }
 
         return new TokenMetadata(
-            token,
-            vaultEntry.getLastFourDigits(),
-            vaultEntry.getCardBrand(),
-            vaultEntry.getCreatedAt(),
-            vaultEntry.isActive()
-        );
+                token,
+                vaultEntry.getLastFourDigits(),
+                vaultEntry.getCardBrand(),
+                vaultEntry.getCreatedAt(),
+                vaultEntry.isActive());
     }
 
     /**
@@ -193,11 +189,11 @@ public class TokenizationService {
 
     private String findTokenByCardHash(String cardHash) {
         return tokenVault.values().stream()
-            .filter(entry -> entry.getCardHash().equals(cardHash))
-            .filter(TokenVaultEntity::isActive)
-            .map(TokenVaultEntity::getToken)
-            .findFirst()
-            .orElse(null);
+                .filter(entry -> entry.getCardHash().equals(cardHash))
+                .filter(TokenVaultEntity::isActive)
+                .map(TokenVaultEntity::getToken)
+                .findFirst()
+                .orElse(null);
     }
 
     private boolean isValidCardNumberFormat(String cardNumber) {
@@ -249,9 +245,9 @@ public class TokenizationService {
     private boolean isAuthorizedForDetokenization(String authorizationContext) {
         // In production, this would verify user permissions/roles
         // For now, we accept specific authorization contexts
-        return "PAYMENT_PROCESSOR".equals(authorizationContext) ||
-               "REFUND_SERVICE".equals(authorizationContext) ||
-               "ADMIN".equals(authorizationContext);
+        return "PAYMENT_PROCESSOR".equals(authorizationContext)
+                || "REFUND_SERVICE".equals(authorizationContext)
+                || "ADMIN".equals(authorizationContext);
     }
 
     private String maskToken(String token) {

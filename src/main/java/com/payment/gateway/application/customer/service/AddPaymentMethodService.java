@@ -6,11 +6,9 @@ import com.payment.gateway.application.customer.port.in.AddPaymentMethodUseCase;
 import com.payment.gateway.application.customer.port.out.CustomerCommandPort;
 import com.payment.gateway.application.customer.port.out.TokenizationServicePort;
 import com.payment.gateway.commons.exception.BusinessException;
-import com.payment.gateway.commons.utils.CryptoUtils;
+import com.payment.gateway.domain.customer.model.CardDetails;
 import com.payment.gateway.domain.customer.model.Customer;
 import com.payment.gateway.domain.customer.model.PaymentMethod;
-import com.payment.gateway.domain.customer.model.CardDetails;
-import com.payment.gateway.domain.customer.model.PaymentMethodType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +24,8 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
     private final CustomerCommandPort customerCommandPort;
     private final TokenizationServicePort tokenizationServicePort;
 
-    public AddPaymentMethodService(CustomerCommandPort customerCommandPort,
-                                   TokenizationServicePort tokenizationServicePort) {
+    public AddPaymentMethodService(
+            CustomerCommandPort customerCommandPort, TokenizationServicePort tokenizationServicePort) {
         this.customerCommandPort = customerCommandPort;
         this.tokenizationServicePort = tokenizationServicePort;
     }
@@ -36,7 +34,8 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
     public CustomerResponse addPaymentMethod(AddPaymentMethodCommand command) {
         log.info("Adding payment method to customer: {}", command.getCustomerId());
 
-        Customer customer = customerCommandPort.findById(command.getCustomerId())
+        Customer customer = customerCommandPort
+                .findById(command.getCustomerId())
                 .orElseThrow(() -> new BusinessException("Customer not found: " + command.getCustomerId()));
 
         // Validate merchant ownership
@@ -49,8 +48,7 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
                 command.getCardNumber(),
                 command.getCardExpiryMonth(),
                 command.getCardExpiryYear(),
-                command.getCardCvv()
-        );
+                command.getCardCvv());
 
         // Create card details
         CardDetails cardDetails = CardDetails.create(
@@ -59,15 +57,10 @@ public class AddPaymentMethodService implements AddPaymentMethodUseCase {
                 cardBrandFromNumber(command.getCardNumber()),
                 Integer.parseInt(command.getCardExpiryMonth()),
                 Integer.parseInt(command.getCardExpiryYear()),
-                command.getCardholderName()
-        );
+                command.getCardholderName());
 
         // Create payment method
-        PaymentMethod paymentMethod = PaymentMethod.createCard(
-                command.getCustomerId(),
-                cardDetails,
-                token
-        );
+        PaymentMethod paymentMethod = PaymentMethod.createCard(command.getCustomerId(), cardDetails, token);
 
         if (Boolean.TRUE.equals(command.getIsDefault())) {
             paymentMethod.markAsDefault();

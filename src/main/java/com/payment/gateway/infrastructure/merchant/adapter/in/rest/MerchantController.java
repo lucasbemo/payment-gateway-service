@@ -60,10 +60,10 @@ public class MerchantController implements MerchantApi {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MerchantResponse>> updateMerchant(
-            @PathVariable String id,
-            @Valid @RequestBody UpdateMerchantRequest request) {
+            @PathVariable String id, @Valid @RequestBody UpdateMerchantRequest request) {
         log.info("Updating merchant: {}", id);
-        var response = updateMerchantUseCase.updateMerchant(id, request.getName(), request.getEmail(), request.getWebhookUrl());
+        var response = updateMerchantUseCase.updateMerchant(
+                id, request.getName(), request.getEmail(), request.getWebhookUrl());
         return ResponseEntity.ok(ApiResponse.success("Merchant updated successfully", response));
     }
 
@@ -90,11 +90,17 @@ public class MerchantController implements MerchantApi {
     @Schema(description = "Request to register a new merchant")
     public static class CreateMerchantRequest {
 
-        @Schema(description = "Merchant display name", example = "Acme Corporation", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "Merchant display name",
+                example = "Acme Corporation",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Name is required")
         private String name;
 
-        @Schema(description = "Merchant email address", example = "contact@acme.com", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "Merchant email address",
+                example = "contact@acme.com",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Email is required")
         private String email;
 

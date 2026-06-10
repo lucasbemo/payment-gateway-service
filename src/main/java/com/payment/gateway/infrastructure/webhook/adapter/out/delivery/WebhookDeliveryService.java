@@ -4,6 +4,8 @@ import com.payment.gateway.application.commons.port.out.AuditPort;
 import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
 import com.payment.gateway.domain.merchant.model.Merchant;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +18,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Outbound adapter that delivers integration events to merchant webhook endpoints.
@@ -46,11 +45,12 @@ public class WebhookDeliveryService implements WebhookDeliveryPort {
     private final int maxAttempts;
     private final long baseBackoffMs;
 
-    public WebhookDeliveryService(MerchantQueryPort merchantQueryPort,
-                                  AuditPort auditPort,
-                                  @Qualifier("webhookRestTemplate") RestTemplate restTemplate,
-                                  @Value("${webhook.delivery.max-attempts:3}") int maxAttempts,
-                                  @Value("${webhook.delivery.base-backoff-ms:1000}") long baseBackoffMs) {
+    public WebhookDeliveryService(
+            MerchantQueryPort merchantQueryPort,
+            AuditPort auditPort,
+            @Qualifier("webhookRestTemplate") RestTemplate restTemplate,
+            @Value("${webhook.delivery.max-attempts:3}") int maxAttempts,
+            @Value("${webhook.delivery.base-backoff-ms:1000}") long baseBackoffMs) {
         this.merchantQueryPort = merchantQueryPort;
         this.auditPort = auditPort;
         this.restTemplate = restTemplate;
@@ -64,8 +64,8 @@ public class WebhookDeliveryService implements WebhookDeliveryPort {
             doDeliver(merchantId, eventType, payloadJson);
         } catch (Exception e) {
             // Webhook delivery must never break event consumption.
-            log.error("Unexpected error during webhook delivery: merchantId={}, eventType={}",
-                    merchantId, eventType, e);
+            log.error(
+                    "Unexpected error during webhook delivery: merchantId={}, eventType={}", merchantId, eventType, e);
         }
     }
 
@@ -77,15 +77,19 @@ public class WebhookDeliveryService implements WebhookDeliveryPort {
 
         Optional<Merchant> merchant = merchantQueryPort.findById(merchantId);
         if (merchant.isEmpty()) {
-            log.debug("Skipping webhook delivery: merchant not found (merchantId={}, eventType={})",
-                    merchantId, eventType);
+            log.debug(
+                    "Skipping webhook delivery: merchant not found (merchantId={}, eventType={})",
+                    merchantId,
+                    eventType);
             return;
         }
 
         String webhookUrl = merchant.get().getWebhookUrl();
         if (webhookUrl == null || webhookUrl.isBlank()) {
-            log.debug("Skipping webhook delivery: merchant has no webhookUrl (merchantId={}, eventType={})",
-                    merchantId, eventType);
+            log.debug(
+                    "Skipping webhook delivery: merchant has no webhookUrl (merchantId={}, eventType={})",
+                    merchantId,
+                    eventType);
             return;
         }
 
@@ -99,29 +103,49 @@ public class WebhookDeliveryService implements WebhookDeliveryPort {
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
                 ResponseEntity<String> response = restTemplate.postForEntity(webhookUrl, request, String.class);
-                log.info("Webhook delivered: merchantId={}, eventType={}, webhookId={}, status={}, attempt={}/{}",
-                        merchantId, eventType, webhookId, response.getStatusCode().value(), attempt, maxAttempts);
+                log.info(
+                        "Webhook delivered: merchantId={}, eventType={}, webhookId={}, status={}, attempt={}/{}",
+                        merchantId,
+                        eventType,
+                        webhookId,
+                        response.getStatusCode().value(),
+                        attempt,
+                        maxAttempts);
                 auditPort.logWebhookDelivery(merchantId, eventType, webhookUrl, "SUCCESS", attempt);
                 return;
             } catch (ResourceAccessException | HttpServerErrorException e) {
                 // I/O error or 5xx: retryable
-                log.warn("Webhook delivery attempt {}/{} failed: merchantId={}, eventType={}, webhookId={}, error={}",
-                        attempt, maxAttempts, merchantId, eventType, webhookId, e.getMessage());
+                log.warn(
+                        "Webhook delivery attempt {}/{} failed: merchantId={}, eventType={}, webhookId={}, error={}",
+                        attempt,
+                        maxAttempts,
+                        merchantId,
+                        eventType,
+                        webhookId,
+                        e.getMessage());
                 if (attempt < maxAttempts && !backoff(baseBackoffMs * attempt)) {
                     break; // interrupted: stop retrying
                 }
             } catch (RestClientException e) {
                 // 4xx or other non-retryable client error: permanent failure
-                log.error("Webhook delivery permanently failed (non-retryable): merchantId={}, eventType={}, "
+                log.error(
+                        "Webhook delivery permanently failed (non-retryable): merchantId={}, eventType={}, "
                                 + "webhookId={}, error={}",
-                        merchantId, eventType, webhookId, e.getMessage());
+                        merchantId,
+                        eventType,
+                        webhookId,
+                        e.getMessage());
                 auditPort.logWebhookDelivery(merchantId, eventType, webhookUrl, "FAILED", attempt);
                 return;
             }
         }
 
-        log.error("Webhook delivery failed after {} attempts: merchantId={}, eventType={}, webhookId={}",
-                maxAttempts, merchantId, eventType, webhookId);
+        log.error(
+                "Webhook delivery failed after {} attempts: merchantId={}, eventType={}, webhookId={}",
+                maxAttempts,
+                merchantId,
+                eventType,
+                webhookId);
         auditPort.logWebhookDelivery(merchantId, eventType, webhookUrl, "FAILED", maxAttempts);
     }
 

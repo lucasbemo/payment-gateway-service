@@ -1,12 +1,11 @@
 package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistence;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Entity
 @Table(name = "discrepancies")
@@ -104,22 +103,85 @@ public class DiscrepancyJpaEntity {
         private Instant createdAt;
         private Instant updatedAt;
 
-        public Builder id(String id) { this.id = id; return this; }
-        public Builder reconciliationBatchId(String reconciliationBatchId) { this.reconciliationBatchId = reconciliationBatchId; return this; }
-        public Builder transactionId(String transactionId) { this.transactionId = transactionId; return this; }
-        public Builder paymentId(String paymentId) { this.paymentId = paymentId; return this; }
-        public Builder discrepancyType(String discrepancyType) { this.discrepancyType = discrepancyType; return this; }
-        public Builder description(String description) { this.description = description; return this; }
-        public Builder expectedAmount(BigDecimal expectedAmount) { this.expectedAmount = expectedAmount; return this; }
-        public Builder actualAmount(BigDecimal actualAmount) { this.actualAmount = actualAmount; return this; }
-        public Builder expectedStatus(String expectedStatus) { this.expectedStatus = expectedStatus; return this; }
-        public Builder actualStatus(String actualStatus) { this.actualStatus = actualStatus; return this; }
-        public Builder resolutionStatus(String resolutionStatus) { this.resolutionStatus = resolutionStatus; return this; }
-        public Builder resolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; return this; }
-        public Builder resolvedBy(String resolvedBy) { this.resolvedBy = resolvedBy; return this; }
-        public Builder resolvedAt(Instant resolvedAt) { this.resolvedAt = resolvedAt; return this; }
-        public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
-        public Builder updatedAt(Instant updatedAt) { this.updatedAt = updatedAt; return this; }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder reconciliationBatchId(String reconciliationBatchId) {
+            this.reconciliationBatchId = reconciliationBatchId;
+            return this;
+        }
+
+        public Builder transactionId(String transactionId) {
+            this.transactionId = transactionId;
+            return this;
+        }
+
+        public Builder paymentId(String paymentId) {
+            this.paymentId = paymentId;
+            return this;
+        }
+
+        public Builder discrepancyType(String discrepancyType) {
+            this.discrepancyType = discrepancyType;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder expectedAmount(BigDecimal expectedAmount) {
+            this.expectedAmount = expectedAmount;
+            return this;
+        }
+
+        public Builder actualAmount(BigDecimal actualAmount) {
+            this.actualAmount = actualAmount;
+            return this;
+        }
+
+        public Builder expectedStatus(String expectedStatus) {
+            this.expectedStatus = expectedStatus;
+            return this;
+        }
+
+        public Builder actualStatus(String actualStatus) {
+            this.actualStatus = actualStatus;
+            return this;
+        }
+
+        public Builder resolutionStatus(String resolutionStatus) {
+            this.resolutionStatus = resolutionStatus;
+            return this;
+        }
+
+        public Builder resolutionNotes(String resolutionNotes) {
+            this.resolutionNotes = resolutionNotes;
+            return this;
+        }
+
+        public Builder resolvedBy(String resolvedBy) {
+            this.resolvedBy = resolvedBy;
+            return this;
+        }
+
+        public Builder resolvedAt(Instant resolvedAt) {
+            this.resolvedAt = resolvedAt;
+            return this;
+        }
+
+        public Builder createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder updatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
 
         public DiscrepancyJpaEntity build() {
             return new DiscrepancyJpaEntity(this);

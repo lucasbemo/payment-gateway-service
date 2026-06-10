@@ -2,12 +2,11 @@ package com.payment.gateway.domain.payment.model;
 
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.Getter;
 
 /**
  * Aggregate Root representing a Payment.
@@ -34,15 +33,16 @@ public class Payment {
     /**
      * Create a new payment.
      */
-    public static Payment create(String merchantId,
-                                  Money amount,
-                                  String currency,
-                                  PaymentMethod paymentMethod,
-                                  String idempotencyKey,
-                                  String description,
-                                  PaymentMetadata metadata,
-                                  List<PaymentItem> items,
-                                  String customerId) {
+    public static Payment create(
+            String merchantId,
+            Money amount,
+            String currency,
+            PaymentMethod paymentMethod,
+            String idempotencyKey,
+            String description,
+            PaymentMetadata metadata,
+            List<PaymentItem> items,
+            String customerId) {
         validatePaymentData(merchantId, amount, currency, paymentMethod, idempotencyKey);
 
         Payment payment = new Payment();
@@ -63,8 +63,8 @@ public class Payment {
         return payment;
     }
 
-    private static void validatePaymentData(String merchantId, Money amount, String currency,
-                                            PaymentMethod paymentMethod, String idempotencyKey) {
+    private static void validatePaymentData(
+            String merchantId, Money amount, String currency, PaymentMethod paymentMethod, String idempotencyKey) {
         if (merchantId == null || merchantId.isBlank()) {
             throw new BusinessException("Merchant ID is required");
         }
@@ -126,8 +126,7 @@ public class Payment {
 
     private void validateTransition(PaymentStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
-            throw new BusinessException(
-                "Cannot transition from " + this.status + " to " + newStatus);
+            throw new BusinessException("Cannot transition from " + this.status + " to " + newStatus);
         }
     }
 

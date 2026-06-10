@@ -1,16 +1,15 @@
 package com.payment.gateway.infrastructure.outbox.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class OutboxEventMapperTest {
 
@@ -171,11 +170,8 @@ class OutboxEventMapperTest {
         @Test
         @DisplayName("should preserve key data through toEntity then toDomain")
         void shouldPreserveDataThroughRoundTrip() {
-            OutboxEvent original = OutboxEvent.create(
-                    "agg-rt", "Payment",
-                    EventType.PAYMENT_COMPLETED,
-                    "{\"status\":\"completed\"}"
-            );
+            OutboxEvent original =
+                    OutboxEvent.create("agg-rt", "Payment", EventType.PAYMENT_COMPLETED, "{\"status\":\"completed\"}");
 
             OutboxEventJpaEntity entity = mapper.toEntity(original);
             OutboxEvent restored = mapper.toDomain(entity);

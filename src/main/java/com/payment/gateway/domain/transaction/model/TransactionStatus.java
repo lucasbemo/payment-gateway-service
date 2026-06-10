@@ -18,7 +18,8 @@ public enum TransactionStatus {
 
     public boolean canTransitionTo(TransactionStatus newStatus) {
         return switch (this) {
-            case PENDING -> Set.of(PROCESSING, AUTHORIZED, CAPTURED, SETTLED, FAILED).contains(newStatus);
+            case PENDING -> Set.of(PROCESSING, AUTHORIZED, CAPTURED, SETTLED, FAILED)
+                    .contains(newStatus);
             case PROCESSING -> Set.of(AUTHORIZED, CAPTURED, SETTLED, FAILED).contains(newStatus);
             case AUTHORIZED -> Set.of(CAPTURED, SETTLED, REVERSED, FAILED).contains(newStatus);
             case CAPTURED -> Set.of(SETTLED, REFUNDED, PARTIALLY_REFUNDED).contains(newStatus);
@@ -39,7 +40,8 @@ public enum TransactionStatus {
     }
 
     public boolean isSuccessful() {
-        return Set.of(AUTHORIZED, CAPTURED, SETTLED, REFUNDED, PARTIALLY_REFUNDED).contains(this);
+        return Set.of(AUTHORIZED, CAPTURED, SETTLED, REFUNDED, PARTIALLY_REFUNDED)
+                .contains(this);
     }
 
     public static TransactionStatus fromString(String value) {

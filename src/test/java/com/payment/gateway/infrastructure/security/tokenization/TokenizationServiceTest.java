@@ -1,12 +1,12 @@
 package com.payment.gateway.infrastructure.security.tokenization;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.exception.DomainException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Comprehensive unit tests for TokenizationService.
@@ -86,10 +86,7 @@ class TokenizationServiceTest {
         @DisplayName("Should throw exception for null card number")
         void shouldThrowExceptionForNullCardNumber() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.tokenize(null)
-            );
+            DomainException exception = assertThrows(DomainException.class, () -> tokenizationService.tokenize(null));
             assertEquals("Card number cannot be null or empty", exception.getMessage());
         }
 
@@ -97,10 +94,7 @@ class TokenizationServiceTest {
         @DisplayName("Should throw exception for empty card number")
         void shouldThrowExceptionForEmptyCardNumber() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.tokenize("")
-            );
+            DomainException exception = assertThrows(DomainException.class, () -> tokenizationService.tokenize(""));
             assertEquals("Card number cannot be null or empty", exception.getMessage());
         }
 
@@ -111,10 +105,8 @@ class TokenizationServiceTest {
             String invalidCardNumber = "1234567890123456";
 
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.tokenize(invalidCardNumber)
-            );
+            DomainException exception =
+                    assertThrows(DomainException.class, () -> tokenizationService.tokenize(invalidCardNumber));
             assertEquals("Invalid card number format", exception.getMessage());
         }
 
@@ -172,9 +164,7 @@ class TokenizationServiceTest {
 
             // When & Then
             DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.detokenize(token, invalidAuthContext)
-            );
+                    DomainException.class, () -> tokenizationService.detokenize(token, invalidAuthContext));
             assertEquals("Unauthorized: insufficient permissions for detokenization", exception.getMessage());
         }
 
@@ -182,10 +172,8 @@ class TokenizationServiceTest {
         @DisplayName("Should throw exception for null token")
         void shouldThrowExceptionForNullToken() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.detokenize(null, "ADMIN")
-            );
+            DomainException exception =
+                    assertThrows(DomainException.class, () -> tokenizationService.detokenize(null, "ADMIN"));
             assertEquals("Token cannot be null or empty", exception.getMessage());
         }
 
@@ -193,10 +181,8 @@ class TokenizationServiceTest {
         @DisplayName("Should throw exception for invalid token")
         void shouldThrowExceptionForInvalidToken() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.detokenize("invalid_token", "ADMIN")
-            );
+            DomainException exception =
+                    assertThrows(DomainException.class, () -> tokenizationService.detokenize("invalid_token", "ADMIN"));
             assertEquals("Invalid token: token not found in vault", exception.getMessage());
         }
 
@@ -209,10 +195,8 @@ class TokenizationServiceTest {
             tokenizationService.deactivateToken(token);
 
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> tokenizationService.detokenize(token, "ADMIN")
-            );
+            DomainException exception =
+                    assertThrows(DomainException.class, () -> tokenizationService.detokenize(token, "ADMIN"));
             assertEquals("Token is no longer active", exception.getMessage());
         }
     }

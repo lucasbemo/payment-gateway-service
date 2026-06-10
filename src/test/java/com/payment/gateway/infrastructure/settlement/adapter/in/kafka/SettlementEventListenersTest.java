@@ -1,14 +1,13 @@
 package com.payment.gateway.infrastructure.settlement.adapter.in.kafka;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for SettlementEventListeners.
@@ -37,8 +36,7 @@ class SettlementEventListenersTest {
                     "merchantId", "merchant_123",
                     "totalAmount", "10000.00",
                     "currency", "USD",
-                    "transactionCount", 100
-            );
+                    "transactionCount", 100);
 
             listeners.onSettlementBatch(event, null);
 
@@ -53,8 +51,7 @@ class SettlementEventListenersTest {
                     "merchantId", "merchant_456",
                     "totalAmount", "1000000.00",
                     "currency", "USD",
-                    "transactionCount", 10000
-            );
+                    "transactionCount", 10000);
 
             listeners.onSettlementBatch(event, null);
 
@@ -68,8 +65,7 @@ class SettlementEventListenersTest {
                     "batchId", "batch_partial",
                     "merchantId", "merchant_789",
                     "totalAmount", "5000.00",
-                    "currency", "USD"
-            );
+                    "currency", "USD");
 
             listeners.onSettlementBatch(event, null);
 

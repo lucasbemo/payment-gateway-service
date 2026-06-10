@@ -74,8 +74,7 @@ class ProdProfileAuthSmokeE2ETest extends ContainerConfig {
     @Test
     @DisplayName("rejects unauthenticated /api/v1 requests with 401")
     void unauthenticatedRequestReturns401() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/v1/merchants/" + merchantId, String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/api/v1/merchants/" + merchantId, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -88,10 +87,7 @@ class ProdProfileAuthSmokeE2ETest extends ContainerConfig {
         headers.set("X-Api-Secret", apiSecret);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/api/v1/merchants/" + merchantId,
-                HttpMethod.GET,
-                new HttpEntity<>(headers),
-                String.class);
+                "/api/v1/merchants/" + merchantId, HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
         assertThat(response.getStatusCode()).isNotEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -100,8 +96,7 @@ class ProdProfileAuthSmokeE2ETest extends ContainerConfig {
     @Test
     @DisplayName("leaves actuator health public")
     void actuatorHealthIsPublic() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/actuator/health", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/health", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }

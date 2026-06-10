@@ -1,11 +1,10 @@
 package com.payment.gateway.infrastructure.payment.adapter.in.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.application.webhook.port.out.WebhookDeliveryPort;
-import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.port.PaymentEventPublisherPort;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +12,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Kafka listeners for payment events.
@@ -43,12 +40,12 @@ public class PaymentEventListeners {
     private String paymentCancelledTopic;
 
     @KafkaListener(
-        topics = "${kafka.topics.payment-created:payment.created}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onPaymentCreated(@Payload Map<String, Object> event,
-                                  @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.payment-created:payment.created}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onPaymentCreated(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received payment.created event: {}", event);
         try {
             String paymentId = (String) event.get("aggregateId");
@@ -65,12 +62,12 @@ public class PaymentEventListeners {
     }
 
     @KafkaListener(
-        topics = "${kafka.topics.payment-completed:payment.completed}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onPaymentCompleted(@Payload Map<String, Object> event,
-                                    @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.payment-completed:payment.completed}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onPaymentCompleted(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received payment.completed event: {}", event);
         try {
             String paymentId = (String) event.get("aggregateId");
@@ -87,12 +84,12 @@ public class PaymentEventListeners {
     }
 
     @KafkaListener(
-        topics = "${kafka.topics.payment-failed:payment.failed}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onPaymentFailed(@Payload Map<String, Object> event,
-                                 @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.payment-failed:payment.failed}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onPaymentFailed(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received payment.failed event: {}", event);
         try {
             String paymentId = (String) event.get("aggregateId");
@@ -110,12 +107,12 @@ public class PaymentEventListeners {
     }
 
     @KafkaListener(
-        topics = "${kafka.topics.payment-cancelled:payment.cancelled}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onPaymentCancelled(@Payload Map<String, Object> event,
-                                    @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.payment-cancelled:payment.cancelled}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onPaymentCancelled(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received payment.cancelled event: {}", event);
         try {
             String paymentId = (String) event.get("aggregateId");
@@ -136,17 +133,19 @@ public class PaymentEventListeners {
         // Add business logic here (e.g., send notification, update analytics, etc.)
     }
 
-    private void handlePaymentCompleted(String paymentId, String providerTransactionId,
-                                         Map<String, Object> event) {
-        log.info("Handling payment completed: paymentId={}, providerTransactionId={}",
-                 paymentId, providerTransactionId);
+    private void handlePaymentCompleted(String paymentId, String providerTransactionId, Map<String, Object> event) {
+        log.info(
+                "Handling payment completed: paymentId={}, providerTransactionId={}", paymentId, providerTransactionId);
         deliverMerchantWebhook("payment.completed", event);
     }
 
-    private void handlePaymentFailed(String paymentId, String errorCode, String errorMessage,
-                                      Map<String, Object> event) {
-        log.info("Handling payment failed: paymentId={}, errorCode={}, errorMessage={}",
-                 paymentId, errorCode, errorMessage);
+    private void handlePaymentFailed(
+            String paymentId, String errorCode, String errorMessage, Map<String, Object> event) {
+        log.info(
+                "Handling payment failed: paymentId={}, errorCode={}, errorMessage={}",
+                paymentId,
+                errorCode,
+                errorMessage);
         deliverMerchantWebhook("payment.failed", event);
     }
 
@@ -162,9 +161,8 @@ public class PaymentEventListeners {
     private void deliverMerchantWebhook(String fallbackEventType, Map<String, Object> event) {
         try {
             String merchantId = (String) event.get("merchantId");
-            String eventType = event.get("eventType") instanceof String type && !type.isBlank()
-                    ? type
-                    : fallbackEventType;
+            String eventType =
+                    event.get("eventType") instanceof String type && !type.isBlank() ? type : fallbackEventType;
             String payloadJson = objectMapper.writeValueAsString(event);
             webhookDeliveryPort.deliver(merchantId, eventType, payloadJson);
         } catch (Exception e) {

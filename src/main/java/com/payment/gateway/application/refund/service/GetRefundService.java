@@ -25,7 +25,8 @@ public class GetRefundService implements GetRefundUseCase {
     public RefundResponse getRefundById(String refundId, String merchantId) {
         log.info("Getting refund by id: {} for merchant: {}", refundId, merchantId);
 
-        Refund refund = refundQueryPort.findById(refundId)
+        Refund refund = refundQueryPort
+                .findById(refundId)
                 .orElseThrow(() -> new BusinessException("Refund not found: " + refundId));
 
         // Validate merchant ownership

@@ -1,10 +1,9 @@
 package com.payment.gateway.domain.payment.event;
 
 import com.payment.gateway.commons.event.IntegrationEvent;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.Map;
+import lombok.Getter;
 
 /**
  * Event published when a payment fails.
@@ -21,8 +20,13 @@ public class PaymentFailedEvent extends IntegrationEvent {
     private final String errorCode;
     private final String errorMessage;
 
-    public PaymentFailedEvent(String aggregateId, String merchantId, String amount,
-                               String currency, String errorCode, String errorMessage) {
+    public PaymentFailedEvent(
+            String aggregateId,
+            String merchantId,
+            String amount,
+            String currency,
+            String errorCode,
+            String errorMessage) {
         super(aggregateId, CURRENT_SCHEMA_VERSION, "PAYMENT_FAILED");
         this.merchantId = merchantId;
         this.amount = amount;
@@ -31,9 +35,16 @@ public class PaymentFailedEvent extends IntegrationEvent {
         this.errorMessage = errorMessage;
     }
 
-    public PaymentFailedEvent(String id, Instant occurredOn, String aggregateId,
-                               String merchantId, String amount, String currency,
-                               String errorCode, String errorMessage, String schemaVersion) {
+    public PaymentFailedEvent(
+            String id,
+            Instant occurredOn,
+            String aggregateId,
+            String merchantId,
+            String amount,
+            String currency,
+            String errorCode,
+            String errorMessage,
+            String schemaVersion) {
         super(id, occurredOn, aggregateId, schemaVersion, "PAYMENT_FAILED");
         this.merchantId = merchantId;
         this.amount = amount;
@@ -59,16 +70,15 @@ public class PaymentFailedEvent extends IntegrationEvent {
         }
 
         PaymentFailedEvent event = new PaymentFailedEvent(
-            (String) map.get("id"),
-            (Instant) map.get("occurredOn"),
-            (String) map.get("aggregateId"),
-            (String) map.get("merchantId"),
-            (String) map.get("amount"),
-            (String) map.get("currency"),
-            (String) map.get("errorCode"),
-            (String) map.get("errorMessage"),
-            schemaVersion
-        );
+                (String) map.get("id"),
+                (Instant) map.get("occurredOn"),
+                (String) map.get("aggregateId"),
+                (String) map.get("merchantId"),
+                (String) map.get("amount"),
+                (String) map.get("currency"),
+                (String) map.get("errorCode"),
+                (String) map.get("errorMessage"),
+                schemaVersion);
 
         if (!CURRENT_SCHEMA_VERSION.equals(schemaVersion)) {
             event = (PaymentFailedEvent) event.migrateFrom(schemaVersion);

@@ -15,10 +15,5 @@ public interface TokenizationServicePort {
      */
     CardData detokenize(String token);
 
-    record CardData(
-        String cardNumber,
-        String expiryMonth,
-        String expiryYear,
-        String cvv
-    ) {}
+    record CardData(String cardNumber, String expiryMonth, String expiryYear, String cvv) {}
 }

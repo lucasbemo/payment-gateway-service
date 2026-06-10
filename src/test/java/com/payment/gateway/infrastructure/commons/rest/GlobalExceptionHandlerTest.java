@@ -1,8 +1,11 @@
 package com.payment.gateway.infrastructure.commons.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.merchant.exception.MerchantNotFoundException;
 import com.payment.gateway.domain.payment.exception.PaymentNotFoundException;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,10 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("GlobalExceptionHandler Tests")
 class GlobalExceptionHandlerTest {
@@ -89,18 +88,15 @@ class GlobalExceptionHandlerTest {
         @Test
         @DisplayName("should return 400 with field errors for MethodArgumentNotValidException")
         void shouldHandleValidationException() throws NoSuchMethodException {
-            BeanPropertyBindingResult bindingResult =
-                    new BeanPropertyBindingResult(new Object(), "testObject");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "testObject");
             bindingResult.addError(new FieldError("testObject", "amount", "must not be null"));
             bindingResult.addError(new FieldError("testObject", "currency", "must not be blank"));
 
-            MethodParameter methodParameter = new MethodParameter(
-                    this.getClass().getDeclaredMethod("shouldHandleValidationException"), -1);
-            MethodArgumentNotValidException ex =
-                    new MethodArgumentNotValidException(methodParameter, bindingResult);
+            MethodParameter methodParameter =
+                    new MethodParameter(this.getClass().getDeclaredMethod("shouldHandleValidationException"), -1);
+            MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
-            ResponseEntity<ApiResponse<Map<String, String>>> response =
-                    handler.handleValidationExceptions(ex);
+            ResponseEntity<ApiResponse<Map<String, String>>> response = handler.handleValidationExceptions(ex);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(response.getBody()).isNotNull();

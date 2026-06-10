@@ -1,14 +1,13 @@
 package com.payment.gateway.infrastructure.merchant.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.domain.merchant.model.Merchant;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MerchantMapperTest {
 
@@ -34,8 +33,7 @@ class MerchantMapperTest {
                     "api-key-hash-123",
                     "api-secret-hash-456",
                     "https://acme.com/webhook",
-                    null
-            );
+                    null);
 
             // when
             MerchantJpaEntity entity = mapper.toEntity(merchant);
@@ -58,14 +56,7 @@ class MerchantMapperTest {
         @DisplayName("should map activated merchant with ACTIVE status")
         void shouldMapActivatedMerchant() {
             Merchant merchant = Merchant.register(
-                    "Active Corp",
-                    "active@example.com",
-                    "test-api-key-2",
-                    "key-hash",
-                    "secret-hash",
-                    null,
-                    null
-            );
+                    "Active Corp", "active@example.com", "test-api-key-2", "key-hash", "secret-hash", null, null);
             merchant.activate();
 
             MerchantJpaEntity entity = mapper.toEntity(merchant);
@@ -128,7 +119,8 @@ class MerchantMapperTest {
 
             Merchant merchant = mapper.toDomain(entity);
 
-            assertThat(merchant.getStatus()).isEqualTo(com.payment.gateway.domain.merchant.model.MerchantStatus.SUSPENDED);
+            assertThat(merchant.getStatus())
+                    .isEqualTo(com.payment.gateway.domain.merchant.model.MerchantStatus.SUSPENDED);
         }
     }
 
@@ -146,8 +138,7 @@ class MerchantMapperTest {
                     "rt-key-hash",
                     "rt-secret-hash",
                     "https://rt.com/webhook",
-                    null
-            );
+                    null);
 
             MerchantJpaEntity entity = mapper.toEntity(original);
             Merchant restored = mapper.toDomain(entity);

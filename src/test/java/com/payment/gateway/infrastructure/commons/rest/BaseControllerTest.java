@@ -1,15 +1,14 @@
 package com.payment.gateway.infrastructure.commons.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("BaseController Tests")
 class BaseControllerTest {
@@ -142,17 +141,16 @@ class BaseControllerTest {
                     .first(true)
                     .last(false)
                     .build();
-            PagedResponse<String> pagedResponse = PagedResponse.of(
-                    List.of("item1", "item2", "item3"), pageInfo);
+            PagedResponse<String> pagedResponse = PagedResponse.of(List.of("item1", "item2", "item3"), pageInfo);
 
-            ResponseEntity<ApiResponse<PagedResponse<String>>> response =
-                    controller.callOkPaged(pagedResponse);
+            ResponseEntity<ApiResponse<PagedResponse<String>>> response = controller.callOkPaged(pagedResponse);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().isSuccess()).isTrue();
             assertThat(response.getBody().getData().getContent()).hasSize(3);
-            assertThat(response.getBody().getData().getPageInfo().getTotalElements()).isEqualTo(25);
+            assertThat(response.getBody().getData().getPageInfo().getTotalElements())
+                    .isEqualTo(25);
         }
     }
 }

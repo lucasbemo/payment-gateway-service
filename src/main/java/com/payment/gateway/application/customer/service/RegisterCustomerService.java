@@ -34,11 +34,7 @@ public class RegisterCustomerService implements RegisterCustomerUseCase {
         }
 
         // Create customer
-        Customer customer = Customer.create(
-                command.getMerchantId(),
-                command.getEmail(),
-                command.getName()
-        );
+        Customer customer = Customer.create(command.getMerchantId(), command.getEmail(), command.getName());
 
         // Set optional fields
         if (command.getPhone() != null && !command.getPhone().isBlank()) {

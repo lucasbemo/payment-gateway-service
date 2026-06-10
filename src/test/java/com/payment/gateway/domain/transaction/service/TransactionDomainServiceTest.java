@@ -1,7 +1,10 @@
 package com.payment.gateway.domain.transaction.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
 import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.domain.transaction.exception.InvalidTransactionStateException;
 import com.payment.gateway.domain.transaction.exception.TransactionNotFoundException;
 import com.payment.gateway.domain.transaction.exception.TransactionProcessingException;
 import com.payment.gateway.domain.transaction.model.Transaction;
@@ -9,6 +12,9 @@ import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
 import com.payment.gateway.domain.transaction.port.TransactionEventPublisherPort;
 import com.payment.gateway.domain.transaction.port.TransactionRepositoryPort;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,14 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TransactionDomainService Tests")
@@ -56,13 +54,13 @@ class TransactionDomainServiceTest {
         @DisplayName("Should create transaction successfully")
         void shouldCreateTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
             // When
             Transaction result = transactionDomainService.createTransaction(
-                PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL"
-            );
+                    PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
 
             // Then
             assertThat(result).isNotNull();
@@ -79,7 +77,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should authorize payment transaction successfully")
         void shouldAuthorizePaymentTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
@@ -96,7 +95,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should authorize authorization transaction successfully")
         void shouldAuthorizeAuthorizationTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.AUTHORIZATION, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.AUTHORIZATION, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
@@ -113,13 +113,14 @@ class TransactionDomainServiceTest {
         @DisplayName("Should throw exception when authorizing non-authorizable transaction")
         void shouldThrowExceptionWhenAuthorizingNonAuthorizableTransaction() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.REFUND, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.REFUND, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
 
             // When & Then
             assertThatThrownBy(() -> transactionDomainService.authorizeTransaction(TRANSACTION_ID))
-                .isInstanceOf(TransactionProcessingException.class)
-                .hasMessageContaining("Cannot authorize transaction of type");
+                    .isInstanceOf(TransactionProcessingException.class)
+                    .hasMessageContaining("Cannot authorize transaction of type");
 
             verify(repository, never()).save(any(Transaction.class));
             verify(eventPublisher, never()).publishTransactionCompleted(any(Transaction.class));
@@ -134,7 +135,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should capture payment transaction successfully")
         void shouldCapturePaymentTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
@@ -151,13 +153,14 @@ class TransactionDomainServiceTest {
         @DisplayName("Should throw exception when capturing non-capturable transaction")
         void shouldThrowExceptionWhenCapturingNonCapturableTransaction() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.REFUND, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.REFUND, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
 
             // When & Then
             assertThatThrownBy(() -> transactionDomainService.captureTransaction(TRANSACTION_ID))
-                .isInstanceOf(TransactionProcessingException.class)
-                .hasMessageContaining("Cannot capture transaction of type");
+                    .isInstanceOf(TransactionProcessingException.class)
+                    .hasMessageContaining("Cannot capture transaction of type");
 
             verify(repository, never()).save(any(Transaction.class));
         }
@@ -171,7 +174,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should settle transaction successfully")
         void shouldSettleTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
@@ -193,7 +197,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should fail transaction with error details")
         void shouldFailTransactionWithErrorDetails() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             String errorCode = "INSUFFICIENT_FUNDS";
             String errorMessage = "Insufficient funds";
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
@@ -217,7 +222,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should reverse transaction successfully")
         void shouldReverseTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             transaction.authorize(); // Must be AUTHORIZED before reverse
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
@@ -240,7 +246,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should fully refund transaction")
         void shouldFullyRefundTransaction() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             transaction.capture(); // Must be CAPTURED before refund
             transaction.settle(); // Or SETTLED
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
@@ -259,7 +266,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should partially refund transaction")
         void shouldPartiallyRefundTransaction() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             transaction.capture(); // Must be CAPTURED before refund
             transaction.settle(); // Or SETTLED
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
@@ -283,7 +291,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should retry pending transaction successfully")
         void shouldRetryPendingTransactionSuccessfully() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
@@ -299,14 +308,15 @@ class TransactionDomainServiceTest {
         @DisplayName("Should throw exception when retrying non-pending transaction")
         void shouldThrowExceptionWhenRetryingNonPendingTransaction() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             transaction.authorize(); // Change status from PENDING
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
 
             // When & Then
             assertThatThrownBy(() -> transactionDomainService.retryTransaction(TRANSACTION_ID))
-                .isInstanceOf(TransactionProcessingException.class)
-                .hasMessageContaining("Cannot retry transaction that is not in pending state");
+                    .isInstanceOf(TransactionProcessingException.class)
+                    .hasMessageContaining("Cannot retry transaction that is not in pending state");
 
             verify(repository, never()).save(any(Transaction.class));
         }
@@ -320,7 +330,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should return transaction when found")
         void shouldReturnTransactionWhenFound() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
 
             // When
@@ -347,7 +358,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should return transaction when found with orThrow method")
         void shouldReturnTransactionWhenFoundWithOrThrowMethod() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
 
             // When
@@ -365,8 +377,8 @@ class TransactionDomainServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> transactionDomainService.getTransactionOrThrow(TRANSACTION_ID))
-                .isInstanceOf(TransactionNotFoundException.class)
-                .hasMessageContaining(TRANSACTION_ID);
+                    .isInstanceOf(TransactionNotFoundException.class)
+                    .hasMessageContaining(TRANSACTION_ID);
         }
     }
 
@@ -378,7 +390,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should return list of transactions by payment ID")
         void shouldReturnListOfTransactionsByPaymentId() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findByPaymentId(PAYMENT_ID)).willReturn(List.of(transaction));
 
             // When
@@ -398,7 +411,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should return list of transactions by merchant ID")
         void shouldReturnListOfTransactionsByMerchantId() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findByMerchantId(MERCHANT_ID)).willReturn(List.of(transaction));
 
             // When
@@ -418,7 +432,8 @@ class TransactionDomainServiceTest {
         @DisplayName("Should return list of transactions by status")
         void shouldReturnListOfTransactionsByStatus() {
             // Given
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findByStatus(TransactionStatus.PENDING)).willReturn(List.of(transaction));
 
             // When
@@ -470,12 +485,14 @@ class TransactionDomainServiceTest {
         void shouldUpdateGatewayTransactionIdSuccessfully() {
             // Given
             String gatewayTransactionId = "gateway_txn_123";
-            Transaction transaction = Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
+            Transaction transaction =
+                    Transaction.create(PAYMENT_ID, MERCHANT_ID, TransactionType.PAYMENT, AMOUNT, "BRL");
             given(repository.findById(TRANSACTION_ID)).willReturn(Optional.of(transaction));
             given(repository.save(any(Transaction.class))).willReturn(transaction);
 
             // When
-            Transaction result = transactionDomainService.updateGatewayTransactionId(TRANSACTION_ID, gatewayTransactionId);
+            Transaction result =
+                    transactionDomainService.updateGatewayTransactionId(TRANSACTION_ID, gatewayTransactionId);
 
             // Then
             assertThat(result).isEqualTo(transaction);

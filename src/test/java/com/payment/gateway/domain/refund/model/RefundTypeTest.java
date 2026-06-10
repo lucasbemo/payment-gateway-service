@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.refund.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("RefundType Enum Tests")
 class RefundTypeTest {
@@ -61,8 +61,7 @@ class RefundTypeTest {
         @Test
         @DisplayName("Should throw exception for invalid type")
         void shouldThrowExceptionForInvalidType() {
-            assertThatThrownBy(() -> RefundType.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> RefundType.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -75,13 +74,13 @@ class RefundTypeTest {
         void shouldReturnAllRefundTypes() {
             RefundType[] values = RefundType.values();
             assertThat(values).hasSize(5);
-            assertThat(values).containsExactlyInAnyOrder(
-                RefundType.FULL,
-                RefundType.PARTIAL,
-                RefundType.MULTIPLE,
-                RefundType.CHARGEBACK,
-                RefundType.CANCELLATION
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            RefundType.FULL,
+                            RefundType.PARTIAL,
+                            RefundType.MULTIPLE,
+                            RefundType.CHARGEBACK,
+                            RefundType.CANCELLATION);
         }
     }
 }

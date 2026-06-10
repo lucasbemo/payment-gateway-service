@@ -1,6 +1,7 @@
 package com.payment.gateway.infrastructure.merchant.adapter.in.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,8 +9,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Kafka listeners for merchant notification events.
@@ -26,12 +25,12 @@ public class MerchantNotificationListeners {
     private String merchantNotificationTopic;
 
     @KafkaListener(
-        topics = "${kafka.topics.merchant-notification:merchant.notification}",
-        groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void onMerchantNotification(@Payload Map<String, Object> event,
-                                        @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
+            topics = "${kafka.topics.merchant-notification:merchant.notification}",
+            groupId = "${spring.kafka.consumer.group-id:payment-gateway-group}",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void onMerchantNotification(
+            @Payload Map<String, Object> event,
+            @Header(value = "kafka_receivedMessageKey", required = false) String receivedKey) {
         log.info("Received merchant.notification event: {}", event);
         try {
             String notificationId = (String) event.get("notificationId");
@@ -49,10 +48,13 @@ public class MerchantNotificationListeners {
         }
     }
 
-    private void handleMerchantNotification(String notificationId, String merchantId,
-                                             String notificationType, String payload) {
-        log.info("Handling merchant notification: notificationId={}, merchantId={}, notificationType={}",
-                 notificationId, merchantId, notificationType);
+    private void handleMerchantNotification(
+            String notificationId, String merchantId, String notificationType, String payload) {
+        log.info(
+                "Handling merchant notification: notificationId={}, merchantId={}, notificationType={}",
+                notificationId,
+                merchantId,
+                notificationType);
         // Add business logic here (e.g., send webhook, email notification, update merchant dashboard, etc.)
     }
 }

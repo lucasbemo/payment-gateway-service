@@ -1,14 +1,13 @@
 package com.payment.gateway.domain.reconciliation.model;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * ReconciliationBatch aggregate root.
@@ -60,8 +59,8 @@ public class ReconciliationBatch {
         return new Builder();
     }
 
-    public static ReconciliationBatch create(String merchantId, LocalDate reconciliationDate,
-                                              String gatewayName, String initiatedBy) {
+    public static ReconciliationBatch create(
+            String merchantId, LocalDate reconciliationDate, String gatewayName, String initiatedBy) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())
@@ -133,8 +132,8 @@ public class ReconciliationBatch {
     }
 
     public boolean isComplete() {
-        return this.status == ReconciliationStatus.COMPLETED ||
-               this.status == ReconciliationStatus.PARTIALLY_RECONCILED;
+        return this.status == ReconciliationStatus.COMPLETED
+                || this.status == ReconciliationStatus.PARTIALLY_RECONCILED;
     }
 
     public static class Builder {

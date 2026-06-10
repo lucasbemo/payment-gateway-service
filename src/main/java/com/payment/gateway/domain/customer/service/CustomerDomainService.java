@@ -7,13 +7,12 @@ import com.payment.gateway.domain.customer.model.CardDetails;
 import com.payment.gateway.domain.customer.model.Customer;
 import com.payment.gateway.domain.customer.model.PaymentMethod;
 import com.payment.gateway.domain.customer.port.CustomerRepositoryPort;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Customer domain service.
@@ -51,8 +50,7 @@ public class CustomerDomainService {
     }
 
     public Customer getCustomerOrThrow(String customerId) {
-        return repository.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException(customerId));
+        return repository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException(customerId));
     }
 
     public Optional<Customer> getCustomer(String customerId) {

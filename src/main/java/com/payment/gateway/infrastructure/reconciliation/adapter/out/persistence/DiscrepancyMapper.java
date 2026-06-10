@@ -4,9 +4,8 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.reconciliation.model.Discrepancy;
 import com.payment.gateway.domain.reconciliation.model.DiscrepancyStatus;
 import com.payment.gateway.domain.reconciliation.model.DiscrepancyType;
-import org.springframework.stereotype.Component;
-
 import java.util.Currency;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DiscrepancyMapper {
@@ -21,9 +20,16 @@ public class DiscrepancyMapper {
                 .paymentId(domain.getMerchantId() != null ? domain.getMerchantId() : "")
                 .discrepancyType(domain.getType() != null ? domain.getType().name() : null)
                 .description(domain.getDescription())
-                .expectedAmount(domain.getSystemAmount() != null ? domain.getSystemAmount().getAmount() : null)
-                .actualAmount(domain.getGatewayAmount() != null ? domain.getGatewayAmount().getAmount() : null)
-                .resolutionStatus(domain.getStatus() != null ? domain.getStatus().name() : DiscrepancyStatus.OPEN.name())
+                .expectedAmount(
+                        domain.getSystemAmount() != null
+                                ? domain.getSystemAmount().getAmount()
+                                : null)
+                .actualAmount(
+                        domain.getGatewayAmount() != null
+                                ? domain.getGatewayAmount().getAmount()
+                                : null)
+                .resolutionStatus(
+                        domain.getStatus() != null ? domain.getStatus().name() : DiscrepancyStatus.OPEN.name())
                 .resolutionNotes(domain.getResolutionNotes())
                 .resolvedBy(domain.getResolvedBy())
                 .resolvedAt(domain.getResolvedAt())
@@ -33,12 +39,10 @@ public class DiscrepancyMapper {
     }
 
     public Discrepancy toDomain(DiscrepancyJpaEntity entity) {
-        Money systemAmount = entity.getExpectedAmount() != null
-                ? Money.of(entity.getExpectedAmount(), DEFAULT_CURRENCY)
-                : null;
-        Money gatewayAmount = entity.getActualAmount() != null
-                ? Money.of(entity.getActualAmount(), DEFAULT_CURRENCY)
-                : null;
+        Money systemAmount =
+                entity.getExpectedAmount() != null ? Money.of(entity.getExpectedAmount(), DEFAULT_CURRENCY) : null;
+        Money gatewayAmount =
+                entity.getActualAmount() != null ? Money.of(entity.getActualAmount(), DEFAULT_CURRENCY) : null;
 
         return Discrepancy.builder()
                 .id(entity.getId())
@@ -46,7 +50,10 @@ public class DiscrepancyMapper {
                 .merchantId(entity.getPaymentId())
                 .transactionId(entity.getTransactionId())
                 .type(entity.getDiscrepancyType() != null ? DiscrepancyType.valueOf(entity.getDiscrepancyType()) : null)
-                .status(entity.getResolutionStatus() != null ? DiscrepancyStatus.valueOf(entity.getResolutionStatus()) : null)
+                .status(
+                        entity.getResolutionStatus() != null
+                                ? DiscrepancyStatus.valueOf(entity.getResolutionStatus())
+                                : null)
                 .systemAmount(systemAmount)
                 .gatewayAmount(gatewayAmount)
                 .description(entity.getDescription())

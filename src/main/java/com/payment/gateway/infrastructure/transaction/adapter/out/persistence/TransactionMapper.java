@@ -4,10 +4,9 @@ import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Currency;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TransactionMapper {
@@ -18,10 +17,19 @@ public class TransactionMapper {
                 .paymentId(transaction.getPaymentId())
                 .merchantId(transaction.getMerchantId())
                 .type(transaction.getType() != null ? transaction.getType().name() : null)
-                .amount(transaction.getAmount() != null ? BigDecimal.valueOf(transaction.getAmount().getAmountInCents()) : BigDecimal.ZERO)
-                .netAmount(transaction.getNetAmount() != null ? BigDecimal.valueOf(transaction.getNetAmount().getAmountInCents()) : null)
+                .amount(
+                        transaction.getAmount() != null
+                                ? BigDecimal.valueOf(transaction.getAmount().getAmountInCents())
+                                : BigDecimal.ZERO)
+                .netAmount(
+                        transaction.getNetAmount() != null
+                                ? BigDecimal.valueOf(transaction.getNetAmount().getAmountInCents())
+                                : null)
                 .currency(transaction.getCurrency())
-                .status(transaction.getStatus() != null ? transaction.getStatus().name() : null)
+                .status(
+                        transaction.getStatus() != null
+                                ? transaction.getStatus().name()
+                                : null)
                 .gatewayTransactionId(transaction.getGatewayTransactionId())
                 .errorCode(transaction.getErrorCode())
                 .errorMessage(transaction.getErrorMessage())
@@ -38,9 +46,8 @@ public class TransactionMapper {
         Money amount = entity.getAmount() != null
                 ? Money.of(entity.getAmount().longValueExact(), currency)
                 : Money.zero(currency);
-        Money netAmount = entity.getNetAmount() != null
-                ? Money.of(entity.getNetAmount().longValueExact(), currency)
-                : null;
+        Money netAmount =
+                entity.getNetAmount() != null ? Money.of(entity.getNetAmount().longValueExact(), currency) : null;
 
         return Transaction.builder()
                 .id(entity.getId())

@@ -2,17 +2,16 @@ package com.payment.gateway.infrastructure.payment.adapter.out.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.gateway.domain.payment.port.PaymentEventPublisherPort;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Kafka adapter for publishing payment events.
@@ -30,8 +29,8 @@ public class KafkaPaymentEventPublisher implements PaymentEventPublisherPort {
     private String paymentEventsTopic;
 
     @Override
-    public void publishPaymentCreated(String paymentId, String merchantId, String amount,
-                                      String currency, String idempotencyKey) {
+    public void publishPaymentCreated(
+            String paymentId, String merchantId, String amount, String currency, String idempotencyKey) {
         Map<String, Object> event = createBaseEvent("PAYMENT_CREATED", paymentId, merchantId);
         event.put("amount", amount);
         event.put("currency", currency);
@@ -40,8 +39,8 @@ public class KafkaPaymentEventPublisher implements PaymentEventPublisherPort {
     }
 
     @Override
-    public void publishPaymentCompleted(String paymentId, String merchantId, String amount,
-                                        String currency, String providerTransactionId) {
+    public void publishPaymentCompleted(
+            String paymentId, String merchantId, String amount, String currency, String providerTransactionId) {
         Map<String, Object> event = createBaseEvent("PAYMENT_COMPLETED", paymentId, merchantId);
         event.put("amount", amount);
         event.put("currency", currency);
@@ -50,8 +49,13 @@ public class KafkaPaymentEventPublisher implements PaymentEventPublisherPort {
     }
 
     @Override
-    public void publishPaymentFailed(String paymentId, String merchantId, String amount,
-                                     String currency, String errorCode, String errorMessage) {
+    public void publishPaymentFailed(
+            String paymentId,
+            String merchantId,
+            String amount,
+            String currency,
+            String errorCode,
+            String errorMessage) {
         Map<String, Object> event = createBaseEvent("PAYMENT_FAILED", paymentId, merchantId);
         event.put("amount", amount);
         event.put("currency", currency);
@@ -68,8 +72,13 @@ public class KafkaPaymentEventPublisher implements PaymentEventPublisherPort {
     }
 
     @Override
-    public void publishRefundProcessed(String refundId, String paymentId, String merchantId,
-                                       String refundAmount, String currency, String refundType) {
+    public void publishRefundProcessed(
+            String refundId,
+            String paymentId,
+            String merchantId,
+            String refundAmount,
+            String currency,
+            String refundType) {
         Map<String, Object> event = createBaseEvent("REFUND_PROCESSED", refundId, merchantId);
         event.put("paymentId", paymentId);
         event.put("refundAmount", refundAmount);
@@ -96,7 +105,8 @@ public class KafkaPaymentEventPublisher implements PaymentEventPublisherPort {
             if (ex != null) {
                 log.error("Failed to publish payment event: {}", event.get("eventType"), ex);
             } else {
-                log.debug("Successfully published payment event: {} to topic {} partition {} offset {}",
+                log.debug(
+                        "Successfully published payment event: {} to topic {} partition {} offset {}",
                         event.get("eventType"),
                         result.getRecordMetadata().topic(),
                         result.getRecordMetadata().partition(),

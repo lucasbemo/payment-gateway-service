@@ -11,11 +11,5 @@ public interface TransactionCommandPort {
     String createTransaction(CreateTransactionCommand command);
 
     record CreateTransactionCommand(
-        String paymentId,
-        String merchantId,
-        String type,
-        Long amount,
-        String currency,
-        String status
-    ) {}
+            String paymentId, String merchantId, String type, Long amount, String currency, String status) {}
 }

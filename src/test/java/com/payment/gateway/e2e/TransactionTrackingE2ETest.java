@@ -1,15 +1,14 @@
 package com.payment.gateway.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.e2e.testdata.TestDataFactory;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E2E tests for transaction tracking.
@@ -23,14 +22,13 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         cleanupDatabase();
 
         // Register a merchant
-        var merchantResponse = getApiClient().registerMerchant(
-            TestDataFactory.MerchantData.create().name,
-            TestDataFactory.MerchantData.create().email,
-            null
-        );
+        var merchantResponse = getApiClient()
+                .registerMerchant(
+                        TestDataFactory.MerchantData.create().name, TestDataFactory.MerchantData.create().email, null);
         assertThat(merchantResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String, Object> merchantData = (Map<String, Object>) merchantResponse.getBody().get("data");
+        Map<String, Object> merchantData =
+                (Map<String, Object>) merchantResponse.getBody().get("data");
         merchantId = (String) merchantData.get("id");
         String apiKey = (String) merchantData.get("apiKey");
         setApiKey(apiKey);
@@ -47,12 +45,9 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
         // When: Processing the payment
-        var response = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var response = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
         // Then: Payment is processed
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -71,22 +66,17 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-        var paymentResponse = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // Get transaction ID from database
         String transactionId = jdbcTemplate.queryForObject(
-            "SELECT id FROM transactions WHERE payment_id = ?",
-            String.class,
-            paymentId
-        );
+                "SELECT id FROM transactions WHERE payment_id = ?", String.class, paymentId);
 
         // When: Getting transaction by ID
         var response = getApiClient().getTransaction(transactionId, merchantId);
@@ -104,19 +94,13 @@ class TransactionTrackingE2ETest extends E2ETestBase {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
             var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-            getApiClient().processPayment(
-                paymentData.merchantId,
-                paymentData.amountInCents,
-                paymentData.currency,
-                idempotencyKey
-            );
+            getApiClient()
+                    .processPayment(
+                            paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
         }
 
         // When: Getting all transactions for the merchant (via payment join)
-        var response = restTemplate.getForEntity(
-            "/api/v1/transactions?merchant_id=" + merchantId,
-            Map.class
-        );
+        var response = restTemplate.getForEntity("/api/v1/transactions?merchant_id=" + merchantId, Map.class);
 
         // Then: Transactions are returned
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -137,23 +121,18 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
         var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-        var paymentResponse = getApiClient().processPayment(
-            paymentData.merchantId,
-            paymentData.amountInCents,
-            paymentData.currency,
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient()
+                .processPayment(
+                        paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
         String paymentStatus = (String) payment.get("status");
 
         // When: Getting transaction from database
         String transactionStatus = jdbcTemplate.queryForObject(
-            "SELECT status FROM transactions WHERE payment_id = ?",
-            String.class,
-            paymentId
-        );
+                "SELECT status FROM transactions WHERE payment_id = ?", String.class, paymentId);
 
         // Then: Transaction status matches payment status
         assertThat(transactionStatus).isEqualTo(paymentStatus);
@@ -170,14 +149,12 @@ class TransactionTrackingE2ETest extends E2ETestBase {
             String idempotencyKey = TestDataFactory.generateIdempotencyKey();
             var paymentData = TestDataFactory.PaymentData.create(merchantId);
 
-            var response = getApiClient().processPayment(
-                paymentData.merchantId,
-                paymentData.amountInCents,
-                paymentData.currency,
-                idempotencyKey
-            );
+            var response = getApiClient()
+                    .processPayment(
+                            paymentData.merchantId, paymentData.amountInCents, paymentData.currency, idempotencyKey);
 
-            Map<String, Object> payment = (Map<String, Object>) response.getBody().get("data");
+            Map<String, Object> payment =
+                    (Map<String, Object>) response.getBody().get("data");
             paymentIds.add((String) payment.get("id"));
 
             // Small delay to ensure different timestamps
@@ -190,10 +167,9 @@ class TransactionTrackingE2ETest extends E2ETestBase {
 
         // When: Querying transactions by created_at (via payment join for merchant)
         List<String> orderedIds = jdbcTemplate.queryForList(
-            "SELECT t.payment_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE p.merchant_id = ? ORDER BY t.created_at ASC",
-            String.class,
-            merchantId
-        );
+                "SELECT t.payment_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE p.merchant_id = ? ORDER BY t.created_at ASC",
+                String.class,
+                merchantId);
 
         // Then: Transactions are in chronological order
         assertThat(orderedIds).hasSize(numPayments);
@@ -207,22 +183,15 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         Long amount = 25000L; // $250.00
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            amount,
-            "USD",
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient().processPayment(merchantId, amount, "USD", idempotencyKey);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // When: Getting transaction amount from database
         Long transactionAmount = jdbcTemplate.queryForObject(
-            "SELECT amount FROM transactions WHERE payment_id = ?",
-            Long.class,
-            paymentId
-        );
+                "SELECT amount FROM transactions WHERE payment_id = ?", Long.class, paymentId);
 
         // Then: Transaction amount matches payment amount
         assertThat(transactionAmount).isEqualTo(amount);
@@ -235,22 +204,15 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         String currency = "EUR";
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            currency,
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient().processPayment(merchantId, 10000L, currency, idempotencyKey);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // When: Getting transaction currency from database
         String transactionCurrency = jdbcTemplate.queryForObject(
-            "SELECT currency FROM transactions WHERE payment_id = ?",
-            String.class,
-            paymentId
-        );
+                "SELECT currency FROM transactions WHERE payment_id = ?", String.class, paymentId);
 
         // Then: Transaction currency matches payment currency
         assertThat(transactionCurrency).isEqualTo(currency);
@@ -262,22 +224,15 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         // Given: A payment transaction
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // When: Getting transaction type from database
         String transactionType = jdbcTemplate.queryForObject(
-            "SELECT type FROM transactions WHERE payment_id = ?",
-            String.class,
-            paymentId
-        );
+                "SELECT type FROM transactions WHERE payment_id = ?", String.class, paymentId);
 
         // Then: Transaction type is SALE (for payment)
         assertThat(transactionType).isNotNull();
@@ -289,22 +244,17 @@ class TransactionTrackingE2ETest extends E2ETestBase {
         // Given: A payment for a specific merchant
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
 
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey
-        );
+        var paymentResponse = getApiClient().processPayment(merchantId, 10000L, "USD", idempotencyKey);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // When: Getting transaction merchant_id from database (via payment join)
         String transactionMerchantId = jdbcTemplate.queryForObject(
-            "SELECT p.merchant_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE t.payment_id = ?",
-            String.class,
-            paymentId
-        );
+                "SELECT p.merchant_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE t.payment_id = ?",
+                String.class,
+                paymentId);
 
         // Then: Transaction is associated with correct merchant
         assertThat(transactionMerchantId).isEqualTo(merchantId);
@@ -315,38 +265,32 @@ class TransactionTrackingE2ETest extends E2ETestBase {
     void testTransactionWithCustomerReference() {
         // Given: A customer
         var customerData = TestDataFactory.CustomerData.create(merchantId);
-        var customerResponse = getApiClient().registerCustomer(
-            customerData.merchantId,
-            customerData.email,
-            customerData.name,
-            customerData.phone,
-            customerData.externalId
-        );
+        var customerResponse = getApiClient()
+                .registerCustomer(
+                        customerData.merchantId,
+                        customerData.email,
+                        customerData.name,
+                        customerData.phone,
+                        customerData.externalId);
 
-        Map<String, Object> customer = (Map<String, Object>) customerResponse.getBody().get("data");
+        Map<String, Object> customer =
+                (Map<String, Object>) customerResponse.getBody().get("data");
         String customerId = (String) customer.get("id");
 
         // And: A payment for that customer
         String idempotencyKey = TestDataFactory.generateIdempotencyKey();
-        var paymentResponse = getApiClient().processPayment(
-            merchantId,
-            10000L,
-            "USD",
-            idempotencyKey,
-            "Payment with customer",
-            customerId,
-            null
-        );
+        var paymentResponse = getApiClient()
+                .processPayment(merchantId, 10000L, "USD", idempotencyKey, "Payment with customer", customerId, null);
 
-        Map<String, Object> payment = (Map<String, Object>) paymentResponse.getBody().get("data");
+        Map<String, Object> payment =
+                (Map<String, Object>) paymentResponse.getBody().get("data");
         String paymentId = (String) payment.get("id");
 
         // When: Getting transaction customer_id from database (via payment join)
         String transactionCustomerId = jdbcTemplate.queryForObject(
-            "SELECT p.customer_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE t.payment_id = ?",
-            String.class,
-            paymentId
-        );
+                "SELECT p.customer_id FROM transactions t JOIN payments p ON t.payment_id = p.id WHERE t.payment_id = ?",
+                String.class,
+                paymentId);
 
         // Then: Transaction references the customer
         assertThat(transactionCustomerId).isEqualTo(customerId);

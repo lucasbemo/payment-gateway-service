@@ -1,11 +1,10 @@
 package com.payment.gateway.infrastructure.config;
 
+import java.time.Clock;
+import java.time.ZoneId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import java.time.Clock;
-import java.time.ZoneId;
 
 /**
  * Configuration for environment and time-related beans.

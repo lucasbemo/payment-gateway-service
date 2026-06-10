@@ -2,12 +2,11 @@ package com.payment.gateway.infrastructure.payment.adapter.out.persistence;
 
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.*;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 
 /**
  * Mapper between Payment domain model and PaymentJpaEntity.
@@ -73,23 +72,23 @@ public class PaymentMapper {
     public Payment toDomain(PaymentJpaEntity entity) {
         Money amount = Money.of(
                 entity.getAmount() != null ? entity.getAmount().longValueExact() : 0L,
-                Currency.getInstance(entity.getCurrency())
-        );
+                Currency.getInstance(entity.getCurrency()));
 
-        List<PaymentItem> items = entity.getItems() != null ?
-                entity.getItems().stream().map(this::entityToItem).collect(Collectors.toList()) : null;
+        List<PaymentItem> items = entity.getItems() != null
+                ? entity.getItems().stream().map(this::entityToItem).collect(Collectors.toList())
+                : null;
 
         Payment payment = Payment.create(
                 entity.getMerchantId(),
                 amount,
                 entity.getCurrency(),
-                PaymentMethod.valueOf(entity.getPaymentMethodId() != null ? entity.getPaymentMethodId() : "CREDIT_CARD"),
+                PaymentMethod.valueOf(
+                        entity.getPaymentMethodId() != null ? entity.getPaymentMethodId() : "CREDIT_CARD"),
                 entity.getIdempotencyKey(),
                 entity.getDescription(),
                 PaymentMetadata.empty(),
                 items,
-                entity.getCustomerId()
-        );
+                entity.getCustomerId());
 
         // Set the ID using reflection since Payment doesn't have a setter
         setId(payment, entity.getId());
@@ -119,12 +118,9 @@ public class PaymentMapper {
     private PaymentItem entityToItem(PaymentItemJpaEntity entity) {
         Money unitPrice = Money.of(
                 entity.getUnitPrice() != null ? entity.getUnitPrice().longValueExact() : 0L,
-                Currency.getInstance("USD")
-        );
+                Currency.getInstance("USD"));
         Money total = Money.of(
-                entity.getTotal() != null ? entity.getTotal().longValueExact() : 0L,
-                Currency.getInstance("USD")
-        );
+                entity.getTotal() != null ? entity.getTotal().longValueExact() : 0L, Currency.getInstance("USD"));
         return new PaymentItem(entity.getDescription(), entity.getQuantity(), unitPrice, total);
     }
 

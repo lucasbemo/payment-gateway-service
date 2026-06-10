@@ -4,13 +4,12 @@ import com.payment.gateway.application.reconciliation.port.out.ReconciliationBat
 import com.payment.gateway.domain.reconciliation.model.ReconciliationBatch;
 import com.payment.gateway.domain.reconciliation.model.ReconciliationStatus;
 import com.payment.gateway.domain.reconciliation.port.ReconciliationBatchRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -58,8 +57,10 @@ public class ReconciliationPersistenceAdapter implements ReconciliationBatchPort
     }
 
     @Override
-    public Optional<ReconciliationBatch> findByMerchantIdAndGatewayNameAndDate(String merchantId, String gatewayName, LocalDate date) {
-        return reconciliationJpaRepository.findByMerchantIdAndGatewayNameAndReconciliationDate(merchantId, gatewayName, date)
+    public Optional<ReconciliationBatch> findByMerchantIdAndGatewayNameAndDate(
+            String merchantId, String gatewayName, LocalDate date) {
+        return reconciliationJpaRepository
+                .findByMerchantIdAndGatewayNameAndReconciliationDate(merchantId, gatewayName, date)
                 .map(reconciliationMapper::toDomain);
     }
 

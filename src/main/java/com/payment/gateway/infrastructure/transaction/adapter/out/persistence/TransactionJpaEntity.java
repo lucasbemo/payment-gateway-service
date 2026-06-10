@@ -1,12 +1,11 @@
 package com.payment.gateway.infrastructure.transaction.adapter.out.persistence;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Entity
 @Table(name = "transactions")
@@ -99,21 +98,80 @@ public class TransactionJpaEntity {
         private Instant updatedAt;
         private Instant processedAt;
 
-        public Builder id(String id) { this.id = id; return this; }
-        public Builder paymentId(String paymentId) { this.paymentId = paymentId; return this; }
-        public Builder merchantId(String merchantId) { this.merchantId = merchantId; return this; }
-        public Builder type(String type) { this.type = type; return this; }
-        public Builder amount(BigDecimal amount) { this.amount = amount; return this; }
-        public Builder netAmount(BigDecimal netAmount) { this.netAmount = netAmount; return this; }
-        public Builder currency(String currency) { this.currency = currency; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder gatewayTransactionId(String gatewayTransactionId) { this.gatewayTransactionId = gatewayTransactionId; return this; }
-        public Builder errorCode(String errorCode) { this.errorCode = errorCode; return this; }
-        public Builder errorMessage(String errorMessage) { this.errorMessage = errorMessage; return this; }
-        public Builder retryCount(Integer retryCount) { this.retryCount = retryCount; return this; }
-        public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
-        public Builder updatedAt(Instant updatedAt) { this.updatedAt = updatedAt; return this; }
-        public Builder processedAt(Instant processedAt) { this.processedAt = processedAt; return this; }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder paymentId(String paymentId) {
+            this.paymentId = paymentId;
+            return this;
+        }
+
+        public Builder merchantId(String merchantId) {
+            this.merchantId = merchantId;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder amount(BigDecimal amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public Builder netAmount(BigDecimal netAmount) {
+            this.netAmount = netAmount;
+            return this;
+        }
+
+        public Builder currency(String currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder gatewayTransactionId(String gatewayTransactionId) {
+            this.gatewayTransactionId = gatewayTransactionId;
+            return this;
+        }
+
+        public Builder errorCode(String errorCode) {
+            this.errorCode = errorCode;
+            return this;
+        }
+
+        public Builder errorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+            return this;
+        }
+
+        public Builder retryCount(Integer retryCount) {
+            this.retryCount = retryCount;
+            return this;
+        }
+
+        public Builder createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder updatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public Builder processedAt(Instant processedAt) {
+            this.processedAt = processedAt;
+            return this;
+        }
 
         public TransactionJpaEntity build() {
             return new TransactionJpaEntity(this);

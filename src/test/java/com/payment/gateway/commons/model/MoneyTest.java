@@ -1,12 +1,10 @@
 package com.payment.gateway.commons.model;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Currency;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for Money value object.
@@ -44,26 +42,17 @@ class MoneyTest {
 
     @Test
     void shouldThrowExceptionWhenAmountIsNull() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> Money.of(null, USD)
-        );
+        assertThrows(IllegalArgumentException.class, () -> Money.of(null, USD));
     }
 
     @Test
     void shouldThrowExceptionWhenAmountIsNegative() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> Money.of(new BigDecimal("-10.00"), USD)
-        );
+        assertThrows(IllegalArgumentException.class, () -> Money.of(new BigDecimal("-10.00"), USD));
     }
 
     @Test
     void shouldThrowExceptionWhenCurrencyIsNull() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> Money.of(new BigDecimal("100.00"), null)
-        );
+        assertThrows(IllegalArgumentException.class, () -> Money.of(new BigDecimal("100.00"), null));
     }
 
     @Test
@@ -82,10 +71,7 @@ class MoneyTest {
         Money money1 = Money.of(10000, USD);
         Money money2 = Money.of(5000, EUR);
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> money1.add(money2)
-        );
+        assertThrows(IllegalArgumentException.class, () -> money1.add(money2));
     }
 
     @Test
@@ -104,10 +90,7 @@ class MoneyTest {
         Money money1 = Money.of(5000, USD);
         Money money2 = Money.of(10000, USD);
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> money1.subtract(money2)
-        );
+        assertThrows(IllegalArgumentException.class, () -> money1.subtract(money2));
     }
 
     @Test
@@ -124,10 +107,7 @@ class MoneyTest {
     void shouldNotMultiplyWithNegativeMultiplier() {
         Money money = Money.of(10000, USD);
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> money.multiply(new BigDecimal("-1"))
-        );
+        assertThrows(IllegalArgumentException.class, () -> money.multiply(new BigDecimal("-1")));
     }
 
     @Test
@@ -147,10 +127,7 @@ class MoneyTest {
         Money money1 = Money.of(10000, USD);
         Money money2 = Money.of(5000, EUR);
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> money1.isGreaterThan(money2)
-        );
+        assertThrows(IllegalArgumentException.class, () -> money1.isGreaterThan(money2));
     }
 
     @Test

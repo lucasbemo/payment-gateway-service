@@ -1,13 +1,12 @@
 package com.payment.gateway.domain.reconciliation.model;
 
 import com.payment.gateway.commons.model.Money;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * Discrepancy aggregate root.
@@ -55,8 +54,8 @@ public class Discrepancy {
         return new Builder();
     }
 
-    public static Discrepancy create(String batchId, String merchantId, DiscrepancyType type,
-                                      String transactionId, String description) {
+    public static Discrepancy create(
+            String batchId, String merchantId, DiscrepancyType type, String transactionId, String description) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())

@@ -2,17 +2,16 @@ package com.payment.gateway.domain.payment.service;
 
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
+import com.payment.gateway.domain.payment.exception.DuplicatePaymentException;
 import com.payment.gateway.domain.payment.model.Payment;
+import com.payment.gateway.domain.payment.model.PaymentItem;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentMethod;
-import com.payment.gateway.domain.payment.model.PaymentItem;
 import com.payment.gateway.domain.payment.port.PaymentRepositoryPort;
-import com.payment.gateway.domain.payment.exception.DuplicatePaymentException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Domain service for Payment operations.
@@ -27,15 +26,16 @@ public class PaymentDomainService {
     /**
      * Process a new payment.
      */
-    public Payment processPayment(String merchantId,
-                                   Money amount,
-                                   String currency,
-                                   PaymentMethod paymentMethod,
-                                   String idempotencyKey,
-                                   String description,
-                                   PaymentMetadata metadata,
-                                   List<PaymentItem> items,
-                                   String customerId) {
+    public Payment processPayment(
+            String merchantId,
+            Money amount,
+            String currency,
+            PaymentMethod paymentMethod,
+            String idempotencyKey,
+            String description,
+            PaymentMetadata metadata,
+            List<PaymentItem> items,
+            String customerId) {
         // Check for duplicate payment
         if (paymentRepository.existsByIdempotencyKey(idempotencyKey)) {
             throw new DuplicatePaymentException(idempotencyKey);
@@ -43,16 +43,7 @@ public class PaymentDomainService {
 
         // Create and save payment
         Payment payment = Payment.create(
-            merchantId,
-            amount,
-            currency,
-            paymentMethod,
-            idempotencyKey,
-            description,
-            metadata,
-            items,
-            customerId
-        );
+                merchantId, amount, currency, paymentMethod, idempotencyKey, description, metadata, items, customerId);
 
         return paymentRepository.save(payment);
     }
@@ -61,16 +52,18 @@ public class PaymentDomainService {
      * Get payment by ID.
      */
     public Payment getPayment(String paymentId) {
-        return paymentRepository.findById(paymentId)
-            .orElseThrow(() -> new BusinessException("Payment not found: " + paymentId));
+        return paymentRepository
+                .findById(paymentId)
+                .orElseThrow(() -> new BusinessException("Payment not found: " + paymentId));
     }
 
     /**
      * Get payment by idempotency key.
      */
     public Payment getPaymentByIdempotencyKey(String idempotencyKey) {
-        return paymentRepository.findByIdempotencyKey(idempotencyKey)
-            .orElseThrow(() -> new BusinessException("Payment not found for idempotency key: " + idempotencyKey));
+        return paymentRepository
+                .findByIdempotencyKey(idempotencyKey)
+                .orElseThrow(() -> new BusinessException("Payment not found for idempotency key: " + idempotencyKey));
     }
 
     /**

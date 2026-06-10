@@ -1,18 +1,6 @@
 package com.payment.gateway.e2e.testdata;
 
-import com.payment.gateway.domain.customer.model.Customer;
-import com.payment.gateway.domain.merchant.model.Merchant;
-import com.payment.gateway.domain.merchant.model.MerchantConfiguration;
-import com.payment.gateway.domain.merchant.model.MerchantStatus;
-import com.payment.gateway.domain.payment.model.PaymentMethod;
-import com.payment.gateway.domain.payment.model.PaymentMetadata;
-import com.payment.gateway.domain.payment.model.PaymentStatus;
-import com.payment.gateway.infrastructure.customer.adapter.in.rest.CustomerController;
-import com.payment.gateway.infrastructure.merchant.adapter.in.rest.MerchantController;
 import com.payment.gateway.infrastructure.payment.adapter.in.rest.CreatePaymentRequest;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -41,10 +29,7 @@ public class TestDataFactory {
         public static MerchantData create() {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
             return new MerchantData(
-                "Test Merchant " + uuid,
-                "test-" + uuid + "@example.com",
-                "https://webhook.site/" + uuid
-            );
+                    "Test Merchant " + uuid, "test-" + uuid + "@example.com", "https://webhook.site/" + uuid);
         }
 
         public static MerchantData create(String name, String email) {
@@ -71,12 +56,11 @@ public class TestDataFactory {
         public static CustomerData create(String merchantId) {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
             return new CustomerData(
-                merchantId,
-                "customer-" + uuid + "@example.com",
-                "Test Customer " + uuid,
-                "+1-555-0100",
-                "ext-" + uuid
-            );
+                    merchantId,
+                    "customer-" + uuid + "@example.com",
+                    "Test Customer " + uuid,
+                    "+1-555-0100",
+                    "ext-" + uuid);
         }
     }
 
@@ -90,9 +74,14 @@ public class TestDataFactory {
         public final String idempotencyKey;
         public final List<CreatePaymentRequest.PaymentItemRequest> items;
 
-        public PaymentData(String merchantId, Long amountInCents, String currency,
-                          String customerId, String description, String idempotencyKey,
-                          List<CreatePaymentRequest.PaymentItemRequest> items) {
+        public PaymentData(
+                String merchantId,
+                Long amountInCents,
+                String currency,
+                String customerId,
+                String description,
+                String idempotencyKey,
+                List<CreatePaymentRequest.PaymentItemRequest> items) {
             this.merchantId = merchantId;
             this.amountInCents = amountInCents;
             this.currency = currency;
@@ -105,43 +94,32 @@ public class TestDataFactory {
         public static PaymentData create(String merchantId) {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
             return new PaymentData(
-                merchantId,
-                10000L, // $100.00
-                "USD",
-                null,
-                "Test payment " + uuid,
-                uuid,
-                null
-            );
+                    merchantId,
+                    10000L, // $100.00
+                    "USD",
+                    null,
+                    "Test payment " + uuid,
+                    uuid,
+                    null);
         }
 
         public static PaymentData createWithCustomer(String merchantId, String customerId) {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
             return new PaymentData(
-                merchantId,
-                15000L, // $150.00
-                "USD",
-                customerId,
-                "Test payment with customer " + uuid,
-                uuid,
-                Arrays.asList(
-                    new CreatePaymentRequest.PaymentItemRequest("Item 1", 2, 5000L),
-                    new CreatePaymentRequest.PaymentItemRequest("Item 2", 1, 5000L)
-                )
-            );
+                    merchantId,
+                    15000L, // $150.00
+                    "USD",
+                    customerId,
+                    "Test payment with customer " + uuid,
+                    uuid,
+                    Arrays.asList(
+                            new CreatePaymentRequest.PaymentItemRequest("Item 1", 2, 5000L),
+                            new CreatePaymentRequest.PaymentItemRequest("Item 2", 1, 5000L)));
         }
 
         public static PaymentData createWithAmount(String merchantId, Long amountInCents) {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
-            return new PaymentData(
-                merchantId,
-                amountInCents,
-                "USD",
-                null,
-                "Test payment " + uuid,
-                uuid,
-                null
-            );
+            return new PaymentData(merchantId, amountInCents, "USD", null, "Test payment " + uuid, uuid, null);
         }
     }
 
@@ -153,8 +131,8 @@ public class TestDataFactory {
         public final String idempotencyKey;
         public final String reason;
 
-        public RefundData(String paymentId, String merchantId, Long amountInCents,
-                         String idempotencyKey, String reason) {
+        public RefundData(
+                String paymentId, String merchantId, Long amountInCents, String idempotencyKey, String reason) {
             this.paymentId = paymentId;
             this.merchantId = merchantId;
             this.amountInCents = amountInCents;
@@ -165,23 +143,16 @@ public class TestDataFactory {
         public static RefundData create(String paymentId, String merchantId) {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
             return new RefundData(
-                paymentId,
-                merchantId,
-                10000L, // $100.00
-                "refund-" + uuid,
-                "Customer requested refund"
-            );
+                    paymentId,
+                    merchantId,
+                    10000L, // $100.00
+                    "refund-" + uuid,
+                    "Customer requested refund");
         }
 
         public static RefundData createWithAmount(String paymentId, String merchantId, Long amountInCents) {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
-            return new RefundData(
-                paymentId,
-                merchantId,
-                amountInCents,
-                "refund-" + uuid,
-                "Partial refund"
-            );
+            return new RefundData(paymentId, merchantId, amountInCents, "refund-" + uuid, "Partial refund");
         }
     }
 

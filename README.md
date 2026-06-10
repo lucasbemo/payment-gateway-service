@@ -299,13 +299,19 @@ This approach:
 
 ### Code Style
 
-```bash
-# Validate code style
-./mvnw spotless:check
+Formatting is automated with **Spotless** (palantir-java-format) and **enforced in CI** —
+the `Code Quality` job fails if code is unformatted. Run `spotless:apply` before committing.
 
-# Auto-format code
+```bash
+# Auto-format code (or: make format)
 ./mvnw spotless:apply
+
+# Validate formatting — what CI runs (or: make validate)
+./mvnw spotless:check
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#code-formatting-spotless) for the formatter,
+pre-commit hook, and IDE setup.
 
 ---
 

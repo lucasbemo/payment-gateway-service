@@ -8,15 +8,14 @@ import com.payment.gateway.application.transaction.port.out.TransactionQueryPort
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.reconciliation.model.SettlementReport;
 import com.payment.gateway.domain.transaction.model.Transaction;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for generating settlement reports.
@@ -30,18 +29,24 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
     private final SettlementReportPort settlementReportPort;
     private final TransactionQueryPort transactionQueryPort;
 
-    public GenerateSettlementReportService(ReportGeneratorPort reportGeneratorPort,
-                                           SettlementReportPort settlementReportPort,
-                                           TransactionQueryPort transactionQueryPort) {
+    public GenerateSettlementReportService(
+            ReportGeneratorPort reportGeneratorPort,
+            SettlementReportPort settlementReportPort,
+            TransactionQueryPort transactionQueryPort) {
         this.reportGeneratorPort = reportGeneratorPort;
         this.settlementReportPort = settlementReportPort;
         this.transactionQueryPort = transactionQueryPort;
     }
 
     @Override
-    public SettlementReportDTO generateSettlementReport(String merchantId, String startDate, String endDate, String format) {
-        log.info("Generating settlement report for merchant: {} from {} to {} in {} format",
-                merchantId, startDate, endDate, format);
+    public SettlementReportDTO generateSettlementReport(
+            String merchantId, String startDate, String endDate, String format) {
+        log.info(
+                "Generating settlement report for merchant: {} from {} to {} in {} format",
+                merchantId,
+                startDate,
+                endDate,
+                format);
 
         // Validate date range
         LocalDate start = LocalDate.parse(startDate);
@@ -83,8 +88,11 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
 
         SettlementReport savedReport = settlementReportPort.saveReport(report);
 
-        log.info("Settlement report generated: {} ({} transactions, {} cents)",
-                savedReport.getId(), transactionCount, totalAmount);
+        log.info(
+                "Settlement report generated: {} ({} transactions, {} cents)",
+                savedReport.getId(),
+                transactionCount,
+                totalAmount);
 
         return mapToResponse(savedReport, totalAmount);
     }
@@ -96,14 +104,16 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
                 .gatewayName(report.getGatewayName())
                 .settlementDate(report.getSettlementDate().toString())
                 .gatewayReportId(report.getGatewayReportId())
-                .grossAmount(report.getGrossAmount() != null ? report.getGrossAmount().getAmountInCents() : null)
+                .grossAmount(
+                        report.getGrossAmount() != null
+                                ? report.getGrossAmount().getAmountInCents()
+                                : null)
                 .feeAmount(report.getFeeAmount() != null ? report.getFeeAmount().getAmountInCents() : null)
                 .netAmount(report.getNetAmount() != null ? report.getNetAmount().getAmountInCents() : null)
                 .currency(report.getCurrency())
                 .totalAmount(totalAmount)
                 .transactionCount(report.getTransactionCount())
                 .filePath(report.getFilePath())
-
                 .createdAt(report.getCreatedAt())
                 .build();
     }

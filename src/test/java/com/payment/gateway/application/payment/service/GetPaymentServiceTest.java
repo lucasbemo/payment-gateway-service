@@ -1,14 +1,24 @@
 package com.payment.gateway.application.payment.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.payment.dto.PaymentResponse;
 import com.payment.gateway.application.payment.port.out.PaymentQueryPort;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
-import com.payment.gateway.domain.transaction.model.Transaction;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.payment.model.Payment;
 import com.payment.gateway.domain.payment.model.PaymentMetadata;
 import com.payment.gateway.domain.payment.model.PaymentStatus;
+import com.payment.gateway.domain.transaction.model.Transaction;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,17 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Get Payment Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -137,8 +136,7 @@ class GetPaymentServiceTest {
                 "Test payment",
                 PaymentMetadata.empty(),
                 List.of(),
-                null
-        );
+                null);
         setId(payment, id);
         return payment;
     }

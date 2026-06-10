@@ -1,7 +1,6 @@
 package com.payment.gateway.domain.transaction.service;
 
 import com.payment.gateway.commons.model.Money;
-import com.payment.gateway.domain.transaction.exception.InvalidTransactionStateException;
 import com.payment.gateway.domain.transaction.exception.TransactionNotFoundException;
 import com.payment.gateway.domain.transaction.exception.TransactionProcessingException;
 import com.payment.gateway.domain.transaction.model.Transaction;
@@ -9,13 +8,12 @@ import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
 import com.payment.gateway.domain.transaction.port.TransactionEventPublisherPort;
 import com.payment.gateway.domain.transaction.port.TransactionRepositoryPort;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Transaction domain service.
@@ -30,8 +28,8 @@ public class TransactionDomainService {
     private final TransactionRepositoryPort repository;
     private final TransactionEventPublisherPort eventPublisher;
 
-    public Transaction createTransaction(String paymentId, String merchantId, TransactionType type,
-                                          Money amount, String currency) {
+    public Transaction createTransaction(
+            String paymentId, String merchantId, TransactionType type, Money amount, String currency) {
         log.info("Creating {} transaction for payment {} with amount {}", type, paymentId, amount);
 
         Transaction transaction = Transaction.create(paymentId, merchantId, type, amount, currency);
@@ -46,11 +44,9 @@ public class TransactionDomainService {
 
         Transaction transaction = getTransactionOrThrow(transactionId);
 
-        if (transaction.getType() != TransactionType.AUTHORIZATION &&
-            transaction.getType() != TransactionType.PAYMENT) {
-            throw new TransactionProcessingException(
-                "Cannot authorize transaction of type: " + transaction.getType()
-            );
+        if (transaction.getType() != TransactionType.AUTHORIZATION
+                && transaction.getType() != TransactionType.PAYMENT) {
+            throw new TransactionProcessingException("Cannot authorize transaction of type: " + transaction.getType());
         }
 
         transaction.authorize();
@@ -65,11 +61,8 @@ public class TransactionDomainService {
 
         Transaction transaction = getTransactionOrThrow(transactionId);
 
-        if (transaction.getType() != TransactionType.CAPTURE &&
-            transaction.getType() != TransactionType.PAYMENT) {
-            throw new TransactionProcessingException(
-                "Cannot capture transaction of type: " + transaction.getType()
-            );
+        if (transaction.getType() != TransactionType.CAPTURE && transaction.getType() != TransactionType.PAYMENT) {
+            throw new TransactionProcessingException("Cannot capture transaction of type: " + transaction.getType());
         }
 
         transaction.capture();
@@ -136,8 +129,7 @@ public class TransactionDomainService {
 
         if (!transaction.isPending()) {
             throw new TransactionProcessingException(
-                "Cannot retry transaction that is not in pending state: " + transaction.getStatus()
-            );
+                    "Cannot retry transaction that is not in pending state: " + transaction.getStatus());
         }
 
         transaction.incrementRetry();
@@ -149,8 +141,7 @@ public class TransactionDomainService {
     }
 
     public Transaction getTransactionOrThrow(String transactionId) {
-        return repository.findById(transactionId)
-                .orElseThrow(() -> new TransactionNotFoundException(transactionId));
+        return repository.findById(transactionId).orElseThrow(() -> new TransactionNotFoundException(transactionId));
     }
 
     public List<Transaction> getTransactionsByPaymentId(String paymentId) {

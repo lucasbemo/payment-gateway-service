@@ -1,12 +1,18 @@
 package com.payment.gateway.application.transaction.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+
 import com.payment.gateway.application.transaction.dto.TransactionResponse;
 import com.payment.gateway.application.transaction.port.out.TransactionQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
 import com.payment.gateway.domain.transaction.model.Transaction;
-import com.payment.gateway.domain.transaction.model.TransactionStatus;
 import com.payment.gateway.domain.transaction.model.TransactionType;
+import java.lang.reflect.Field;
+import java.util.Currency;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,14 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Currency;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
 @DisplayName("Get Transaction Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -88,12 +86,7 @@ class GetTransactionServiceTest {
 
     private Transaction createTransaction(String id, String paymentId, String merchantId) {
         Transaction transaction = Transaction.create(
-                paymentId,
-                merchantId,
-                TransactionType.PAYMENT,
-                Money.of(10000L, Currency.getInstance("USD")),
-                "USD"
-        );
+                paymentId, merchantId, TransactionType.PAYMENT, Money.of(10000L, Currency.getInstance("USD")), "USD");
         setId(transaction, id);
         return transaction;
     }

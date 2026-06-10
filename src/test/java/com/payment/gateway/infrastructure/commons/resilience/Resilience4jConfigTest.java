@@ -1,5 +1,7 @@
 package com.payment.gateway.infrastructure.commons.resilience;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -17,20 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Tests for Resilience4j configuration including Circuit Breaker, Retry, Rate Limiter,
  * Bulkhead, and Time Limiter patterns.
  */
 @DisplayName("Resilience4j Configuration Tests")
-@SpringBootTest(classes = {
-        CircuitBreakerConfig.class,
-        RetryConfig.class,
-        RateLimiterConfig.class,
-        BulkheadConfig.class,
-        TimeLimiterConfig.class
-})
+@SpringBootTest(
+        classes = {
+            CircuitBreakerConfig.class,
+            RetryConfig.class,
+            RateLimiterConfig.class,
+            BulkheadConfig.class,
+            TimeLimiterConfig.class
+        })
 @ActiveProfiles("test")
 class Resilience4jConfigTest {
 
@@ -59,9 +60,12 @@ class Resilience4jConfigTest {
             CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("paymentProvider");
 
             assertThat(circuitBreaker).isNotNull();
-            assertThat(circuitBreaker.getCircuitBreakerConfig().getFailureRateThreshold()).isEqualTo(50f);
-            assertThat(circuitBreaker.getCircuitBreakerConfig().getSlidingWindowSize()).isEqualTo(10);
-            assertThat(circuitBreaker.getCircuitBreakerConfig().getMinimumNumberOfCalls()).isEqualTo(5);
+            assertThat(circuitBreaker.getCircuitBreakerConfig().getFailureRateThreshold())
+                    .isEqualTo(50f);
+            assertThat(circuitBreaker.getCircuitBreakerConfig().getSlidingWindowSize())
+                    .isEqualTo(10);
+            assertThat(circuitBreaker.getCircuitBreakerConfig().getMinimumNumberOfCalls())
+                    .isEqualTo(5);
         }
 
         @Test

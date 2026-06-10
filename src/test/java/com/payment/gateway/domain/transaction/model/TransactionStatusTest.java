@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.transaction.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("TransactionStatus Enum Tests")
 class TransactionStatusTest {
@@ -16,49 +16,57 @@ class TransactionStatusTest {
         @Test
         @DisplayName("PENDING can transition to PROCESSING")
         void pendingCanTransitionToProcessing() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.PROCESSING)).isTrue();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.PROCESSING))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to AUTHORIZED")
         void pendingCanTransitionToAuthorized() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.AUTHORIZED)).isTrue();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.AUTHORIZED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to CAPTURED")
         void pendingCanTransitionToCaptured() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.CAPTURED)).isTrue();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.CAPTURED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to SETTLED")
         void pendingCanTransitionToSettled() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.SETTLED)).isTrue();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.SETTLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING can transition to FAILED")
         void pendingCanTransitionToFailed() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.FAILED)).isTrue();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING cannot transition to REVERSED")
         void pendingCannotTransitionToReversed() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.REVERSED)).isFalse();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.REVERSED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("PENDING cannot transition to REFUNDED")
         void pendingCannotTransitionToRefunded() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.REFUNDED)).isFalse();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.REFUNDED))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("PENDING cannot transition to PARTIALLY_REFUNDED")
         void pendingCannotTransitionToPartiallyRefunded() {
-            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.PARTIALLY_REFUNDED)).isFalse();
+            assertThat(TransactionStatus.PENDING.canTransitionTo(TransactionStatus.PARTIALLY_REFUNDED))
+                    .isFalse();
         }
     }
 
@@ -69,37 +77,43 @@ class TransactionStatusTest {
         @Test
         @DisplayName("PROCESSING can transition to AUTHORIZED")
         void processingCanTransitionToAuthorized() {
-            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.AUTHORIZED)).isTrue();
+            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.AUTHORIZED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING can transition to CAPTURED")
         void processingCanTransitionToCaptured() {
-            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.CAPTURED)).isTrue();
+            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.CAPTURED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING can transition to SETTLED")
         void processingCanTransitionToSettled() {
-            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.SETTLED)).isTrue();
+            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.SETTLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING can transition to FAILED")
         void processingCanTransitionToFailed() {
-            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.FAILED)).isTrue();
+            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PROCESSING cannot transition to PENDING")
         void processingCannotTransitionToPending() {
-            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.PENDING)).isFalse();
+            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.PENDING))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("PROCESSING cannot transition to REVERSED")
         void processingCannotTransitionToReversed() {
-            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.REVERSED)).isFalse();
+            assertThat(TransactionStatus.PROCESSING.canTransitionTo(TransactionStatus.REVERSED))
+                    .isFalse();
         }
     }
 
@@ -110,31 +124,36 @@ class TransactionStatusTest {
         @Test
         @DisplayName("AUTHORIZED can transition to CAPTURED")
         void authorizedCanTransitionToCaptured() {
-            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.CAPTURED)).isTrue();
+            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.CAPTURED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED can transition to SETTLED")
         void authorizedCanTransitionToSettled() {
-            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.SETTLED)).isTrue();
+            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.SETTLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED can transition to REVERSED")
         void authorizedCanTransitionToReversed() {
-            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.REVERSED)).isTrue();
+            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.REVERSED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED can transition to FAILED")
         void authorizedCanTransitionToFailed() {
-            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.FAILED)).isTrue();
+            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.FAILED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("AUTHORIZED cannot transition to REFUNDED")
         void authorizedCannotTransitionToRefunded() {
-            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.REFUNDED)).isFalse();
+            assertThat(TransactionStatus.AUTHORIZED.canTransitionTo(TransactionStatus.REFUNDED))
+                    .isFalse();
         }
     }
 
@@ -145,27 +164,33 @@ class TransactionStatusTest {
         @Test
         @DisplayName("CAPTURED can transition to SETTLED")
         void capturedCanTransitionToSettled() {
-            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.SETTLED)).isTrue();
+            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.SETTLED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("CAPTURED can transition to REFUNDED")
         void capturedCanTransitionToRefunded() {
-            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.REFUNDED)).isTrue();
+            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.REFUNDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("CAPTURED can transition to PARTIALLY_REFUNDED")
         void capturedCanTransitionToPartiallyRefunded() {
-            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.PARTIALLY_REFUNDED)).isTrue();
+            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.PARTIALLY_REFUNDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("CAPTURED cannot transition to other statuses")
         void capturedCannotTransitionToOtherStatuses() {
-            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.PENDING)).isFalse();
-            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.AUTHORIZED)).isFalse();
-            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.REVERSED)).isFalse();
+            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.PENDING))
+                    .isFalse();
+            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.AUTHORIZED))
+                    .isFalse();
+            assertThat(TransactionStatus.CAPTURED.canTransitionTo(TransactionStatus.REVERSED))
+                    .isFalse();
         }
     }
 
@@ -176,21 +201,26 @@ class TransactionStatusTest {
         @Test
         @DisplayName("SETTLED can transition to REFUNDED")
         void settledCanTransitionToRefunded() {
-            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.REFUNDED)).isTrue();
+            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.REFUNDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("SETTLED can transition to PARTIALLY_REFUNDED")
         void settledCanTransitionToPartiallyRefunded() {
-            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.PARTIALLY_REFUNDED)).isTrue();
+            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.PARTIALLY_REFUNDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("SETTLED cannot transition to other statuses")
         void settledCannotTransitionToOtherStatuses() {
-            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.PENDING)).isFalse();
-            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.CAPTURED)).isFalse();
-            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.REVERSED)).isFalse();
+            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.PENDING))
+                    .isFalse();
+            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.CAPTURED))
+                    .isFalse();
+            assertThat(TransactionStatus.SETTLED.canTransitionTo(TransactionStatus.REVERSED))
+                    .isFalse();
         }
     }
 
@@ -201,15 +231,19 @@ class TransactionStatusTest {
         @Test
         @DisplayName("PARTIALLY_REFUNDED can transition to REFUNDED")
         void partiallyRefundedCanTransitionToRefunded() {
-            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.REFUNDED)).isTrue();
+            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.REFUNDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PARTIALLY_REFUNDED cannot transition to other statuses")
         void partiallyRefundedCannotTransitionToOtherStatuses() {
-            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.PENDING)).isFalse();
-            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.CAPTURED)).isFalse();
-            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.SETTLED)).isFalse();
+            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.PENDING))
+                    .isFalse();
+            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.CAPTURED))
+                    .isFalse();
+            assertThat(TransactionStatus.PARTIALLY_REFUNDED.canTransitionTo(TransactionStatus.SETTLED))
+                    .isFalse();
         }
     }
 

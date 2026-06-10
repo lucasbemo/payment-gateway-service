@@ -1,5 +1,7 @@
 package com.payment.gateway.infrastructure.commons.logging;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("CorrelationIdInterceptor Tests")
 class CorrelationIdInterceptorTest {
@@ -53,8 +53,7 @@ class CorrelationIdInterceptorTest {
             interceptor.preHandle(request, response, handler);
 
             String correlationId = MDC.get(CorrelationIdInterceptor.CORRELATION_ID_MDC_KEY);
-            assertThat(correlationId).matches(
-                    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+            assertThat(correlationId).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
         }
 
         @Test

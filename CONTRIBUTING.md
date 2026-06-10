@@ -176,7 +176,7 @@ Then create a Pull Request on GitHub.
 ### 5. PR Requirements
 
 - [ ] All tests pass
-- [ ] Code follows style guidelines
+- [ ] Code is formatted (`./mvnw spotless:check` passes — see [Code Formatting](#code-formatting-spotless))
 - [ ] Documentation updated (if needed)
 - [ ] PR description is clear
 - [ ] Linked to relevant issues
@@ -202,6 +202,55 @@ Then create a Pull Request on GitHub.
   - Methods/Variables: `camelCase`
   - Constants: `SCREAMING_SNAKE_CASE`
   - Packages: `lowercase`
+
+### Code Formatting (Spotless)
+
+Formatting is **automated and enforced in CI** — the `Code Quality` job runs
+`spotless:check` and **fails the build** if any file is not formatted. Format your code
+before committing:
+
+```bash
+# Auto-format all Java sources (src/main + src/test)
+./mvnw spotless:apply        # or: make format
+
+# Verify formatting without modifying files (this is what CI runs)
+./mvnw spotless:check        # or: make validate
+```
+
+The formatter is **[palantir-java-format](https://github.com/palantir/palantir-java-format)**,
+configured via the `spotless-maven-plugin` in `pom.xml`. It also removes unused imports and
+normalises trailing whitespace and final newlines. Its defaults (4-space indentation,
+120-column lines, organised imports without wildcards) match the conventions above, so
+**`spotless:apply` is the source of truth — don't hand-format**.
+
+**Tip:** add a Git pre-commit hook so you never push unformatted code:
+
+```bash
+echo './mvnw -q spotless:apply' > .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+**Editor setup (format on save):**
+
+- **IntelliJ IDEA** — install the **palantir-java-format** plugin (Settings → Plugins), then
+  enable *Settings → Tools → Actions on Save → Reformat code*.
+- **VS Code** — VS Code's built-in Java formatter is Eclipse-based and does **not** match
+  palantir-java-format, so don't rely on it. Run `make format` before committing, or install
+  the **Run on Save** (`emeraldwalk.runonsave`) extension and add to `.vscode/settings.json`:
+
+  ```json
+  {
+    "[java]": { "editor.formatOnSave": false },
+    "emeraldwalk.runonsave": {
+      "commands": [
+        { "match": "\\.java$", "cmd": "./mvnw -q spotless:apply -DspotlessFiles=${file}" }
+      ]
+    }
+  }
+  ```
+
+  `-DspotlessFiles=${file}` formats only the saved file to keep it fast, and disabling the
+  built-in Java formatter stops it from fighting Spotless.
 
 ### Architecture
 

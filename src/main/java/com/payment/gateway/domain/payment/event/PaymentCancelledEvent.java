@@ -1,10 +1,9 @@
 package com.payment.gateway.domain.payment.event;
 
 import com.payment.gateway.commons.event.IntegrationEvent;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.Map;
+import lombok.Getter;
 
 /**
  * Event published when a payment is cancelled.
@@ -24,8 +23,8 @@ public class PaymentCancelledEvent extends IntegrationEvent {
         this.reason = reason;
     }
 
-    public PaymentCancelledEvent(String id, Instant occurredOn, String aggregateId,
-                                  String merchantId, String reason, String schemaVersion) {
+    public PaymentCancelledEvent(
+            String id, Instant occurredOn, String aggregateId, String merchantId, String reason, String schemaVersion) {
         super(id, occurredOn, aggregateId, schemaVersion, "PAYMENT_CANCELLED");
         this.merchantId = merchantId;
         this.reason = reason;
@@ -45,13 +44,12 @@ public class PaymentCancelledEvent extends IntegrationEvent {
         }
 
         PaymentCancelledEvent event = new PaymentCancelledEvent(
-            (String) map.get("id"),
-            (Instant) map.get("occurredOn"),
-            (String) map.get("aggregateId"),
-            (String) map.get("merchantId"),
-            (String) map.get("reason"),
-            schemaVersion
-        );
+                (String) map.get("id"),
+                (Instant) map.get("occurredOn"),
+                (String) map.get("aggregateId"),
+                (String) map.get("merchantId"),
+                (String) map.get("reason"),
+                schemaVersion);
 
         if (!CURRENT_SCHEMA_VERSION.equals(schemaVersion)) {
             event = (PaymentCancelledEvent) event.migrateFrom(schemaVersion);

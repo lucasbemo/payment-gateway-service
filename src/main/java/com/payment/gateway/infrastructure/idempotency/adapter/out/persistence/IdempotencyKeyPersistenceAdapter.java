@@ -2,10 +2,9 @@ package com.payment.gateway.infrastructure.idempotency.adapter.out.persistence;
 
 import com.payment.gateway.domain.idempotency.model.IdempotencyKey;
 import com.payment.gateway.domain.idempotency.port.IdempotencyKeyRepositoryPort;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -23,14 +22,12 @@ public class IdempotencyKeyPersistenceAdapter implements IdempotencyKeyRepositor
 
     @Override
     public Optional<IdempotencyKey> findByIdempotencyKey(String idempotencyKey) {
-        return idempotencyKeyJpaRepository.findByKeyHash(idempotencyKey)
-                .map(idempotencyKeyMapper::toDomain);
+        return idempotencyKeyJpaRepository.findByKeyHash(idempotencyKey).map(idempotencyKeyMapper::toDomain);
     }
 
     @Override
     public Optional<IdempotencyKey> findById(String id) {
-        return idempotencyKeyJpaRepository.findById(id)
-                .map(idempotencyKeyMapper::toDomain);
+        return idempotencyKeyJpaRepository.findById(id).map(idempotencyKeyMapper::toDomain);
     }
 
     @Override

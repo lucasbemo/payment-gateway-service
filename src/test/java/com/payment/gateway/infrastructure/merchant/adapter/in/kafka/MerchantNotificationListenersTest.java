@@ -1,14 +1,13 @@
 package com.payment.gateway.infrastructure.merchant.adapter.in.kafka;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for MerchantNotificationListeners.
@@ -36,8 +35,7 @@ class MerchantNotificationListenersTest {
                     "notificationId", "notif_001",
                     "merchantId", "merchant_123",
                     "notificationType", "PAYMENT_RECEIVED",
-                    "payload", "{\"paymentId\":\"pay_123\",\"amount\":100.00}"
-            );
+                    "payload", "{\"paymentId\":\"pay_123\",\"amount\":100.00}");
 
             listeners.onMerchantNotification(event, null);
 
@@ -51,8 +49,7 @@ class MerchantNotificationListenersTest {
                     "notificationId", "notif_002",
                     "merchantId", "merchant_456",
                     "notificationType", "PAYMENT_COMPLETED",
-                    "payload", "{\"status\":\"completed\"}"
-            );
+                    "payload", "{\"status\":\"completed\"}");
 
             listeners.onMerchantNotification(event, null);
 
@@ -66,8 +63,7 @@ class MerchantNotificationListenersTest {
                     "notificationId", "notif_003",
                     "merchantId", "merchant_789",
                     "notificationType", "SETTLEMENT_COMPLETED",
-                    "payload", "{\"batchId\":\"batch_001\"}"
-            );
+                    "payload", "{\"batchId\":\"batch_001\"}");
 
             listeners.onMerchantNotification(event, null);
 
@@ -80,8 +76,7 @@ class MerchantNotificationListenersTest {
             Map<String, Object> event = Map.of(
                     "notificationId", "notif_004",
                     "merchantId", "merchant_000",
-                    "notificationType", "GENERIC"
-            );
+                    "notificationType", "GENERIC");
 
             listeners.onMerchantNotification(event, null);
 

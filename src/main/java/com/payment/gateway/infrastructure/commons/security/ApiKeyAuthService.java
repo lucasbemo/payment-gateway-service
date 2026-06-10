@@ -4,11 +4,10 @@ import com.payment.gateway.application.payment.port.out.MerchantQueryPort;
 import com.payment.gateway.commons.utils.CryptoUtils;
 import com.payment.gateway.domain.merchant.model.Merchant;
 import com.payment.gateway.domain.merchant.model.MerchantStatus;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Service for validating API keys against merchant credentials.
@@ -37,8 +36,7 @@ public class ApiKeyAuthService {
         }
 
         try {
-            Merchant merchant = merchantQueryPort.findByApiKey(apiKey)
-                    .orElse(null);
+            Merchant merchant = merchantQueryPort.findByApiKey(apiKey).orElse(null);
 
             if (merchant == null) {
                 log.warn("Merchant not found with API key: {}", maskApiKey(apiKey));
@@ -66,8 +64,7 @@ public class ApiKeyAuthService {
             // Determine roles based on merchant status
             List<String> roles = determineRoles(merchant);
 
-            log.info("Successfully authenticated merchant: {} with roles: {}",
-                    merchant.getId(), roles);
+            log.info("Successfully authenticated merchant: {} with roles: {}", merchant.getId(), roles);
 
             return ApiKeyValidationResult.success(merchant.getId(), roles);
 
@@ -83,8 +80,7 @@ public class ApiKeyAuthService {
         roles.add(RbacConfig.ROLE_MERCHANT);
 
         // Add DEVELOPER role if merchant has developer access
-        if (merchant.getConfiguration() != null &&
-            merchant.getConfiguration().hasDeveloperAccess()) {
+        if (merchant.getConfiguration() != null && merchant.getConfiguration().hasDeveloperAccess()) {
             roles.add(RbacConfig.ROLE_DEVELOPER);
         }
 

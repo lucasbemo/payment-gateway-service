@@ -27,7 +27,8 @@ public class RemovePaymentMethodService implements RemovePaymentMethodUseCase {
     public CustomerResponse removePaymentMethod(String customerId, String paymentMethodId) {
         log.info("Removing payment method from customer: {}", customerId);
 
-        Customer customer = customerCommandPort.findById(customerId)
+        Customer customer = customerCommandPort
+                .findById(customerId)
                 .orElseThrow(() -> new BusinessException("Customer not found: " + customerId));
 
         // Validate payment method exists

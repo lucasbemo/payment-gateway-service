@@ -1,12 +1,11 @@
 package com.payment.gateway.domain.payment.model;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
-import org.junit.jupiter.api.Test;
-
 import java.util.Currency;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for Payment aggregate.
@@ -22,16 +21,15 @@ class PaymentTest {
         Money amount = Money.of(10000, USD);
 
         Payment payment = Payment.create(
-            MERCHANT_ID,
-            amount,
-            "USD",
-            PaymentMethod.CREDIT_CARD,
-            IDEMPOTENCY_KEY,
-            "Test payment",
-            PaymentMetadata.empty(),
-            null,
-            null
-        );
+                MERCHANT_ID,
+                amount,
+                "USD",
+                PaymentMethod.CREDIT_CARD,
+                IDEMPOTENCY_KEY,
+                "Test payment",
+                PaymentMetadata.empty(),
+                null,
+                null);
 
         assertNotNull(payment);
         assertEquals(MERCHANT_ID, payment.getMerchantId());
@@ -46,19 +44,17 @@ class PaymentTest {
         Money amount = Money.of(10000, USD);
 
         BusinessException exception = assertThrows(
-            BusinessException.class,
-            () -> Payment.create(
-                null,
-                amount,
-                "USD",
-                PaymentMethod.CREDIT_CARD,
-                IDEMPOTENCY_KEY,
-                "Test payment",
-                PaymentMetadata.empty(),
-                null,
-                null
-            )
-        );
+                BusinessException.class,
+                () -> Payment.create(
+                        null,
+                        amount,
+                        "USD",
+                        PaymentMethod.CREDIT_CARD,
+                        IDEMPOTENCY_KEY,
+                        "Test payment",
+                        PaymentMetadata.empty(),
+                        null,
+                        null));
 
         assertEquals("Merchant ID is required", exception.getMessage());
     }
@@ -68,19 +64,17 @@ class PaymentTest {
         Money amount = Money.zero(USD);
 
         BusinessException exception = assertThrows(
-            BusinessException.class,
-            () -> Payment.create(
-                MERCHANT_ID,
-                amount,
-                "USD",
-                PaymentMethod.CREDIT_CARD,
-                IDEMPOTENCY_KEY,
-                "Test payment",
-                PaymentMetadata.empty(),
-                null,
-                null
-            )
-        );
+                BusinessException.class,
+                () -> Payment.create(
+                        MERCHANT_ID,
+                        amount,
+                        "USD",
+                        PaymentMethod.CREDIT_CARD,
+                        IDEMPOTENCY_KEY,
+                        "Test payment",
+                        PaymentMetadata.empty(),
+                        null,
+                        null));
 
         assertEquals("Payment amount must be greater than zero", exception.getMessage());
     }
@@ -90,19 +84,17 @@ class PaymentTest {
         Money amount = Money.of(10000, USD);
 
         BusinessException exception = assertThrows(
-            BusinessException.class,
-            () -> Payment.create(
-                MERCHANT_ID,
-                amount,
-                "USD",
-                PaymentMethod.CREDIT_CARD,
-                null,
-                "Test payment",
-                PaymentMetadata.empty(),
-                null,
-                null
-            )
-        );
+                BusinessException.class,
+                () -> Payment.create(
+                        MERCHANT_ID,
+                        amount,
+                        "USD",
+                        PaymentMethod.CREDIT_CARD,
+                        null,
+                        "Test payment",
+                        PaymentMetadata.empty(),
+                        null,
+                        null));
 
         assertEquals("Idempotency key is required", exception.getMessage());
     }
@@ -155,10 +147,7 @@ class PaymentTest {
         payment.authorize();
         payment.capture();
 
-        BusinessException exception = assertThrows(
-            BusinessException.class,
-            payment::cancel
-        );
+        BusinessException exception = assertThrows(BusinessException.class, payment::cancel);
 
         assertTrue(exception.getMessage().contains("Cannot transition from CAPTURED to CANCELLED"));
     }
@@ -168,10 +157,7 @@ class PaymentTest {
         Payment payment = createTestPayment();
         payment.fail();
 
-        BusinessException exception = assertThrows(
-            BusinessException.class,
-            payment::authorize
-        );
+        BusinessException exception = assertThrows(BusinessException.class, payment::authorize);
 
         assertTrue(exception.getMessage().contains("Cannot transition from FAILED to AUTHORIZED"));
     }
@@ -182,25 +168,22 @@ class PaymentTest {
 
         assertDoesNotThrow(() -> payment.validateOwnership(MERCHANT_ID));
 
-        BusinessException exception = assertThrows(
-            BusinessException.class,
-            () -> payment.validateOwnership("wrong-merchant-id")
-        );
+        BusinessException exception =
+                assertThrows(BusinessException.class, () -> payment.validateOwnership("wrong-merchant-id"));
 
         assertEquals("Payment does not belong to merchant: wrong-merchant-id", exception.getMessage());
     }
 
     private Payment createTestPayment() {
         return Payment.create(
-            MERCHANT_ID,
-            Money.of(10000, USD),
-            "USD",
-            PaymentMethod.CREDIT_CARD,
-            IDEMPOTENCY_KEY,
-            "Test payment",
-            PaymentMetadata.empty(),
-            null,
-            null
-        );
+                MERCHANT_ID,
+                Money.of(10000, USD),
+                "USD",
+                PaymentMethod.CREDIT_CARD,
+                IDEMPOTENCY_KEY,
+                "Test payment",
+                PaymentMetadata.empty(),
+                null,
+                null);
     }
 }

@@ -17,7 +17,7 @@ public class KafkaMetricsScheduler {
     public void updateKafkaMetrics() {
         try {
             kafkaMetricsBinder.updateLagMetrics();
-            
+
             long totalLag = kafkaMetricsBinder.getTotalLag();
             if (totalLag > 1000) {
                 log.warn("High Kafka consumer lag detected: {} messages", totalLag);

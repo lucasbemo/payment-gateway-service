@@ -2,15 +2,12 @@ package com.payment.gateway.domain.idempotency.service;
 
 import com.payment.gateway.commons.utils.CryptoUtils;
 import com.payment.gateway.domain.idempotency.model.IdempotencyKey;
-import com.payment.gateway.domain.idempotency.model.IdempotencyStatus;
 import com.payment.gateway.domain.idempotency.port.IdempotencyKeyRepositoryPort;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Idempotency domain service.
@@ -34,8 +31,8 @@ public class IdempotencyDomainService {
         this.ttlSeconds = ttlSeconds;
     }
 
-    public IdempotencyKey createOrGetIdempotencyKey(String idempotencyKey, String merchantId,
-                                                      String operation, String requestBody) {
+    public IdempotencyKey createOrGetIdempotencyKey(
+            String idempotencyKey, String merchantId, String operation, String requestBody) {
         log.info("Creating or getting idempotency key: {} for operation: {}", idempotencyKey, operation);
 
         String requestHash = CryptoUtils.hash(requestBody != null ? requestBody : "");
@@ -65,7 +62,8 @@ public class IdempotencyDomainService {
     public IdempotencyKey acquireLock(String idempotencyKey, String lockToken) {
         log.info("Acquiring lock for idempotency key: {}", idempotencyKey);
 
-        IdempotencyKey key = repository.findByIdempotencyKey(idempotencyKey)
+        IdempotencyKey key = repository
+                .findByIdempotencyKey(idempotencyKey)
                 .orElseThrow(() -> new IllegalArgumentException("Idempotency key not found: " + idempotencyKey));
 
         if (key.isTerminal()) {
@@ -80,11 +78,12 @@ public class IdempotencyDomainService {
         return repository.save(key);
     }
 
-    public IdempotencyKey completeWithResponse(String idempotencyKey, String lockToken,
-                                                String responseCode, String responseBody) {
+    public IdempotencyKey completeWithResponse(
+            String idempotencyKey, String lockToken, String responseCode, String responseBody) {
         log.info("Completing idempotency key with response: {}", idempotencyKey);
 
-        IdempotencyKey key = repository.findByIdempotencyKey(idempotencyKey)
+        IdempotencyKey key = repository
+                .findByIdempotencyKey(idempotencyKey)
                 .orElseThrow(() -> new IllegalArgumentException("Idempotency key not found: " + idempotencyKey));
 
         if (key.getLockToken() != null && !key.getLockToken().equals(lockToken)) {
@@ -98,7 +97,8 @@ public class IdempotencyDomainService {
     public IdempotencyKey failWithError(String idempotencyKey, String lockToken, String errorMessage) {
         log.error("Failing idempotency key {}: {}", idempotencyKey, errorMessage);
 
-        IdempotencyKey key = repository.findByIdempotencyKey(idempotencyKey)
+        IdempotencyKey key = repository
+                .findByIdempotencyKey(idempotencyKey)
                 .orElseThrow(() -> new IllegalArgumentException("Idempotency key not found: " + idempotencyKey));
 
         if (key.getLockToken() != null && !key.getLockToken().equals(lockToken)) {
@@ -112,7 +112,8 @@ public class IdempotencyDomainService {
     public IdempotencyKey releaseLock(String idempotencyKey, String lockToken) {
         log.info("Releasing lock for idempotency key: {}", idempotencyKey);
 
-        IdempotencyKey key = repository.findByIdempotencyKey(idempotencyKey)
+        IdempotencyKey key = repository
+                .findByIdempotencyKey(idempotencyKey)
                 .orElseThrow(() -> new IllegalArgumentException("Idempotency key not found: " + idempotencyKey));
 
         key.releaseLock(lockToken);
@@ -128,7 +129,8 @@ public class IdempotencyDomainService {
     }
 
     public IdempotencyKey getIdempotencyKeyOrThrow(String idempotencyKey) {
-        return repository.findByIdempotencyKey(idempotencyKey)
+        return repository
+                .findByIdempotencyKey(idempotencyKey)
                 .orElseThrow(() -> new IllegalArgumentException("Idempotency key not found: " + idempotencyKey));
     }
 }

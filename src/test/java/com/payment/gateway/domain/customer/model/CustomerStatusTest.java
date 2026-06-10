@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.customer.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("CustomerStatus Enum Tests")
 class CustomerStatusTest {
@@ -57,91 +57,106 @@ class CustomerStatusTest {
         @Test
         @DisplayName("ACTIVE can transition to INACTIVE")
         void activeCanTransitionToInactive() {
-            assertThat(CustomerStatus.ACTIVE.canTransitionTo(CustomerStatus.INACTIVE)).isTrue();
+            assertThat(CustomerStatus.ACTIVE.canTransitionTo(CustomerStatus.INACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("ACTIVE can transition to SUSPENDED")
         void activeCanTransitionToSuspended() {
-            assertThat(CustomerStatus.ACTIVE.canTransitionTo(CustomerStatus.SUSPENDED)).isTrue();
+            assertThat(CustomerStatus.ACTIVE.canTransitionTo(CustomerStatus.SUSPENDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("ACTIVE can transition to BLOCKED")
         void activeCanTransitionToBlocked() {
-            assertThat(CustomerStatus.ACTIVE.canTransitionTo(CustomerStatus.BLOCKED)).isTrue();
+            assertThat(CustomerStatus.ACTIVE.canTransitionTo(CustomerStatus.BLOCKED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("INACTIVE can transition to ACTIVE")
         void inactiveCanTransitionToActive() {
-            assertThat(CustomerStatus.INACTIVE.canTransitionTo(CustomerStatus.ACTIVE)).isTrue();
+            assertThat(CustomerStatus.INACTIVE.canTransitionTo(CustomerStatus.ACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("INACTIVE can transition to SUSPENDED")
         void inactiveCanTransitionToSuspended() {
-            assertThat(CustomerStatus.INACTIVE.canTransitionTo(CustomerStatus.SUSPENDED)).isTrue();
+            assertThat(CustomerStatus.INACTIVE.canTransitionTo(CustomerStatus.SUSPENDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("SUSPENDED can transition to ACTIVE")
         void suspendedCanTransitionToActive() {
-            assertThat(CustomerStatus.SUSPENDED.canTransitionTo(CustomerStatus.ACTIVE)).isTrue();
+            assertThat(CustomerStatus.SUSPENDED.canTransitionTo(CustomerStatus.ACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("SUSPENDED can transition to INACTIVE")
         void suspendedCanTransitionToInactive() {
-            assertThat(CustomerStatus.SUSPENDED.canTransitionTo(CustomerStatus.INACTIVE)).isTrue();
+            assertThat(CustomerStatus.SUSPENDED.canTransitionTo(CustomerStatus.INACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("SUSPENDED can transition to BLOCKED")
         void suspendedCanTransitionToBlocked() {
-            assertThat(CustomerStatus.SUSPENDED.canTransitionTo(CustomerStatus.BLOCKED)).isTrue();
+            assertThat(CustomerStatus.SUSPENDED.canTransitionTo(CustomerStatus.BLOCKED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("BLOCKED can transition to SUSPENDED")
         void blockedCanTransitionToSuspended() {
-            assertThat(CustomerStatus.BLOCKED.canTransitionTo(CustomerStatus.SUSPENDED)).isTrue();
+            assertThat(CustomerStatus.BLOCKED.canTransitionTo(CustomerStatus.SUSPENDED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING_VERIFICATION can transition to VERIFIED")
         void pendingVerificationCanTransitionToVerified() {
-            assertThat(CustomerStatus.PENDING_VERIFICATION.canTransitionTo(CustomerStatus.VERIFIED)).isTrue();
+            assertThat(CustomerStatus.PENDING_VERIFICATION.canTransitionTo(CustomerStatus.VERIFIED))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING_VERIFICATION can transition to ACTIVE")
         void pendingVerificationCanTransitionToActive() {
-            assertThat(CustomerStatus.PENDING_VERIFICATION.canTransitionTo(CustomerStatus.ACTIVE)).isTrue();
+            assertThat(CustomerStatus.PENDING_VERIFICATION.canTransitionTo(CustomerStatus.ACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("PENDING_VERIFICATION can transition to INACTIVE")
         void pendingVerificationCanTransitionToInactive() {
-            assertThat(CustomerStatus.PENDING_VERIFICATION.canTransitionTo(CustomerStatus.INACTIVE)).isTrue();
+            assertThat(CustomerStatus.PENDING_VERIFICATION.canTransitionTo(CustomerStatus.INACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("VERIFIED can transition to ACTIVE")
         void verifiedCanTransitionToActive() {
-            assertThat(CustomerStatus.VERIFIED.canTransitionTo(CustomerStatus.ACTIVE)).isTrue();
+            assertThat(CustomerStatus.VERIFIED.canTransitionTo(CustomerStatus.ACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("VERIFIED can transition to INACTIVE")
         void verifiedCanTransitionToInactive() {
-            assertThat(CustomerStatus.VERIFIED.canTransitionTo(CustomerStatus.INACTIVE)).isTrue();
+            assertThat(CustomerStatus.VERIFIED.canTransitionTo(CustomerStatus.INACTIVE))
+                    .isTrue();
         }
 
         @Test
         @DisplayName("VERIFIED can transition to SUSPENDED")
         void verifiedCanTransitionToSuspended() {
-            assertThat(CustomerStatus.VERIFIED.canTransitionTo(CustomerStatus.SUSPENDED)).isTrue();
+            assertThat(CustomerStatus.VERIFIED.canTransitionTo(CustomerStatus.SUSPENDED))
+                    .isTrue();
         }
     }
 
@@ -202,8 +217,7 @@ class CustomerStatusTest {
         @Test
         @DisplayName("Should throw exception for invalid status")
         void shouldThrowExceptionForInvalidStatus() {
-            assertThatThrownBy(() -> CustomerStatus.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> CustomerStatus.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

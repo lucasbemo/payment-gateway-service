@@ -1,13 +1,12 @@
 package com.payment.gateway.infrastructure.reconciliation.adapter.out.persistence;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "settlement_reports")
@@ -110,23 +109,90 @@ public class SettlementReportJpaEntity {
         private Instant settledAt;
         private Instant createdAt;
 
-        public Builder id(String id) { this.id = id; return this; }
-        public Builder merchantId(String merchantId) { this.merchantId = merchantId; return this; }
-        public Builder gatewayName(String gatewayName) { this.gatewayName = gatewayName; return this; }
-        public Builder settlementDate(LocalDate settlementDate) { this.settlementDate = settlementDate; return this; }
-        public Builder gatewayReportId(String gatewayReportId) { this.gatewayReportId = gatewayReportId; return this; }
-        public Builder grossAmount(BigDecimal grossAmount) { this.grossAmount = grossAmount; return this; }
-        public Builder feeAmount(BigDecimal feeAmount) { this.feeAmount = feeAmount; return this; }
-        public Builder netAmount(BigDecimal netAmount) { this.netAmount = netAmount; return this; }
-        public Builder currency(String currency) { this.currency = currency; return this; }
-        public Builder transactionCount(Integer transactionCount) { this.transactionCount = transactionCount; return this; }
-        public Builder reportType(String reportType) { this.reportType = reportType; return this; }
-        public Builder reportFormat(String reportFormat) { this.reportFormat = reportFormat; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder filePath(String filePath) { this.filePath = filePath; return this; }
-        public Builder reconciliationBatchId(String reconciliationBatchId) { this.reconciliationBatchId = reconciliationBatchId; return this; }
-        public Builder settledAt(Instant settledAt) { this.settledAt = settledAt; return this; }
-        public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder merchantId(String merchantId) {
+            this.merchantId = merchantId;
+            return this;
+        }
+
+        public Builder gatewayName(String gatewayName) {
+            this.gatewayName = gatewayName;
+            return this;
+        }
+
+        public Builder settlementDate(LocalDate settlementDate) {
+            this.settlementDate = settlementDate;
+            return this;
+        }
+
+        public Builder gatewayReportId(String gatewayReportId) {
+            this.gatewayReportId = gatewayReportId;
+            return this;
+        }
+
+        public Builder grossAmount(BigDecimal grossAmount) {
+            this.grossAmount = grossAmount;
+            return this;
+        }
+
+        public Builder feeAmount(BigDecimal feeAmount) {
+            this.feeAmount = feeAmount;
+            return this;
+        }
+
+        public Builder netAmount(BigDecimal netAmount) {
+            this.netAmount = netAmount;
+            return this;
+        }
+
+        public Builder currency(String currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        public Builder transactionCount(Integer transactionCount) {
+            this.transactionCount = transactionCount;
+            return this;
+        }
+
+        public Builder reportType(String reportType) {
+            this.reportType = reportType;
+            return this;
+        }
+
+        public Builder reportFormat(String reportFormat) {
+            this.reportFormat = reportFormat;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder filePath(String filePath) {
+            this.filePath = filePath;
+            return this;
+        }
+
+        public Builder reconciliationBatchId(String reconciliationBatchId) {
+            this.reconciliationBatchId = reconciliationBatchId;
+            return this;
+        }
+
+        public Builder settledAt(Instant settledAt) {
+            this.settledAt = settledAt;
+            return this;
+        }
+
+        public Builder createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
 
         public SettlementReportJpaEntity build() {
             return new SettlementReportJpaEntity(this);

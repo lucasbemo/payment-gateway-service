@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.merchant.exception;
 
-import com.payment.gateway.commons.exception.BusinessException;
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.payment.gateway.commons.exception.BusinessException;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link InvalidMerchantException}.
@@ -32,8 +32,8 @@ class InvalidMerchantExceptionTest {
     @Test
     void shouldThrowException() {
         assertThatThrownBy(() -> {
-            throw new InvalidMerchantException("Merchant API key is missing");
-        })
+                    throw new InvalidMerchantException("Merchant API key is missing");
+                })
                 .isInstanceOf(InvalidMerchantException.class)
                 .hasMessage("Merchant API key is missing")
                 .extracting("code")

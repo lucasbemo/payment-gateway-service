@@ -1,5 +1,7 @@
 package com.payment.gateway.infrastructure.payment.adapter.out.provider;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.CardTokenizationRequest;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderRequest;
 import com.payment.gateway.application.payment.port.out.ExternalPaymentProviderPort.PaymentProviderResult;
@@ -7,10 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class PayPalPaymentProviderTest {
 
@@ -28,9 +26,8 @@ class PayPalPaymentProviderTest {
         @Test
         @DisplayName("should return successful result with paypal-auth prefix")
         void shouldReturnSuccessfulAuthorization() {
-            PaymentProviderRequest request = new PaymentProviderRequest(
-                    "pay-001", "merchant-001", 5000L, "USD", "tok_paypal_visa"
-            );
+            PaymentProviderRequest request =
+                    new PaymentProviderRequest("pay-001", "merchant-001", 5000L, "USD", "tok_paypal_visa");
 
             PaymentProviderResult result = provider.authorize(request).join();
 
@@ -43,9 +40,8 @@ class PayPalPaymentProviderTest {
         @Test
         @DisplayName("should include payment ID in provider transaction ID")
         void shouldIncludePaymentIdInTransactionId() {
-            PaymentProviderRequest request = new PaymentProviderRequest(
-                    "pay-abc-456", "merchant-002", 7500L, "EUR", "tok_paypal_mc"
-            );
+            PaymentProviderRequest request =
+                    new PaymentProviderRequest("pay-abc-456", "merchant-002", 7500L, "EUR", "tok_paypal_mc");
 
             PaymentProviderResult result = provider.authorize(request).join();
 
@@ -60,9 +56,8 @@ class PayPalPaymentProviderTest {
         @Test
         @DisplayName("should return successful result with paypal-capture prefix")
         void shouldReturnSuccessfulCapture() {
-            PaymentProviderRequest request = new PaymentProviderRequest(
-                    "pay-002", "merchant-001", 5000L, "USD", "tok_paypal_visa"
-            );
+            PaymentProviderRequest request =
+                    new PaymentProviderRequest("pay-002", "merchant-001", 5000L, "USD", "tok_paypal_visa");
 
             PaymentProviderResult result = provider.capture(request).join();
 
@@ -80,9 +75,8 @@ class PayPalPaymentProviderTest {
         @Test
         @DisplayName("should return successful result with paypal-cancel prefix")
         void shouldReturnSuccessfulCancellation() {
-            PaymentProviderRequest request = new PaymentProviderRequest(
-                    "pay-003", "merchant-001", 5000L, "USD", "tok_paypal_visa"
-            );
+            PaymentProviderRequest request =
+                    new PaymentProviderRequest("pay-003", "merchant-001", 5000L, "USD", "tok_paypal_visa");
 
             PaymentProviderResult result = provider.cancel(request).join();
 
@@ -100,9 +94,7 @@ class PayPalPaymentProviderTest {
         @Test
         @DisplayName("should return token with tok_paypal_ prefix")
         void shouldReturnPayPalToken() {
-            CardTokenizationRequest request = new CardTokenizationRequest(
-                    "5555555555554444", "06", "2028", "456"
-            );
+            CardTokenizationRequest request = new CardTokenizationRequest("5555555555554444", "06", "2028", "456");
 
             String token = provider.tokenizeCard(request).join();
 
@@ -112,9 +104,7 @@ class PayPalPaymentProviderTest {
         @Test
         @DisplayName("should return tokens based on current time millis")
         void shouldReturnTimestampBasedTokens() throws InterruptedException {
-            CardTokenizationRequest request = new CardTokenizationRequest(
-                    "5555555555554444", "06", "2028", "456"
-            );
+            CardTokenizationRequest request = new CardTokenizationRequest("5555555555554444", "06", "2028", "456");
 
             String token1 = provider.tokenizeCard(request).join();
             Thread.sleep(5);

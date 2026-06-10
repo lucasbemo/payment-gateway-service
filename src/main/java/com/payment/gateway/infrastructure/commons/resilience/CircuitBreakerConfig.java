@@ -2,10 +2,9 @@ package com.payment.gateway.infrastructure.commons.resilience;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.Duration;
 
 /**
  * Circuit breaker configuration for external service calls.
@@ -20,7 +19,9 @@ public class CircuitBreakerConfig {
                         .failureRateThreshold(50)
                         .waitDurationInOpenState(Duration.ofSeconds(30))
                         .slidingWindowSize(10)
-                        .slidingWindowType(io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+                        .slidingWindowType(
+                                io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType
+                                        .COUNT_BASED)
                         .minimumNumberOfCalls(5)
                         .permittedNumberOfCallsInHalfOpenState(3)
                         .automaticTransitionFromOpenToHalfOpenEnabled(true)

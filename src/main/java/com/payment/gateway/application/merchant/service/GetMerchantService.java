@@ -25,7 +25,8 @@ public class GetMerchantService implements GetMerchantUseCase {
     public MerchantResponse getMerchantById(String merchantId) {
         log.info("Getting merchant by id: {}", merchantId);
 
-        Merchant merchant = merchantCommandPort.findById(merchantId)
+        Merchant merchant = merchantCommandPort
+                .findById(merchantId)
                 .orElseThrow(() -> new BusinessException("Merchant not found: " + merchantId));
 
         return mapToResponse(merchant);

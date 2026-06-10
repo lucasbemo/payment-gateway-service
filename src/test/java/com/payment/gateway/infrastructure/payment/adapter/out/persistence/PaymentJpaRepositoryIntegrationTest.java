@@ -1,32 +1,30 @@
 package com.payment.gateway.infrastructure.payment.adapter.out.persistence;
 
-import com.payment.gateway.test.TestAwsConfig;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.payment.gateway.test.TestAwsConfig;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("PaymentJpaRepository Integration Tests")
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {
-                "spring.main.allow-bean-definition-override=true",
-                "spring.main.web-application-type=none",
-                "spring.main.lazy-initialization=true"
-        }
-)
+            "spring.main.allow-bean-definition-override=true",
+            "spring.main.web-application-type=none",
+            "spring.main.lazy-initialization=true"
+        })
 @Import({TestAwsConfig.class, com.payment.gateway.test.MockPortsConfig.class})
 @Transactional
 @ActiveProfiles("test")
@@ -99,7 +97,8 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
             List<PaymentJpaEntity> payments = paymentJpaRepository.findByMerchantId(uniqueMerchantId);
 
             assertThat(payments).hasSize(2);
-            assertThat(payments).extracting(PaymentJpaEntity::getId)
+            assertThat(payments)
+                    .extracting(PaymentJpaEntity::getId)
                     .containsExactlyInAnyOrder(payment1.getId(), payment2.getId());
         }
     }
@@ -325,10 +324,10 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
             // Note: This test documents expected behavior
             // A query method findByCustomerId would need to be added to the repository
             String customerId = "customer-test-" + UUID.randomUUID();
-            PaymentJpaEntity payment1 = paymentJpaRepository.save(
-                    createPaymentWithCustomer(customerId, "idem-1-" + UUID.randomUUID()));
-            PaymentJpaEntity payment2 = paymentJpaRepository.save(
-                    createPaymentWithCustomer(customerId, "idem-2-" + UUID.randomUUID()));
+            PaymentJpaEntity payment1 =
+                    paymentJpaRepository.save(createPaymentWithCustomer(customerId, "idem-1-" + UUID.randomUUID()));
+            PaymentJpaEntity payment2 =
+                    paymentJpaRepository.save(createPaymentWithCustomer(customerId, "idem-2-" + UUID.randomUUID()));
 
             // Currently no findByCustomerId method, this test documents the need
             assertThat(payment1.getCustomerId()).isEqualTo(customerId);

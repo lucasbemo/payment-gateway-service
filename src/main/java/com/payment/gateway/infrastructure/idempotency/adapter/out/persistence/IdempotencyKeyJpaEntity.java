@@ -1,11 +1,10 @@
 package com.payment.gateway.infrastructure.idempotency.adapter.out.persistence;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "idempotency_keys")
@@ -93,20 +92,75 @@ public class IdempotencyKeyJpaEntity {
         private Instant createdAt;
         private Instant updatedAt;
 
-        public Builder id(String id) { this.id = id; return this; }
-        public Builder keyHash(String keyHash) { this.keyHash = keyHash; return this; }
-        public Builder merchantId(String merchantId) { this.merchantId = merchantId; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder requestMethod(String requestMethod) { this.requestMethod = requestMethod; return this; }
-        public Builder requestPath(String requestPath) { this.requestPath = requestPath; return this; }
-        public Builder requestHeaders(String requestHeaders) { this.requestHeaders = requestHeaders; return this; }
-        public Builder requestBody(String requestBody) { this.requestBody = requestBody; return this; }
-        public Builder responseCode(Integer responseCode) { this.responseCode = responseCode; return this; }
-        public Builder responseBody(String responseBody) { this.responseBody = responseBody; return this; }
-        public Builder lockedUntil(Instant lockedUntil) { this.lockedUntil = lockedUntil; return this; }
-        public Builder lockedBy(String lockedBy) { this.lockedBy = lockedBy; return this; }
-        public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
-        public Builder updatedAt(Instant updatedAt) { this.updatedAt = updatedAt; return this; }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder keyHash(String keyHash) {
+            this.keyHash = keyHash;
+            return this;
+        }
+
+        public Builder merchantId(String merchantId) {
+            this.merchantId = merchantId;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder requestMethod(String requestMethod) {
+            this.requestMethod = requestMethod;
+            return this;
+        }
+
+        public Builder requestPath(String requestPath) {
+            this.requestPath = requestPath;
+            return this;
+        }
+
+        public Builder requestHeaders(String requestHeaders) {
+            this.requestHeaders = requestHeaders;
+            return this;
+        }
+
+        public Builder requestBody(String requestBody) {
+            this.requestBody = requestBody;
+            return this;
+        }
+
+        public Builder responseCode(Integer responseCode) {
+            this.responseCode = responseCode;
+            return this;
+        }
+
+        public Builder responseBody(String responseBody) {
+            this.responseBody = responseBody;
+            return this;
+        }
+
+        public Builder lockedUntil(Instant lockedUntil) {
+            this.lockedUntil = lockedUntil;
+            return this;
+        }
+
+        public Builder lockedBy(String lockedBy) {
+            this.lockedBy = lockedBy;
+            return this;
+        }
+
+        public Builder createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder updatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
 
         public IdempotencyKeyJpaEntity build() {
             return new IdempotencyKeyJpaEntity(this);

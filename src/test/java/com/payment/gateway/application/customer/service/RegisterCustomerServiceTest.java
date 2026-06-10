@@ -1,10 +1,17 @@
 package com.payment.gateway.application.customer.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.payment.gateway.application.customer.dto.CustomerResponse;
 import com.payment.gateway.application.customer.dto.RegisterCustomerCommand;
 import com.payment.gateway.application.customer.port.out.CustomerCommandPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.domain.customer.model.Customer;
+import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,15 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @DisplayName("Register Customer Service Tests")
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +57,8 @@ class RegisterCustomerServiceTest {
                     .externalId(externalId)
                     .build();
 
-            given(customerCommandPort.existsByEmailAndMerchantId(email, merchantId)).willReturn(false);
+            given(customerCommandPort.existsByEmailAndMerchantId(email, merchantId))
+                    .willReturn(false);
             given(customerCommandPort.saveCustomer(any(Customer.class))).willAnswer(invocation -> {
                 Customer customer = invocation.getArgument(0);
                 setId(customer, customerId);
@@ -95,7 +94,8 @@ class RegisterCustomerServiceTest {
                     .email(email)
                     .build();
 
-            given(customerCommandPort.existsByEmailAndMerchantId(email, merchantId)).willReturn(true);
+            given(customerCommandPort.existsByEmailAndMerchantId(email, merchantId))
+                    .willReturn(true);
 
             // When & Then
             assertThatThrownBy(() -> registerCustomerService.registerCustomer(command))

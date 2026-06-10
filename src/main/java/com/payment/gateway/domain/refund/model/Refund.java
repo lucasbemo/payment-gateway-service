@@ -1,16 +1,15 @@
 package com.payment.gateway.domain.refund.model;
 
 import com.payment.gateway.commons.model.Money;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Refund aggregate root.
@@ -66,9 +65,15 @@ public class Refund {
         return new Builder();
     }
 
-    public static Refund create(String paymentId, String transactionId, String merchantId,
-                                 RefundType type, Money amount, String currency,
-                                 String refundIdempotencyKey, String reason) {
+    public static Refund create(
+            String paymentId,
+            String transactionId,
+            String merchantId,
+            RefundType type,
+            Money amount,
+            String currency,
+            String refundIdempotencyKey,
+            String reason) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())
@@ -161,8 +166,7 @@ public class Refund {
     private void validateStatusTransition(RefundStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
             throw new IllegalStateException(
-                String.format("Cannot transition refund from %s to %s", this.status, newStatus)
-            );
+                    String.format("Cannot transition refund from %s to %s", this.status, newStatus));
         }
     }
 

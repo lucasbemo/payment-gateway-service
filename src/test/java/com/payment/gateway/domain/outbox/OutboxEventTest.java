@@ -1,14 +1,14 @@
 package com.payment.gateway.domain.outbox;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.domain.outbox.model.EventStatus;
 import com.payment.gateway.domain.outbox.model.EventType;
 import com.payment.gateway.domain.outbox.model.OutboxEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for OutboxEvent aggregate.

@@ -1,13 +1,12 @@
 package com.payment.gateway.infrastructure.outbox.adapter.out.persistence;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "outbox_events")
@@ -76,16 +75,55 @@ public class OutboxEventJpaEntity {
         private Instant createdAt;
         private Instant publishedAt;
 
-        public Builder id(String id) { this.id = id; return this; }
-        public Builder aggregateId(String aggregateId) { this.aggregateId = aggregateId; return this; }
-        public Builder aggregateType(String aggregateType) { this.aggregateType = aggregateType; return this; }
-        public Builder eventType(String eventType) { this.eventType = eventType; return this; }
-        public Builder payload(String payload) { this.payload = payload; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder errorMessage(String errorMessage) { this.errorMessage = errorMessage; return this; }
-        public Builder retryCount(Integer retryCount) { this.retryCount = retryCount; return this; }
-        public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
-        public Builder publishedAt(Instant publishedAt) { this.publishedAt = publishedAt; return this; }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder aggregateId(String aggregateId) {
+            this.aggregateId = aggregateId;
+            return this;
+        }
+
+        public Builder aggregateType(String aggregateType) {
+            this.aggregateType = aggregateType;
+            return this;
+        }
+
+        public Builder eventType(String eventType) {
+            this.eventType = eventType;
+            return this;
+        }
+
+        public Builder payload(String payload) {
+            this.payload = payload;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder errorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+            return this;
+        }
+
+        public Builder retryCount(Integer retryCount) {
+            this.retryCount = retryCount;
+            return this;
+        }
+
+        public Builder createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder publishedAt(Instant publishedAt) {
+            this.publishedAt = publishedAt;
+            return this;
+        }
 
         public OutboxEventJpaEntity build() {
             return new OutboxEventJpaEntity(this);

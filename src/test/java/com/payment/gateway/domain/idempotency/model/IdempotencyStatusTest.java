@@ -1,10 +1,10 @@
 package com.payment.gateway.domain.idempotency.model;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("IdempotencyStatus Enum Tests")
 class IdempotencyStatusTest {
@@ -61,8 +61,7 @@ class IdempotencyStatusTest {
         @Test
         @DisplayName("Should throw exception for invalid status")
         void shouldThrowExceptionForInvalidStatus() {
-            assertThatThrownBy(() -> IdempotencyStatus.valueOf("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> IdempotencyStatus.valueOf("INVALID")).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -75,13 +74,13 @@ class IdempotencyStatusTest {
         void shouldReturnAllIdempotencyStatuses() {
             IdempotencyStatus[] values = IdempotencyStatus.values();
             assertThat(values).hasSize(5);
-            assertThat(values).containsExactlyInAnyOrder(
-                IdempotencyStatus.PENDING,
-                IdempotencyStatus.PROCESSING,
-                IdempotencyStatus.COMPLETED,
-                IdempotencyStatus.FAILED,
-                IdempotencyStatus.EXPIRED
-            );
+            assertThat(values)
+                    .containsExactlyInAnyOrder(
+                            IdempotencyStatus.PENDING,
+                            IdempotencyStatus.PROCESSING,
+                            IdempotencyStatus.COMPLETED,
+                            IdempotencyStatus.FAILED,
+                            IdempotencyStatus.EXPIRED);
         }
     }
 }

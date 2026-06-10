@@ -13,8 +13,7 @@ public class StubTokenizationService implements TokenizationServicePort {
 
     @Override
     public String tokenize(String cardNumber, String expiryMonth, String expiryYear, String cvv) {
-        log.info("StubTokenizationService.tokenize: cardNumber=****{}",
-                cardNumber.substring(cardNumber.length() - 4));
+        log.info("StubTokenizationService.tokenize: cardNumber=****{}", cardNumber.substring(cardNumber.length() - 4));
         return "tok_stub_" + System.currentTimeMillis() + "_" + cardNumber.substring(cardNumber.length() - 4);
     }
 

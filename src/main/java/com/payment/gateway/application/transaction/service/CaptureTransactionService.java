@@ -23,9 +23,10 @@ public class CaptureTransactionService implements CaptureTransactionUseCase {
     private final TransactionCommandPort transactionCommandPort;
     private final ExternalTransactionProviderPort externalTransactionProviderPort;
 
-    public CaptureTransactionService(TransactionQueryPort transactionQueryPort,
-                                     TransactionCommandPort transactionCommandPort,
-                                     ExternalTransactionProviderPort externalTransactionProviderPort) {
+    public CaptureTransactionService(
+            TransactionQueryPort transactionQueryPort,
+            TransactionCommandPort transactionCommandPort,
+            ExternalTransactionProviderPort externalTransactionProviderPort) {
         this.transactionQueryPort = transactionQueryPort;
         this.transactionCommandPort = transactionCommandPort;
         this.externalTransactionProviderPort = externalTransactionProviderPort;
@@ -35,11 +36,14 @@ public class CaptureTransactionService implements CaptureTransactionUseCase {
     public TransactionResponse captureTransaction(String transactionId, String merchantId) {
         log.info("Capturing transaction: {} for merchant: {}", transactionId, merchantId);
 
-        Transaction transaction = transactionQueryPort.findByIdAndMerchantId(transactionId, merchantId)
+        Transaction transaction = transactionQueryPort
+                .findByIdAndMerchantId(transactionId, merchantId)
                 .orElseThrow(() -> new BusinessException("Transaction not found: " + transactionId));
 
         // Validate transaction can be captured
-        if (!transaction.getStatus().canTransitionTo(com.payment.gateway.domain.transaction.model.TransactionStatus.CAPTURED)) {
+        if (!transaction
+                .getStatus()
+                .canTransitionTo(com.payment.gateway.domain.transaction.model.TransactionStatus.CAPTURED)) {
             throw new BusinessException("Cannot capture transaction in current state: " + transaction.getStatus());
         }
 
@@ -57,20 +61,16 @@ public class CaptureTransactionService implements CaptureTransactionUseCase {
     private void captureWithProvider(Transaction transaction) {
         log.debug("Capturing transaction {} with external provider", transaction.getId());
 
-        ExternalTransactionProviderPort.CaptureRequest request =
-                new ExternalTransactionProviderPort.CaptureRequest(
-                        transaction.getId(),
-                        transaction.getGatewayTransactionId(),
-                        transaction.getAmount().getAmountInCents(),
-                        transaction.getCurrency()
-                );
+        ExternalTransactionProviderPort.CaptureRequest request = new ExternalTransactionProviderPort.CaptureRequest(
+                transaction.getId(),
+                transaction.getGatewayTransactionId(),
+                transaction.getAmount().getAmountInCents(),
+                transaction.getCurrency());
 
-        ExternalTransactionProviderPort.CaptureResult result =
-                externalTransactionProviderPort.capture(request);
+        ExternalTransactionProviderPort.CaptureResult result = externalTransactionProviderPort.capture(request);
 
         if (!result.success()) {
-            log.warn("Transaction capture with provider failed: {} - {}",
-                    result.errorCode(), result.errorMessage());
+            log.warn("Transaction capture with provider failed: {} - {}", result.errorCode(), result.errorMessage());
             throw new BusinessException("Transaction capture failed: " + result.errorMessage());
         }
 

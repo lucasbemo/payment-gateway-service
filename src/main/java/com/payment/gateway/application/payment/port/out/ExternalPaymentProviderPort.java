@@ -17,24 +17,10 @@ public interface ExternalPaymentProviderPort {
     boolean isHealthy();
 
     record PaymentProviderRequest(
-        String paymentId,
-        String merchantId,
-        Long amount,
-        String currency,
-        String paymentMethodToken
-    ) {}
+            String paymentId, String merchantId, Long amount, String currency, String paymentMethodToken) {}
 
     record PaymentProviderResult(
-        boolean success,
-        String providerTransactionId,
-        String errorCode,
-        String errorMessage
-    ) {}
+            boolean success, String providerTransactionId, String errorCode, String errorMessage) {}
 
-    record CardTokenizationRequest(
-        String cardNumber,
-        String expiryMonth,
-        String expiryYear,
-        String cvv
-    ) {}
+    record CardTokenizationRequest(String cardNumber, String expiryMonth, String expiryYear, String cvv) {}
 }

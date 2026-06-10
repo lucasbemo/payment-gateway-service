@@ -1,12 +1,12 @@
 package com.payment.gateway.infrastructure.security.encryption;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.payment.gateway.commons.exception.DomainException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Comprehensive unit tests for EncryptionService.
@@ -59,10 +59,7 @@ class EncryptionServiceTest {
         @DisplayName("Should throw exception for null plain text")
         void shouldThrowExceptionForNullPlainText() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> encryptionService.encrypt(null)
-            );
+            DomainException exception = assertThrows(DomainException.class, () -> encryptionService.encrypt(null));
             assertEquals("Plain text cannot be null or empty", exception.getMessage());
         }
 
@@ -70,10 +67,7 @@ class EncryptionServiceTest {
         @DisplayName("Should throw exception for empty plain text")
         void shouldThrowExceptionForEmptyPlainText() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> encryptionService.encrypt("")
-            );
+            DomainException exception = assertThrows(DomainException.class, () -> encryptionService.encrypt(""));
             assertEquals("Plain text cannot be null or empty", exception.getMessage());
         }
 
@@ -128,10 +122,7 @@ class EncryptionServiceTest {
         @DisplayName("Should throw exception for null encrypted data")
         void shouldThrowExceptionForNullEncryptedData() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> encryptionService.decrypt(null)
-            );
+            DomainException exception = assertThrows(DomainException.class, () -> encryptionService.decrypt(null));
             assertEquals("Encrypted data cannot be null or empty", exception.getMessage());
         }
 
@@ -139,10 +130,7 @@ class EncryptionServiceTest {
         @DisplayName("Should throw exception for empty encrypted data")
         void shouldThrowExceptionForEmptyEncryptedData() {
             // When & Then
-            DomainException exception = assertThrows(
-                DomainException.class,
-                () -> encryptionService.decrypt("")
-            );
+            DomainException exception = assertThrows(DomainException.class, () -> encryptionService.decrypt(""));
             assertEquals("Encrypted data cannot be null or empty", exception.getMessage());
         }
 
@@ -150,10 +138,7 @@ class EncryptionServiceTest {
         @DisplayName("Should throw exception for invalid encrypted data")
         void shouldThrowExceptionForInvalidEncryptedData() {
             // When & Then
-            assertThrows(
-                DomainException.class,
-                () -> encryptionService.decrypt("invalid-encrypted-data")
-            );
+            assertThrows(DomainException.class, () -> encryptionService.decrypt("invalid-encrypted-data"));
         }
     }
 

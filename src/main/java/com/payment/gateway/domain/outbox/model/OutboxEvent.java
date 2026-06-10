@@ -1,12 +1,11 @@
 package com.payment.gateway.domain.outbox.model;
 
+import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * OutboxEvent aggregate root.

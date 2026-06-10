@@ -1,9 +1,8 @@
 package com.payment.gateway.infrastructure.commons.security;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 /**
  * Result of API key validation.

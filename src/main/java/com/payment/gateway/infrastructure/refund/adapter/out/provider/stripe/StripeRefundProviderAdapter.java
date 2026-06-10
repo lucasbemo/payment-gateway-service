@@ -10,10 +10,9 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class StripeRefundProviderAdapter implements ExternalRefundProviderPort {
@@ -31,34 +30,29 @@ public class StripeRefundProviderAdapter implements ExternalRefundProviderPort {
     @RateLimiter(name = "refund")
     @Async
     public CompletableFuture<RefundProviderResult> processRefund(RefundProviderRequest request) {
-        log.info("Stripe processRefund: refundId={}, paymentIntentId={}, amount={}",
-                request.refundId(), request.providerTransactionId(), request.amount());
+        log.info(
+                "Stripe processRefund: refundId={}, paymentIntentId={}, amount={}",
+                request.refundId(),
+                request.providerTransactionId(),
+                request.amount());
         try {
             RefundCreateParams params = RefundCreateParams.builder()
-                .setPaymentIntent(request.providerTransactionId())
-                .setAmount(request.amount())
-                .setReason(mapReason(request.reason()))
-                .putMetadata("refund_id", request.refundId())
-                .build();
-            
+                    .setPaymentIntent(request.providerTransactionId())
+                    .setAmount(request.amount())
+                    .setReason(mapReason(request.reason()))
+                    .putMetadata("refund_id", request.refundId())
+                    .build();
+
             Refund refund = Refund.create(params);
-            
+
             log.info("Stripe refund success: refundId={}", refund.getId());
-            
-            return CompletableFuture.completedFuture(new RefundProviderResult(
-                "succeeded".equals(refund.getStatus()),
-                refund.getId(),
-                null,
-                null
-            ));
+
+            return CompletableFuture.completedFuture(
+                    new RefundProviderResult("succeeded".equals(refund.getStatus()), refund.getId(), null, null));
         } catch (StripeException e) {
             log.error("Stripe refund failed: {}", e.getMessage());
-            return CompletableFuture.completedFuture(new RefundProviderResult(
-                false,
-                null,
-                e.getCode(),
-                e.getMessage()
-            ));
+            return CompletableFuture.completedFuture(
+                    new RefundProviderResult(false, null, e.getCode(), e.getMessage()));
         }
     }
 
@@ -66,11 +60,7 @@ public class StripeRefundProviderAdapter implements ExternalRefundProviderPort {
     public CompletableFuture<RefundProviderResult> processRefundFallback(RefundProviderRequest request, Throwable t) {
         log.error("Stripe refund fallback: refundId={}, error={}", request.refundId(), t.getMessage());
         return CompletableFuture.completedFuture(new RefundProviderResult(
-            false,
-            null,
-            "PROVIDER_UNAVAILABLE",
-            "Refund processing temporarily unavailable. Please retry."
-        ));
+                false, null, "PROVIDER_UNAVAILABLE", "Refund processing temporarily unavailable. Please retry."));
     }
 
     @Override
@@ -81,9 +71,8 @@ public class StripeRefundProviderAdapter implements ExternalRefundProviderPort {
         try {
             Refund refund = Refund.retrieve(providerRefundId);
             return CompletableFuture.completedFuture(new RefundStatusResult(
-                refund.getStatus(),
-                refund.getCreated() != null ? java.time.Instant.ofEpochSecond(refund.getCreated()) : null
-            ));
+                    refund.getStatus(),
+                    refund.getCreated() != null ? java.time.Instant.ofEpochSecond(refund.getCreated()) : null));
         } catch (StripeException e) {
             log.error("Stripe getRefundStatus failed: {}", e.getMessage());
             return CompletableFuture.completedFuture(new RefundStatusResult("unknown", null));

@@ -1,7 +1,16 @@
 package com.payment.gateway.infrastructure.customer.adapter.out.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.payment.gateway.domain.customer.model.Customer;
 import com.payment.gateway.domain.customer.model.PaymentMethod;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,16 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CustomerPersistenceAdapterTest {
@@ -35,10 +34,7 @@ class CustomerPersistenceAdapterTest {
     @BeforeEach
     void setUp() {
         adapter = new CustomerPersistenceAdapter(
-                customerJpaRepository,
-                paymentMethodJpaRepository,
-                new CustomerMapper(),
-                new PaymentMethodMapper());
+                customerJpaRepository, paymentMethodJpaRepository, new CustomerMapper(), new PaymentMethodMapper());
     }
 
     private static PaymentMethod domainPaymentMethod(String id, String customerId) {
@@ -55,8 +51,8 @@ class CustomerPersistenceAdapterTest {
                 .build();
     }
 
-    private static PaymentMethodJpaEntity paymentMethodEntity(String id, String customerId,
-                                                              PaymentMethodStatus status) {
+    private static PaymentMethodJpaEntity paymentMethodEntity(
+            String id, String customerId, PaymentMethodStatus status) {
         Instant now = Instant.now();
         return PaymentMethodJpaEntity.builder()
                 .id(id)
@@ -84,8 +80,10 @@ class CustomerPersistenceAdapterTest {
 
             when(customerJpaRepository.save(any(CustomerJpaEntity.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            PaymentMethodJpaEntity existingPm1 = paymentMethodEntity("pm-1", customer.getId(), PaymentMethodStatus.ACTIVE);
-            PaymentMethodJpaEntity existingPm2 = paymentMethodEntity("pm-2", customer.getId(), PaymentMethodStatus.ACTIVE);
+            PaymentMethodJpaEntity existingPm1 =
+                    paymentMethodEntity("pm-1", customer.getId(), PaymentMethodStatus.ACTIVE);
+            PaymentMethodJpaEntity existingPm2 =
+                    paymentMethodEntity("pm-2", customer.getId(), PaymentMethodStatus.ACTIVE);
             when(paymentMethodJpaRepository.findByCustomerId(customer.getId()))
                     .thenReturn(List.of(existingPm1, existingPm2));
 
@@ -100,12 +98,12 @@ class CustomerPersistenceAdapterTest {
 
             // and: the remaining pm-1 is persisted from the aggregate with ACTIVE status
             ArgumentCaptor<PaymentMethodJpaEntity> captor = ArgumentCaptor.forClass(PaymentMethodJpaEntity.class);
-            verify(paymentMethodJpaRepository, org.mockito.Mockito.atLeastOnce()).save(captor.capture());
-            assertThat(captor.getAllValues())
-                    .anySatisfy(saved -> {
-                        assertThat(saved.getId()).isEqualTo("pm-1");
-                        assertThat(saved.getStatus()).isEqualTo(PaymentMethodStatus.ACTIVE);
-                    });
+            verify(paymentMethodJpaRepository, org.mockito.Mockito.atLeastOnce())
+                    .save(captor.capture());
+            assertThat(captor.getAllValues()).anySatisfy(saved -> {
+                assertThat(saved.getId()).isEqualTo("pm-1");
+                assertThat(saved.getStatus()).isEqualTo(PaymentMethodStatus.ACTIVE);
+            });
         }
 
         @Test
@@ -115,9 +113,9 @@ class CustomerPersistenceAdapterTest {
             // aggregate has no payment methods; DB row is already soft-deleted
             when(customerJpaRepository.save(any(CustomerJpaEntity.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            PaymentMethodJpaEntity inactivePm = paymentMethodEntity("pm-9", customer.getId(), PaymentMethodStatus.INACTIVE);
-            when(paymentMethodJpaRepository.findByCustomerId(customer.getId()))
-                    .thenReturn(List.of(inactivePm));
+            PaymentMethodJpaEntity inactivePm =
+                    paymentMethodEntity("pm-9", customer.getId(), PaymentMethodStatus.INACTIVE);
+            when(paymentMethodJpaRepository.findByCustomerId(customer.getId())).thenReturn(List.of(inactivePm));
 
             adapter.saveCustomer(customer);
 
@@ -152,8 +150,7 @@ class CustomerPersistenceAdapterTest {
             assertThat(customer.get().getPaymentMethods())
                     .extracting(PaymentMethod::getId)
                     .containsExactly("pm-1");
-            verify(paymentMethodJpaRepository)
-                    .findByCustomerIdAndStatusNot("cust-1", PaymentMethodStatus.INACTIVE);
+            verify(paymentMethodJpaRepository).findByCustomerIdAndStatusNot("cust-1", PaymentMethodStatus.INACTIVE);
         }
 
         @Test

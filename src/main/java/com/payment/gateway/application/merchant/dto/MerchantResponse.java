@@ -1,10 +1,9 @@
 package com.payment.gateway.application.merchant.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -21,10 +20,9 @@ public class MerchantResponse {
     private final String email;
 
     @Schema(
-        description = "Merchant account status",
-        example = "ACTIVE",
-        allowableValues = {"ACTIVE", "SUSPENDED", "PENDING", "CLOSED"}
-    )
+            description = "Merchant account status",
+            example = "ACTIVE",
+            allowableValues = {"ACTIVE", "SUSPENDED", "PENDING", "CLOSED"})
     private final String status;
 
     @Schema(description = "API key for authentication (shown only on registration)", example = "pk_live_abc123...")

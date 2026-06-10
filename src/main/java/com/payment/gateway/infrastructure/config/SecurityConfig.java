@@ -4,10 +4,12 @@ import com.payment.gateway.infrastructure.commons.security.ApiKeyAuthService;
 import com.payment.gateway.infrastructure.commons.security.ApiKeyAuthenticationFilter;
 import com.payment.gateway.infrastructure.commons.security.JwtAuthenticationFilter;
 import com.payment.gateway.infrastructure.commons.security.JwtTokenProvider;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,15 +17,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -37,15 +36,20 @@ public class SecurityConfig {
     @Bean
     @Profile({"local", "dev"})
     public SecurityFilterChain localSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .anyRequest().permitAll()
-                );
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
+                        .permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**")
+                        .permitAll()
+                        .anyRequest()
+                        .permitAll());
         return http.build();
     }
 
@@ -55,18 +59,26 @@ public class SecurityConfig {
     @Bean
     @Profile("!e2e & !local & !dev & !prod")
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/health/**").permitAll()
-                        .requestMatchers("/api/v1/**").authenticated()
-                        .anyRequest().authenticated()
-                );
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
+                        .permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**")
+                        .permitAll()
+                        .requestMatchers("/api/v1/auth/**")
+                        .permitAll()
+                        .requestMatchers("/api/v1/health/**")
+                        .permitAll()
+                        .requestMatchers("/api/v1/**")
+                        .authenticated()
+                        .anyRequest()
+                        .authenticated());
         return http.build();
     }
 
@@ -87,23 +99,30 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain productionSecurityFilterChain(
                 HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
-            http
-                    .csrf(AbstractHttpConfigurer::disable)
+            http.csrf(AbstractHttpConfigurer::disable)
                     .cors(cors -> cors.configurationSource(corsConfigurationSource))
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/actuator/**").permitAll()
-                            .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                            .requestMatchers("/api/v1/auth/**").permitAll()
-                            .requestMatchers("/api/v1/health/**").permitAll()
-                            .anyRequest().authenticated()
-                    )
-                    .exceptionHandling(ex -> ex.authenticationEntryPoint(
-                            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                    .addFilterBefore(new ApiKeyAuthenticationFilter(apiKeyAuthService),
+                    .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
+                            .permitAll()
+                            .requestMatchers(
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html",
+                                    "/v3/api-docs/**",
+                                    "/swagger-resources/**",
+                                    "/webjars/**")
+                            .permitAll()
+                            .requestMatchers("/api/v1/auth/**")
+                            .permitAll()
+                            .requestMatchers("/api/v1/health/**")
+                            .permitAll()
+                            .anyRequest()
+                            .authenticated())
+                    .exceptionHandling(
+                            ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                    .addFilterBefore(
+                            new ApiKeyAuthenticationFilter(apiKeyAuthService),
                             UsernamePasswordAuthenticationFilter.class)
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                            ApiKeyAuthenticationFilter.class);
+                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), ApiKeyAuthenticationFilter.class);
             return http.build();
         }
     }

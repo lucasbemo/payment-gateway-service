@@ -1,14 +1,13 @@
 package com.payment.gateway.domain.reconciliation.model;
 
 import com.payment.gateway.commons.model.Money;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.Instant;
-import java.util.UUID;
 
 /**
  * SettlementReport aggregate root.
@@ -58,9 +57,15 @@ public class SettlementReport {
         return new Builder();
     }
 
-    public static SettlementReport create(String merchantId, String gatewayName, LocalDate settlementDate,
-                                           String gatewayReportId, Money grossAmount, Money feeAmount,
-                                           Money netAmount, String currency) {
+    public static SettlementReport create(
+            String merchantId,
+            String gatewayName,
+            LocalDate settlementDate,
+            String gatewayReportId,
+            Money grossAmount,
+            Money feeAmount,
+            Money netAmount,
+            String currency) {
         Instant now = Instant.now();
         return new Builder()
                 .id(UUID.randomUUID().toString())
