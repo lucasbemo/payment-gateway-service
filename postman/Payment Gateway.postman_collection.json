@@ -521,7 +521,7 @@
 							"script": {
 								"exec": [
 									"// Generate UUID for idempotency key",
-									"const idempotencyKey = crypto.randomUUID();",
+									"const idempotencyKey = pm.variables.replaceIn('{{$guid}}');",
 									"pm.environment.set('idempotencyKey', idempotencyKey);",
 									"console.log('Generated idempotency key:', idempotencyKey);",
 									""
@@ -903,7 +903,7 @@
 							"script": {
 								"exec": [
 									"// Generate UUID for refund idempotency key",
-									"const refundIdempotencyKey = crypto.randomUUID();",
+									"const refundIdempotencyKey = pm.variables.replaceIn('{{$guid}}');",
 									"pm.environment.set('refundIdempotencyKey', refundIdempotencyKey);",
 									"console.log('Generated refund idempotency key:', refundIdempotencyKey);",
 									""
@@ -1217,7 +1217,7 @@
 									"pm.variables.set('flowCustomerEmail', `customer-${timestamp}@test.com`);",
 									"pm.variables.set('flowCustomerExternalId', `FLOW-EXT-${timestamp}`);",
 									"",
-									"const idempotencyKey = crypto.randomUUID();",
+									"const idempotencyKey = pm.variables.replaceIn('{{$guid}}');",
 									"pm.variables.set('flowIdempotencyKey', idempotencyKey);",
 									"",
 									"console.log('Starting full payment flow...');",
