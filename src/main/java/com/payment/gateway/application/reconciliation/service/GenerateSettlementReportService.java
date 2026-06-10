@@ -10,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * Application service for generating settlement reports.
@@ -46,14 +48,17 @@ public class GenerateSettlementReportService implements GenerateSettlementReport
         String filePath = reportGeneratorPort.generateReport(merchantId, startDate, endDate, format);
 
         // Create settlement report record (using builder since create requires amounts)
+        Instant now = Instant.now();
         SettlementReport report = SettlementReport.builder()
+                .id(UUID.randomUUID().toString())
                 .merchantId(merchantId)
                 .gatewayName("DEFAULT_GATEWAY")
                 .settlementDate(end)
                 .currency("USD")
                 .filePath(filePath)
-                
                 .status("GENERATED")
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
         SettlementReport savedReport = settlementReportPort.saveReport(report);

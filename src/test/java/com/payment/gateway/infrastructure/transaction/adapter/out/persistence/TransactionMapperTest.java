@@ -60,8 +60,9 @@ class TransactionMapperTest {
             assertThat(entity.getPaymentId()).isEqualTo("pay-001");
             assertThat(entity.getMerchantId()).isEqualTo("merchant-001");
             assertThat(entity.getType()).isEqualTo("PAYMENT");
-            assertThat(entity.getAmount()).isEqualByComparingTo(new BigDecimal("100.00"));
-            assertThat(entity.getNetAmount()).isEqualByComparingTo(new BigDecimal("97.50"));
+            // DB stores cents (same convention as payments): 100.00 USD -> 10000
+            assertThat(entity.getAmount()).isEqualByComparingTo(new BigDecimal("10000"));
+            assertThat(entity.getNetAmount()).isEqualByComparingTo(new BigDecimal("9750"));
             assertThat(entity.getCurrency()).isEqualTo("USD");
             assertThat(entity.getStatus()).isEqualTo("PENDING");
             assertThat(entity.getGatewayTransactionId()).isEqualTo("gw-txn-001");
@@ -111,8 +112,8 @@ class TransactionMapperTest {
                     .paymentId("pay-entity-001")
                     .merchantId("merchant-entity-001")
                     .type("AUTHORIZATION")
-                    .amount(new BigDecimal("200.00"))
-                    .netAmount(new BigDecimal("195.00"))
+                    .amount(new BigDecimal("20000"))
+                    .netAmount(new BigDecimal("19500"))
                     .currency("EUR")
                     .status("AUTHORIZED")
                     .gatewayTransactionId("gw-txn-entity-001")

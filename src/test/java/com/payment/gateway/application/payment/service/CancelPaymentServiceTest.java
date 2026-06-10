@@ -38,11 +38,14 @@ class CancelPaymentServiceTest {
     @Mock
     private ExternalPaymentProviderPort externalPaymentProviderPort;
 
+    @Mock
+    private com.payment.gateway.domain.outbox.service.OutboxEventDomainService outboxEventService;
+
     private CancelPaymentService cancelPaymentService;
 
     @BeforeEach
     void setUp() {
-        cancelPaymentService = new CancelPaymentService(paymentQueryPort, externalPaymentProviderPort);
+        cancelPaymentService = new CancelPaymentService(paymentQueryPort, externalPaymentProviderPort, outboxEventService);
     }
 
     @Nested

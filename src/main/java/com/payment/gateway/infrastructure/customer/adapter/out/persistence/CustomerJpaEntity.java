@@ -35,6 +35,9 @@ public class CustomerJpaEntity {
     @Column(name = "phone", length = 50)
     private String phone;
 
+    @Column(name = "external_id", length = 255)
+    private String externalId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)
     private CustomerStatus status;
@@ -53,6 +56,7 @@ public class CustomerJpaEntity {
         this.email = builder.email;
         this.name = builder.name;
         this.phone = builder.phone;
+        this.externalId = builder.externalId;
         this.status = builder.status;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
@@ -69,6 +73,7 @@ public class CustomerJpaEntity {
         private String email;
         private String name;
         private String phone;
+        private String externalId;
         private CustomerStatus status;
         private Instant createdAt;
         private Instant updatedAt;
@@ -100,6 +105,11 @@ public class CustomerJpaEntity {
 
         public Builder phone(String phone) {
             this.phone = phone;
+            return this;
+        }
+
+        public Builder externalId(String externalId) {
+            this.externalId = externalId;
             return this;
         }
 

@@ -130,6 +130,7 @@ public class CustomerController implements CustomerApi {
 
         @Schema(description = "Card number (test: 4111111111111111)", example = "4111111111111111", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "Card number is required")
+        @jakarta.validation.constraints.Pattern(regexp = "\\d{13,19}", message = "Card number must be 13-19 digits")
         private String cardNumber;
 
         @Schema(description = "Card expiry month (MM)", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)

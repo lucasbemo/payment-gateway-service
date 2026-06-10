@@ -21,6 +21,8 @@ public interface CustomerJpaRepository extends JpaRepository<CustomerJpaEntity, 
 
     List<CustomerJpaEntity> findByMerchantId(String merchantId);
 
+    Optional<CustomerJpaEntity> findByMerchantIdAndExternalId(String merchantId, String externalId);
+
     List<CustomerJpaEntity> findByEmailContainingAndMerchantId(String email, String merchantId);
 
     boolean existsByEmail(String email);

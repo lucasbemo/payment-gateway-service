@@ -18,8 +18,8 @@ public class TransactionMapper {
                 .paymentId(transaction.getPaymentId())
                 .merchantId(transaction.getMerchantId())
                 .type(transaction.getType() != null ? transaction.getType().name() : null)
-                .amount(transaction.getAmount() != null ? transaction.getAmount().getAmount() : BigDecimal.ZERO)
-                .netAmount(transaction.getNetAmount() != null ? transaction.getNetAmount().getAmount() : null)
+                .amount(transaction.getAmount() != null ? BigDecimal.valueOf(transaction.getAmount().getAmountInCents()) : BigDecimal.ZERO)
+                .netAmount(transaction.getNetAmount() != null ? BigDecimal.valueOf(transaction.getNetAmount().getAmountInCents()) : null)
                 .currency(transaction.getCurrency())
                 .status(transaction.getStatus() != null ? transaction.getStatus().name() : null)
                 .gatewayTransactionId(transaction.getGatewayTransactionId())
@@ -34,11 +34,12 @@ public class TransactionMapper {
 
     public Transaction toDomain(TransactionJpaEntity entity) {
         Currency currency = Currency.getInstance(entity.getCurrency());
+        // DB stores cents (same convention as payments) — load via the cents overload
         Money amount = entity.getAmount() != null
-                ? Money.of(entity.getAmount(), currency)
+                ? Money.of(entity.getAmount().longValueExact(), currency)
                 : Money.zero(currency);
         Money netAmount = entity.getNetAmount() != null
-                ? Money.of(entity.getNetAmount(), currency)
+                ? Money.of(entity.getNetAmount().longValueExact(), currency)
                 : null;
 
         return Transaction.builder()
