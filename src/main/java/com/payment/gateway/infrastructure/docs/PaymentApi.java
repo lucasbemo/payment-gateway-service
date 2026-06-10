@@ -14,10 +14,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 
-@Tag(
-        name = "Payment Processing",
-        description =
-                """
+@Tag(name = "Payment Processing", description = """
         Payment authorization, capture, and cancellation operations.
 
         ## Payment Lifecycle
@@ -31,11 +28,7 @@ import org.springframework.http.ResponseEntity;
         """)
 public interface PaymentApi {
 
-    @Operation(
-            operationId = "processPayment",
-            summary = "Process a new payment",
-            description =
-                    """
+    @Operation(operationId = "processPayment", summary = "Process a new payment", description = """
             Authorizes a payment for the specified amount. The payment will be in
             AUTHORIZED status and can be captured later using the capture endpoint.
 
@@ -61,8 +54,7 @@ public interface PaymentApi {
                                                 @ExampleObject(
                                                         name = "Successful Payment",
                                                         summary = "Payment authorized successfully",
-                                                        value =
-                                                                """
+                                                        value = """
                         {
                           "success": true,
                           "message": "Payment processed successfully",
@@ -96,11 +88,7 @@ public interface PaymentApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Validation Error",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Validation Error", value = """
                         {
                           "success": false,
                           "message": "Validation failed",
@@ -114,11 +102,7 @@ public interface PaymentApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Not Found Error",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Not Found Error", value = """
                         {
                           "success": false,
                           "message": "Merchant not found: merch_invalid",
@@ -132,11 +116,7 @@ public interface PaymentApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Idempotency Hit",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Idempotency Hit", value = """
                         {
                           "success": true,
                           "message": "Payment already processed",
@@ -179,8 +159,7 @@ public interface PaymentApi {
                                                             @ExampleObject(
                                                                     name = "Payment Request",
                                                                     summary = "Standard payment request",
-                                                                    value =
-                                                                            """
+                                                                    value = """
                             {
                               "merchantId": "merch_xyz789",
                               "amountInCents": 10000,
@@ -216,11 +195,7 @@ public interface PaymentApi {
                                                         implementation =
                                                                 com.payment.gateway.infrastructure.commons.rest
                                                                         .ApiResponse.class),
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Payment Details",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Payment Details", value = """
                         {
                           "success": true,
                           "message": "Success",
@@ -239,13 +214,7 @@ public interface PaymentApi {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "404",
                         description = "Payment not found",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
+                        content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                         {
                           "success": false,
                           "message": "Payment not found: pay_invalid",
@@ -289,11 +258,7 @@ public interface PaymentApi {
                                                         implementation =
                                                                 com.payment.gateway.infrastructure.commons.rest
                                                                         .ApiResponse.class),
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Payment List",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Payment List", value = """
                         {
                           "success": true,
                           "message": "Success",
@@ -329,11 +294,7 @@ public interface PaymentApi {
                                     example = "merch_xyz789")
                             String merchantId);
 
-    @Operation(
-            operationId = "capturePayment",
-            summary = "Capture an authorized payment",
-            description =
-                    """
+    @Operation(operationId = "capturePayment", summary = "Capture an authorized payment", description = """
             Captures a previously authorized payment. The payment must be in AUTHORIZED status.
             After capture, the payment status changes to CAPTURED.
             """)
@@ -345,11 +306,7 @@ public interface PaymentApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Captured Payment",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Captured Payment", value = """
                         {
                           "success": true,
                           "message": "Payment captured successfully",
@@ -364,13 +321,7 @@ public interface PaymentApi {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "400",
                         description = "Payment cannot be captured (wrong status)",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
+                        content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                         {
                           "success": false,
                           "message": "Payment cannot be captured: current status is CAPTURED",
@@ -397,11 +348,7 @@ public interface PaymentApi {
                                     example = "merch_xyz789")
                             String merchantId);
 
-    @Operation(
-            operationId = "cancelPayment",
-            summary = "Cancel an authorized payment",
-            description =
-                    """
+    @Operation(operationId = "cancelPayment", summary = "Cancel an authorized payment", description = """
             Cancels a previously authorized payment. The payment must be in AUTHORIZED status.
             After cancellation, the payment status changes to CANCELLED and the authorization is released.
             """)
@@ -413,11 +360,7 @@ public interface PaymentApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Cancelled Payment",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Cancelled Payment", value = """
                         {
                           "success": true,
                           "message": "Payment cancelled successfully",
@@ -431,13 +374,7 @@ public interface PaymentApi {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "400",
                         description = "Payment cannot be cancelled",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
+                        content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                         {
                           "success": false,
                           "message": "Payment cannot be cancelled: current status is CAPTURED",

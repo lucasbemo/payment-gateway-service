@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
-@Tag(
-        name = "Transaction Management",
-        description =
-                """
+@Tag(name = "Transaction Management", description = """
         Transaction operations including capture and void.
 
         ## Transaction Types
@@ -37,11 +34,7 @@ public interface TransactionApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Transaction Details",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Transaction Details", value = """
                         {
                           "success": true,
                           "message": "Success",
@@ -62,13 +55,7 @@ public interface TransactionApi {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "404",
                         description = "Transaction not found",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
+                        content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                         {
                           "success": false,
                           "message": "Transaction not found: txn_invalid",
@@ -95,11 +82,7 @@ public interface TransactionApi {
                                     example = "merch_xyz789")
                             String merchantId);
 
-    @Operation(
-            operationId = "captureTransaction",
-            summary = "Capture a transaction",
-            description =
-                    """
+    @Operation(operationId = "captureTransaction", summary = "Capture a transaction", description = """
             Captures a previously authorized transaction.
             The transaction must be in APPROVED status with type AUTHORIZATION.
             """)
@@ -111,11 +94,7 @@ public interface TransactionApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Captured Transaction",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Captured Transaction", value = """
                         {
                           "success": true,
                           "message": "Transaction captured successfully",
@@ -130,13 +109,7 @@ public interface TransactionApi {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "400",
                         description = "Transaction cannot be captured",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
+                        content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                         {
                           "success": false,
                           "message": "Transaction cannot be captured",
@@ -163,11 +136,7 @@ public interface TransactionApi {
                                     example = "merch_xyz789")
                             String merchantId);
 
-    @Operation(
-            operationId = "voidTransaction",
-            summary = "Void a transaction",
-            description =
-                    """
+    @Operation(operationId = "voidTransaction", summary = "Void a transaction", description = """
             Voids a previously authorized transaction.
             The transaction must be in APPROVED status with type AUTHORIZATION.
             """)
@@ -179,11 +148,7 @@ public interface TransactionApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Voided Transaction",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Voided Transaction", value = """
                         {
                           "success": true,
                           "message": "Transaction voided successfully",
@@ -197,13 +162,7 @@ public interface TransactionApi {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "400",
                         description = "Transaction cannot be voided",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
+                        content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                         {
                           "success": false,
                           "message": "Transaction cannot be voided: already captured",

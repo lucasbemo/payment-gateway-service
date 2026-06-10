@@ -186,18 +186,22 @@ public class CustomMetricsBinder implements MeterBinder {
 
     public void recordMerchantPayment(String merchantId, long amountCents) {
         paymentsPerMerchant
-                .computeIfAbsent(merchantId, k -> Counter.builder("payment.gateway.merchant.payments.total")
-                        .description("Total payments per merchant")
-                        .tag("merchantId", k)
-                        .register(registry))
+                .computeIfAbsent(
+                        merchantId,
+                        k -> Counter.builder("payment.gateway.merchant.payments.total")
+                                .description("Total payments per merchant")
+                                .tag("merchantId", k)
+                                .register(registry))
                 .increment();
 
         revenuePerMerchant
-                .computeIfAbsent(merchantId, k -> DistributionSummary.builder("payment.gateway.merchant.revenue")
-                        .description("Revenue per merchant")
-                        .tag("merchantId", k)
-                        .baseUnit("cents")
-                        .register(registry))
+                .computeIfAbsent(
+                        merchantId,
+                        k -> DistributionSummary.builder("payment.gateway.merchant.revenue")
+                                .description("Revenue per merchant")
+                                .tag("merchantId", k)
+                                .baseUnit("cents")
+                                .register(registry))
                 .record(amountCents);
     }
 

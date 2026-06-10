@@ -14,10 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
-@Tag(
-        name = "Refund Processing",
-        description =
-                """
+@Tag(name = "Refund Processing", description = """
         Full and partial refund processing operations.
 
         ## Refund Types
@@ -29,11 +26,7 @@ import org.springframework.http.ResponseEntity;
         """)
 public interface RefundApi {
 
-    @Operation(
-            operationId = "processRefund",
-            summary = "Process a refund",
-            description =
-                    """
+    @Operation(operationId = "processRefund", summary = "Process a refund", description = """
             Processes a refund for a captured payment. Can be full or partial refund.
 
             **Requirements:**
@@ -48,11 +41,7 @@ public interface RefundApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Successful Refund",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Successful Refund", value = """
                         {
                           "success": true,
                           "message": "Refund processed successfully",
@@ -77,11 +66,7 @@ public interface RefundApi {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            examples =
-                                                    @ExampleObject(
-                                                            name = "Refund Request",
-                                                            value =
-                                                                    """
+                                            examples = @ExampleObject(name = "Refund Request", value = """
                             {
                               "paymentId": "pay_xyz789",
                               "merchantId": "merch_xyz789",
@@ -105,11 +90,7 @@ public interface RefundApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Refund Details",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Refund Details", value = """
                         {
                           "success": true,
                           "message": "Success",
@@ -149,11 +130,7 @@ public interface RefundApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        name = "Cancelled Refund",
-                                                        value =
-                                                                """
+                                        examples = @ExampleObject(name = "Cancelled Refund", value = """
                         {
                           "success": true,
                           "message": "Refund cancelled successfully",

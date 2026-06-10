@@ -75,8 +75,7 @@ class PaymentControllerTest {
                         .status("PENDING")
                         .build());
 
-        String requestBody =
-                """
+        String requestBody = """
                 {
                     "merchantId": "merchant-1",
                     "amountInCents": 10000,

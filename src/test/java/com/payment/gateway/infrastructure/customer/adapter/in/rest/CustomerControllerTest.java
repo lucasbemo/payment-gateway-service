@@ -104,8 +104,7 @@ class CustomerControllerTest {
 
         given(addPaymentMethodUseCase.addPaymentMethod(any())).willReturn(response);
 
-        String body =
-                """
+        String body = """
                 {
                     "merchantId": "m-1",
                     "cardNumber": "4111111111111111",
