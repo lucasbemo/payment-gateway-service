@@ -204,6 +204,34 @@ Install the **palantir-java-format** plugin and enable *Settings → Tools → A
 → Reformat code* so files are formatted automatically on save, matching the project's
 Spotless configuration (see [Code Style](#code-style) below).
 
+### Visual Studio Code
+
+#### Recommended Extensions
+
+- **Extension Pack for Java** (`vscjava.vscode-java-pack`) — language support, debugger, Maven
+- **Run on Save** (`emeraldwalk.runonsave`) — to apply Spotless formatting on save (see below)
+
+#### Code Style
+
+VS Code's built-in Java formatter is Eclipse-based and does **not** match
+palantir-java-format, so don't rely on it — Spotless is the source of truth. Run
+`make format` (`./mvnw spotless:apply`) before committing, or format each file on save with
+the **Run on Save** extension by adding to `.vscode/settings.json`:
+
+```json
+{
+  "[java]": { "editor.formatOnSave": false },
+  "emeraldwalk.runonsave": {
+    "commands": [
+      { "match": "\\.java$", "cmd": "./mvnw -q spotless:apply -DspotlessFiles=${file}" }
+    ]
+  }
+}
+```
+
+`-DspotlessFiles=${file}` formats only the saved file to keep it fast. See
+[CONTRIBUTING.md](../CONTRIBUTING.md#code-formatting-spotless) for the full formatting workflow.
+
 ---
 
 ## Database Management

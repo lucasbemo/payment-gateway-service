@@ -230,8 +230,27 @@ echo './mvnw -q spotless:apply' > .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
-IntelliJ IDEA users can install the **palantir-java-format** plugin and enable
-*Settings → Tools → Actions on Save → Reformat code* for the same result on every save.
+**Editor setup (format on save):**
+
+- **IntelliJ IDEA** — install the **palantir-java-format** plugin (Settings → Plugins), then
+  enable *Settings → Tools → Actions on Save → Reformat code*.
+- **VS Code** — VS Code's built-in Java formatter is Eclipse-based and does **not** match
+  palantir-java-format, so don't rely on it. Run `make format` before committing, or install
+  the **Run on Save** (`emeraldwalk.runonsave`) extension and add to `.vscode/settings.json`:
+
+  ```json
+  {
+    "[java]": { "editor.formatOnSave": false },
+    "emeraldwalk.runonsave": {
+      "commands": [
+        { "match": "\\.java$", "cmd": "./mvnw -q spotless:apply -DspotlessFiles=${file}" }
+      ]
+    }
+  }
+  ```
+
+  `-DspotlessFiles=${file}` formats only the saved file to keep it fast, and disabling the
+  built-in Java formatter stops it from fighting Spotless.
 
 ### Architecture
 
