@@ -25,6 +25,10 @@
 - Maven 3.8+
 - Docker & Docker Compose
 
+> For the AI-assisted spec-driven workflow you also need **GitHub CLI (`gh`)** with the
+> `project` scope and **`jq`** — see [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md). They are
+> not required to build or run the app.
+
 ### 1. Clone and Setup
 
 ```bash

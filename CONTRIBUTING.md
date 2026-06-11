@@ -51,6 +51,14 @@ We are committed to providing a welcoming and inspiring community for all.
 - Git
 - IDE (IntelliJ IDEA recommended)
 
+For the AI-assisted [spec-driven workflow](#spec-driven-workflow-ai-assisted) you also
+need (not required for plain manual contribution):
+
+- **GitHub CLI (`gh`)**, authenticated with the `project` scope (`gh auth refresh -s project`)
+- **`jq`** (`brew install jq`)
+
+See [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md) for the full workflow prerequisites.
+
 ### Fork and Clone
 
 ```bash
