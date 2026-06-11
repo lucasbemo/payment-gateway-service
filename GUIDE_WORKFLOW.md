@@ -69,7 +69,8 @@ any code (or create the worktree) until you reply `APPROVE` to its Phase 1 plan.
 
 > ⚠️ **The JDK must be 21 — not newer.** The host's default JDK (e.g. Temurin 25/26)
 > breaks Lombok/Mockito. See the *Gotchas* in [`CLAUDE.md`](CLAUDE.md) for the exact
-> `JAVA_HOME` (sdkman JDK 21) recipe and the Testcontainers `-Dapi.version=1.44` flag.
+> JDK 26 toolchain (`sdk use java 26.0.1-tem`). The old JDK-21 pin and Testcontainers
+> `-Dapi.version=1.44` workaround are obsolete after the Spring Boot 4 / JDK 26 upgrade.
 
 ### One-time setup
 

@@ -130,17 +130,17 @@ Root Java package: `com.payment.gateway`. Single-module Maven project.
 
 | Area | Choice |
 | --- | --- |
-| Language / build | Java **21**, Maven (`./mvnw`), Spring Boot **3.2.0** |
+| Language / build | Java **26**, Maven (`./mvnw`), Spring Boot **4.1.0** |
 | Persistence | PostgreSQL + Spring Data JPA/Hibernate, **Flyway** migrations |
 | Messaging | Spring Kafka (transactional outbox pattern) |
 | Cache / locks | Redis + Redisson (idempotency, distributed locks) |
 | Resilience | Resilience4j (circuit breaker, retry, bulkhead, rate limiter), Bucket4j |
-| Mapping / boilerplate | MapStruct 1.5.5, Lombok 1.18.30 |
+| Mapping / boilerplate | MapStruct 1.6.3, Lombok 1.18.46 |
 | Payments | stripe-java 24.0.0 |
 | Reports / storage | spring-cloud-aws S3, iText7 (PDF) |
 | API docs | springdoc-openapi (Swagger UI) |
 | Observability | Micrometer + Prometheus, Brave/Zipkin tracing |
-| Testing | JUnit 5, AssertJ, Mockito (BDD), Testcontainers 1.19.3, ArchUnit 1.2.1 |
+| Testing | JUnit 5, AssertJ, Mockito (BDD), Testcontainers 2.0.5, ArchUnit 1.4.2 |
 | Formatting | Spotless 3.6.0 + palantir-java-format 2.92.0 |
 
 ## Build & Run Commands
@@ -270,24 +270,15 @@ kafka-ui 8082, pgadmin 8083, Prometheus 9090, Grafana 3000, Zipkin 9411, MinIO
 
 ## Gotchas & Known Issues
 
-* **JDK:** the host default JDK (Temurin 26) breaks Lombok/Mockito. Build with
-  JDK 21:
-
-  ```shell
-  JAVA_HOME=~/.sdkman/candidates/java/21.0.11-tem ./mvnw ...
-  ```
-
-* **Testcontainers on host:** Testcontainers 1.19.3 negotiates Docker API 1.32,
-  but Docker 29's daemon minimum is 1.40 → `400 BadRequest`. Override:
-
-  ```shell
-  ./mvnw test -DargLine='-Dapi.version=1.44'
-  ```
-  
-  This flag is host-only — it is NOT in pom.xml / Makefile / CI.
-* **E2E locally:** run e2e classes **one per JVM** (`-DreuseForks=false` or a
-  per-class loop) to avoid "ApplicationContext failure threshold exceeded" when
-  the local docker-compose stack runs alongside. CI (single JVM) is fine.
+* **JDK:** the project targets **JDK 26** (Spring Boot 4.1). Build with a JDK 26
+  toolchain (`sdk use java 26.0.1-tem` or any Temurin 26). Older JDKs (≤21) will not
+  compile `--release 26`. The previous "use JDK 21" workaround is obsolete.
+* **Testcontainers:** uses Testcontainers **2.x**, which negotiates a modern Docker
+  API automatically — the old `-Dapi.version=1.44` override is **no longer needed**.
+* **E2E locally:** the full e2e suite runs in a single JVM (`./mvnw test
+  -Dtest='com.payment.gateway.e2e.**'`). If you hit "ApplicationContext failure
+  threshold exceeded" while the local docker-compose stack is also running, run e2e
+  classes one per JVM (`-DreuseForks=false`).
 * **CI no-ops:** the `code-quality` job runs `checkstyle:check`/`spotbugs:check`
   wrapped in `|| true`, but those plugins aren't configured — effectively no-ops.
   Only `spotless:check` is a real gate.
