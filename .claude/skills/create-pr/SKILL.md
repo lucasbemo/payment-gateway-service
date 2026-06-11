@@ -134,13 +134,23 @@ Use this structure:
 
 ## GitHub CLI workflow
 
-If `gh` is available and the user wants the PR created:
+`gh` (authenticated GitHub CLI) is a **required** tool for this workflow — see the
+prerequisites in [`GUIDE_WORKFLOW.md`](../../../GUIDE_WORKFLOW.md). Verify it before
+creating the PR:
 
-1. Push the current branch.
-2. Create the PR with `gh pr create`.
+- Run `gh auth status`. If `gh` is missing or not authenticated, **STOP** and tell the
+  user to install/authenticate it (`gh auth login`; and `gh auth refresh -s project`
+  for the backlog skills). Do not silently work around it.
+
+When `gh` is available and the user wants the PR created:
+
+1. Push the current branch (in a worktree, the `feature/<n>-<slug>` branch).
+2. Create the PR with `gh pr create` (draft, per project convention).
 3. Return the PR link.
 
-If `gh` is not available, produce the exact PR title and body for manual creation.
+Only if `gh` genuinely cannot run in the current environment, fall back to printing the
+exact PR title and body for manual creation — treat this as a degraded last resort, not
+the normal path.
 
 ## Final response
 
