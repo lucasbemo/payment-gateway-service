@@ -56,28 +56,42 @@ any code (or create the worktree) until you reply `APPROVE` to its Phase 1 plan.
 
 ## Prerequisites
 
-Run these once before using the workflow:
+### Required tools
 
-1. **GitHub CLI with `project` scope.** The backlog scripts call
-   `gh project item-list`, which needs the `project` (or `read:project`) scope —
-   the default `repo` token does **not** include it.
+| Tool | Version | Why | Needed for |
+|------|---------|-----|------------|
+| **JDK** | **21** | Build / run / test the app | Always |
+| **Docker + Docker Compose** | Latest | Local infra (Postgres, Kafka, Redis, …) and Testcontainers e2e tests | Always |
+| **Git** | ≥ 2.x | Version control + worktree-per-feature | Always |
+| **Maven** | 3.8+ | The repo ships `./mvnw`, so a system Maven install is **optional** | Always |
+| **GitHub CLI (`gh`)** | 2.x, authenticated, `project` scope | Backlog skills call `gh project item-list` / `gh pr create` | Workflow |
+| **`jq`** | Latest | Parses GitHub issue JSON into specs | Workflow |
+
+> ⚠️ **The JDK must be 21 — not newer.** The host's default JDK (e.g. Temurin 25/26)
+> breaks Lombok/Mockito. See the *Gotchas* in [`CLAUDE.md`](CLAUDE.md) for the exact
+> `JAVA_HOME` (sdkman JDK 21) recipe and the Testcontainers `-Dapi.version=1.44` flag.
+
+### One-time setup
+
+1. **Authenticate `gh` with the `project` scope** (the default `repo` token lacks it):
    ```bash
    gh auth status            # check current scopes
    gh auth refresh -s project
    ```
-2. **`jq`** installed (`brew install jq`) — used to parse issue JSON into specs.
-3. **Git ≥ 2.x** (worktree support) — features are implemented in isolated worktrees.
-4. **JDK 21** for any build/verify steps the skills run. The host default JDK
-   may be newer and break the build — see the *Gotchas* section in
-   [`CLAUDE.md`](CLAUDE.md) for the exact `JAVA_HOME` recipe.
-5. **Shared infra running** — start the single docker-compose stack once from the main
-   checkout (`make docker-up`); all worktrees share it.
-6. **Fill in the project config** (gitignored, never committed):
+2. **Fill in the project config** (gitignored, never committed):
    ```bash
    cp .claude/config/github-project.env.example .claude/config/github-project.env
-   # then edit .claude/config/github-project.env with your real values
+   # then edit it with your real GitHub Project owner / number / repo
    ```
    (The worktree tooling copies this file into each new worktree automatically.)
+
+### Each session
+
+Start the shared infra stack **once** from the main checkout — all worktrees reuse it:
+
+```bash
+make docker-up
+```
 
 ---
 
