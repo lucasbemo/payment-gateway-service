@@ -145,34 +145,41 @@ Wait for all services to be ready (~30 seconds).
 
 ## Spec-Driven Workflow (AI-Assisted)
 
-For non-trivial feature work, this project uses a **spec-driven, human-in-the-loop
-workflow** assisted by Claude Code skills. Features flow from a GitHub Project
-backlog item → an approved local spec under `specs/active/` → implementation →
-review → PR, with explicit human approval gates. GitHub Project is the backlog
-source of truth; the approved spec is the engineering contract; **current code and
-tests always override older specs**.
+For non-trivial feature work, this project offers a **spec-driven, human-in-the-loop
+workflow** powered by Claude Code skills. The idea is simple: a backlog item becomes an
+approved spec, the spec drives the implementation, and you stay in control at every gate.
 
-The pipeline (each step is a Claude Code skill):
+> 💡 **Optional.** The standard manual flow in the rest of this guide works exactly the
+> same. Full reference: **[`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md)**.
 
-```
-/list-github-project-items  →  /import-github-project-item <n>  →  (human approval)
-  →  /implement-feature specs/active/<n>-<slug>  →  /spring-boot-review  →  /create-pr
-  →  (merge)  →  /finish-feature <n>-<slug>
-```
+### How it flows
 
-Each feature is implemented in its **own git worktree** (auto-created by
-`/implement-feature`) on a `feature/<n>-<slug>` branch with its own app port, sharing
-one local infra stack — so you can switch between features without stashing.
+Each step is a Claude Code skill you invoke by name:
 
-These skills honor the same conventions described in this guide — branch naming
-(`feature/`, `fix/`, …), [Conventional Commits](#commit-guidelines), the
-[Spotless gate](#code-formatting-spotless), and draft PRs that are never
-auto-merged (see also the *Git workflow* rules in [`CLAUDE.md`](CLAUDE.md)).
+| # | Step | Command | What it does |
+|:-:|------|---------|--------------|
+| 1 | Browse the backlog | `/list-github-project-items` | Lists open GitHub Project items |
+| 2 | Import an item | `/import-github-project-item <n>` | Scaffolds a spec at `specs/active/<n>-<slug>/` and asks blocking questions |
+| 3 | 🧑‍💻 **Review & approve** | _(you)_ | Answer the questions and edit the spec — it becomes the contract |
+| 4 | Implement | `/implement-feature specs/active/<n>-<slug>` | Plans, waits for your `APPROVE`, then builds + tests in an isolated worktree |
+| 5 | Review | `/spring-boot-review` | Staff-level adversarial review of the diff |
+| 6 | Open the PR | `/create-pr` | Opens a draft PR with risk + rollback notes |
+| 7 | After merge, clean up | `/finish-feature <n>-<slug>` | Archives the spec and removes the worktree |
 
-**See [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md) for the full reference** —
-prerequisites (incl. `gh auth refresh -s project`), the `specs/` lifecycle, the
-spec context policy, configuration, and troubleshooting. Using this workflow is
-optional; the standard manual flow below works the same.
+Two human gates keep you in control: approving the **spec** (step 3) and approving the
+**plan** before any code is written (step 4).
+
+### Good to know
+
+- **GitHub Project is the backlog's source of truth**; the approved spec is the
+  engineering contract; **current code and tests always override older specs**.
+- **One worktree per feature** — step 4 auto-creates an isolated git worktree on a
+  `feature/<n>-<slug>` branch with its own app port (sharing one local infra stack), so
+  you can switch between features without stashing.
+- **Same conventions as everywhere else** — these skills follow this guide's branch
+  naming (`feature/`, `fix/`, …), [Conventional Commits](#commit-guidelines), the
+  [Spotless gate](#code-formatting-spotless), and draft-PRs-never-auto-merged rules
+  (see also the *Git workflow* section in [`CLAUDE.md`](CLAUDE.md)).
 
 ---
 
