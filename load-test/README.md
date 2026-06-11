@@ -87,6 +87,39 @@ BASE_URL=http://localhost:8080 CONCURRENCY=8 PASSES=5 load-test/newman/newman-lo
 
 ---
 
+## Soak (sustained stability)
+
+A soak runs steady traffic for a long window and watches for slow problems a short load
+test misses — memory creep, latency drift, connection-pool exhaustion, Kafka-lag / outbox
+backlog growth, container restarts. Use it as the production-readiness stability gate
+(e.g. after the JDK 26 / Spring Boot 4 upgrade) in lieu of a real staging environment.
+
+```bash
+make docker-up                 # full stack (app, infra, Prometheus, Grafana, Zipkin)
+make soak                      # ~1h soak (default)
+DURATION=4h VUS=20 make soak   # longer / heavier
+```
+
+`load-test/soak/soak.sh` drives k6 at a steady rate, samples metrics every 60s to
+`load-test/soak/out/soak-metrics-<ts>.csv` (JVM heap/GC/threads, Hikari pool, Kafka lag,
+**outbox PENDING backlog**, container mem/CPU), then `analyze.py` writes
+`soak-report-<ts>.md` with PASS/FAIL per signal:
+
+| Signal | Pass condition |
+|---|---|
+| Container restarts | `RestartCount` unchanged (no crash/OOM-kill) |
+| JVM heap (post-warmup) | no creep — last-third avg ≤ first-third × 1.2, peak < 95% of max |
+| Hikari pending | ~0 (no pool exhaustion) |
+| Kafka lag / outbox backlog | bounded (consumers + poller keep up) |
+| k6 error rate / thresholds | <1% errors, p95 in budget |
+| Logs | no `OutOfMemory` |
+
+While it runs, watch **Grafana** (http://localhost:3000, provisioned payment dashboard) and
+confirm **no Prometheus alerts fire** (http://localhost:9090/alerts). Output files are
+git-ignored. A local 1h soak is a smoke-soak; run `DURATION=8h` for stronger sign-off.
+
+---
+
 ## Suggested baseline (and regression gate)
 
 Capture numbers on a known-good build, then compare after changes (e.g. before/after

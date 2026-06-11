@@ -93,6 +93,9 @@ load-test-k6: ## Run the k6 throughput/latency load test (needs k6 + a running a
 load-test-newman: ## Run the newman functional load loop (needs a running app)
 	load-test/newman/newman-load.sh
 
+soak: ## Run a local staging soak (~1h; needs the full stack up). DURATION overridable
+	load-test/soak/soak.sh
+
 format: ## Format code
 	mvn spotless:apply
 
