@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
 
@@ -19,14 +19,14 @@
     <description>Production Payment Gateway Service - DDD Hexagonal Architecture</description>
 
     <properties>
-        <java.version>21</java.version>
-        <resilience4j.version>2.2.0</resilience4j.version>
+        <java.version>26</java.version>
+        <resilience4j.version>2.4.0</resilience4j.version>
         <bucket4j.version>8.10.1</bucket4j.version>
-        <testcontainers.version>1.19.3</testcontainers.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <lombok.version>1.18.30</lombok.version>
-        <redisson.version>3.24.3</redisson.version>
-        <flyway.version>9.22.3</flyway.version>
+        <testcontainers.version>2.0.5</testcontainers.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.46</lombok.version>
+        <redisson.version>4.5.0</redisson.version>
+        <flyway.version>12.8.1</flyway.version>
     </properties>
 
     <dependencies>
@@ -110,10 +110,10 @@
             <version>${resilience4j.version}</version>
         </dependency>
 
-        <!-- AOP for Aspects -->
+        <!-- AOP for Aspects (Spring Boot 4 removed spring-boot-starter-aop) -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
         </dependency>
 
         <!-- Bucket4j for Rate Limiting -->
@@ -136,11 +136,17 @@
             <version>${flyway.version}</version>
         </dependency>
 
+        <!-- Spring Boot 4 extracted Flyway auto-configuration into its own module -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-flyway</artifactId>
+        </dependency>
+
         <!-- API Documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.3.0</version>
+            <version>3.0.3</version>
         </dependency>
 
         <!-- Object Mapping -->
@@ -170,7 +176,7 @@
         <dependency>
             <groupId>io.awspring.cloud</groupId>
             <artifactId>spring-cloud-aws-starter-s3</artifactId>
-            <version>3.0.2</version>
+            <version>4.0.2</version>
         </dependency>
 
         <!-- Stripe Java SDK -->
@@ -224,28 +230,22 @@
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>kafka</artifactId>
+            <artifactId>testcontainers-kafka</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -303,7 +303,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <goals>
