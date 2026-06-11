@@ -70,3 +70,9 @@ coverage/
 !**/mvnw
 !**/mvnw.cmd
 .factorypath
+
+# Claude local project config
+.claude/config/github-project.env
+
+# Generated temporary GitHub Project payloads
+.claude/tmp/

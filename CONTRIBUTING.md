@@ -10,6 +10,7 @@ Thank you for your interest in contributing to the Payment Gateway Service! This
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
 - [How to Contribute](#how-to-contribute)
+- [Spec-Driven Workflow](#spec-driven-workflow-ai-assisted)
 - [Pull Request Process](#pull-request-process)
 - [Coding Standards](#coding-standards)
 - [Commit Guidelines](#commit-guidelines)
@@ -131,6 +132,34 @@ Wait for all services to be ready (~30 seconds).
 2. Make your changes
 3. Write/update tests
 4. Submit a pull request
+
+---
+
+## Spec-Driven Workflow (AI-Assisted)
+
+For non-trivial feature work, this project uses a **spec-driven, human-in-the-loop
+workflow** assisted by Claude Code skills. Features flow from a GitHub Project
+backlog item → an approved local spec under `specs/active/` → implementation →
+review → PR, with explicit human approval gates. GitHub Project is the backlog
+source of truth; the approved spec is the engineering contract; **current code and
+tests always override older specs**.
+
+The pipeline (each step is a Claude Code skill):
+
+```
+/list-github-project-items  →  /import-github-project-item <n>  →  (human approval)
+  →  /implement-feature specs/active/<n>-<slug>  →  /spring-boot-review  →  /create-pr
+```
+
+These skills honor the same conventions described in this guide — branch naming
+(`feature/`, `fix/`, …), [Conventional Commits](#commit-guidelines), the
+[Spotless gate](#code-formatting-spotless), and draft PRs that are never
+auto-merged (see also the *Git workflow* rules in [`CLAUDE.md`](CLAUDE.md)).
+
+**See [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md) for the full reference** —
+prerequisites (incl. `gh auth refresh -s project`), the `specs/` lifecycle, the
+spec context policy, configuration, and troubleshooting. Using this workflow is
+optional; the standard manual flow below works the same.
 
 ---
 
@@ -400,6 +429,7 @@ void processPayment_withInvalidAmount_throwsException() { }
 | File | Purpose |
 |------|---------|
 | `README.md` | Project overview |
+| `GUIDE_WORKFLOW.md` | Spec-driven (AI-assisted) development workflow |
 | `CHANGELOG.md` | Version history |
 | `docs/API_DOCUMENTATION.md` | API reference |
 | `docs/GETTING_STARTED.md` | Quick start |
