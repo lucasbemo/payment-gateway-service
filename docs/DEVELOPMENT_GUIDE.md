@@ -31,6 +31,11 @@ This guide provides detailed instructions for developing and contributing to the
 | Docker | Latest | Containerization |
 | Docker Compose | Latest | Multi-container setup |
 | Git | Latest | Version control |
+| GitHub CLI (`gh`) | 2.x+ (`project` scope) | AI spec-driven workflow only |
+| `jq` | Latest | AI spec-driven workflow only |
+
+> `gh` and `jq` are required only for the AI-assisted spec-driven workflow — see
+> [`GUIDE_WORKFLOW.md`](../GUIDE_WORKFLOW.md). They are not needed to build or run the app.
 
 ### Recommended IDE
 

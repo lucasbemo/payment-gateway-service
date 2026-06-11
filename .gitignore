@@ -70,3 +70,14 @@ coverage/
 !**/mvnw
 !**/mvnw.cmd
 .factorypath
+
+# Claude local project config
+.claude/config/github-project.env
+
+# Generated temporary GitHub Project payloads
+.claude/tmp/
+
+# Git worktrees (spec-driven workflow) + their per-worktree local artifacts
+.worktrees/
+.env.worktree
+run-app.sh

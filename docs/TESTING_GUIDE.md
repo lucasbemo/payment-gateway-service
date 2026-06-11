@@ -18,7 +18,7 @@ Comprehensive guide for testing the Payment Gateway API using Postman.
 ### Required Software
 
 - Postman v10 or later
-- Java 17+
+- Java 21+
 - Maven 3.8+
 
 ### Application Setup

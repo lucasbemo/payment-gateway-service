@@ -10,6 +10,7 @@ Thank you for your interest in contributing to the Payment Gateway Service! This
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
 - [How to Contribute](#how-to-contribute)
+- [Spec-Driven Workflow](#spec-driven-workflow-ai-assisted)
 - [Pull Request Process](#pull-request-process)
 - [Coding Standards](#coding-standards)
 - [Commit Guidelines](#commit-guidelines)
@@ -49,6 +50,14 @@ We are committed to providing a welcoming and inspiring community for all.
 - Docker & Docker Compose
 - Git
 - IDE (IntelliJ IDEA recommended)
+
+For the AI-assisted [spec-driven workflow](#spec-driven-workflow-ai-assisted) you also
+need (not required for plain manual contribution):
+
+- **GitHub CLI (`gh`)**, authenticated with the `project` scope (`gh auth refresh -s project`)
+- **`jq`** (`brew install jq`)
+
+See [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md) for the full workflow prerequisites.
 
 ### Fork and Clone
 
@@ -131,6 +140,46 @@ Wait for all services to be ready (~30 seconds).
 2. Make your changes
 3. Write/update tests
 4. Submit a pull request
+
+---
+
+## Spec-Driven Workflow (AI-Assisted)
+
+For non-trivial feature work, this project offers a **spec-driven, human-in-the-loop
+workflow** powered by Claude Code skills. The idea is simple: a backlog item becomes an
+approved spec, the spec drives the implementation, and you stay in control at every gate.
+
+> 💡 **Optional.** The standard manual flow in the rest of this guide works exactly the
+> same. Full reference: **[`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md)**.
+
+### How it flows
+
+Each step is a Claude Code skill you invoke by name:
+
+| # | Step | Command | What it does |
+|:-:|------|---------|--------------|
+| 1 | Browse the backlog | `/list-github-project-items` | Lists open GitHub Project items |
+| 2 | Import an item | `/import-github-project-item <n>` | Scaffolds a spec at `specs/active/<n>-<slug>/` and asks blocking questions |
+| 3 | 🧑‍💻 **Review & approve** | _(you)_ | Answer the questions and edit the spec — it becomes the contract |
+| 4 | Implement | `/implement-feature specs/active/<n>-<slug>` | Plans, waits for your `APPROVE`, then builds + tests in an isolated worktree |
+| 5 | Review | `/spring-boot-review` | Staff-level adversarial review of the diff |
+| 6 | Open the PR | `/create-pr` | Opens a draft PR with risk + rollback notes |
+| 7 | After merge, clean up | `/finish-feature <n>-<slug>` | Archives the spec and removes the worktree |
+
+Two human gates keep you in control: approving the **spec** (step 3) and approving the
+**plan** before any code is written (step 4).
+
+### Good to know
+
+- **GitHub Project is the backlog's source of truth**; the approved spec is the
+  engineering contract; **current code and tests always override older specs**.
+- **One worktree per feature** — step 4 auto-creates an isolated git worktree on a
+  `feature/<n>-<slug>` branch with its own app port (sharing one local infra stack), so
+  you can switch between features without stashing.
+- **Same conventions as everywhere else** — these skills follow this guide's branch
+  naming (`feature/`, `fix/`, …), [Conventional Commits](#commit-guidelines), the
+  [Spotless gate](#code-formatting-spotless), and draft-PRs-never-auto-merged rules
+  (see also the *Git workflow* section in [`CLAUDE.md`](CLAUDE.md)).
 
 ---
 
@@ -400,6 +449,7 @@ void processPayment_withInvalidAmount_throwsException() { }
 | File | Purpose |
 |------|---------|
 | `README.md` | Project overview |
+| `GUIDE_WORKFLOW.md` | Spec-driven (AI-assisted) development workflow |
 | `CHANGELOG.md` | Version history |
 | `docs/API_DOCUMENTATION.md` | API reference |
 | `docs/GETTING_STARTED.md` | Quick start |
