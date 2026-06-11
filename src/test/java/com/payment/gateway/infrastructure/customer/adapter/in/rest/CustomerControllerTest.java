@@ -11,21 +11,22 @@ import com.payment.gateway.application.customer.port.in.AddPaymentMethodUseCase;
 import com.payment.gateway.application.customer.port.in.GetCustomerUseCase;
 import com.payment.gateway.application.customer.port.in.RegisterCustomerUseCase;
 import com.payment.gateway.application.customer.port.in.RemovePaymentMethodUseCase;
+import com.payment.gateway.infrastructure.config.JacksonConfig;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @DisplayName("CustomerController Tests")
 @WebMvcTest(CustomerController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JacksonConfig.class})
 class CustomerControllerTest {
 
     @Autowired

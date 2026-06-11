@@ -19,20 +19,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 
 /**
- * Tests for PaymentEventListeners using embedded Kafka.
+ * Unit tests for PaymentEventListeners. Dependencies are mocked and the listener is
+ * exercised directly, so no Kafka broker is required.
  */
-@EmbeddedKafka(
-        partitions = 1,
-        brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"},
-        topics = {"payment.created", "payment.completed", "payment.failed", "payment.cancelled"})
 @DisplayName("Payment Event Listeners Tests")
 class PaymentEventListenersTest {
 
-    private EmbeddedKafkaBroker embeddedKafka;
     private PaymentQueryPort paymentQueryPort;
     private PaymentEventPublisherPort paymentEventPublisher;
     private ObjectMapper objectMapper;
