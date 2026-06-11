@@ -14,6 +14,9 @@ allowed-tools:
   - Bash(git branch*)
   - Bash(git checkout*)
   - Bash(git switch*)
+  - Bash(git fetch*)
+  - Bash(git worktree*)
+  - Bash(.claude/scripts/worktree/*)
   - Bash(gh issue view*)
   - Bash(gh pr view*)
   - Bash(./mvnw*)
@@ -211,9 +214,31 @@ Do not continue to implementation in the same response.
 
 Start Phase 2 only after explicit approval.
 
-Before editing:
+### Step 0 — Create or enter the feature worktree (default)
 
-1. Re-check `git status`.
+This project uses **worktree-per-feature** (shared infra + app port offset). Before
+writing any code:
+
+1. Derive the slug from the spec path: `specs/active/<n>-<slug>` → slug `<n>-<slug>`.
+2. If the current working directory is already under `.worktrees/`, you are already in
+   the worktree — skip creation.
+3. Otherwise create/enter it:
+   `.claude/scripts/worktree/create-worktree.sh <n>-<slug>`
+   Read the `WORKTREE_PATH=` and `SERVER_PORT=` lines from its output. Use
+   `WORKTREE_PATH` as the **working root for ALL subsequent edits, builds, and git
+   commands** (absolute paths under it, or `git -C <WORKTREE_PATH>`). The script
+   creates branch `feature/<n>-<slug>`, moves the spec onto it, copies local config
+   (`.claude/config/github-project.env`, `.env*`), and assigns a unique app port.
+4. Infrastructure (DB/Kafka/Redis) is a **single shared stack** started once from the
+   main checkout (`make docker-up`). Do NOT start a second stack. To run the app, use
+   `<WORKTREE_PATH>/run-app.sh`, which binds the assigned `SERVER_PORT` against the
+   shared infra. Testcontainers-based tests are already isolated and need no port handling.
+
+Never create the worktree during Phase 1.
+
+### Before editing (inside the worktree)
+
+1. Re-check `git -C <WORKTREE_PATH> status`.
 2. Confirm whether there are existing uncommitted changes.
 3. Avoid overwriting user changes.
 4. If the working tree has unrelated changes, preserve them and work around them.

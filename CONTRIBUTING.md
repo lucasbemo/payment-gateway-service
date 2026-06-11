@@ -149,7 +149,12 @@ The pipeline (each step is a Claude Code skill):
 ```
 /list-github-project-items  →  /import-github-project-item <n>  →  (human approval)
   →  /implement-feature specs/active/<n>-<slug>  →  /spring-boot-review  →  /create-pr
+  →  (merge)  →  /finish-feature <n>-<slug>
 ```
+
+Each feature is implemented in its **own git worktree** (auto-created by
+`/implement-feature`) on a `feature/<n>-<slug>` branch with its own app port, sharing
+one local infra stack — so you can switch between features without stashing.
 
 These skills honor the same conventions described in this guide — branch naming
 (`feature/`, `fix/`, …), [Conventional Commits](#commit-guidelines), the

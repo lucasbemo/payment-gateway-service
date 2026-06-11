@@ -20,6 +20,13 @@ allowed-tools:
 
 Review the current Spring Boot changes.
 
+## Worktree awareness
+
+Feature work happens in a per-feature worktree under `.worktrees/<n>-<slug>/` on branch
+`feature/<n>-<slug>`. If the current directory is under `.worktrees/`, review that
+worktree's diff and run any verification there (it has its own `target/` and assigned
+`SERVER_PORT`). The shared infra stack is started once from the main checkout.
+
 ## Live diff context
 
 * Branch: !`git branch --show-current 2>/dev/null || true`

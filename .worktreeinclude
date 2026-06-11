@@ -1,0 +1,10 @@
+# Files copied into a new worktree created by Claude Code's native `claude --worktree`.
+# Uses .gitignore syntax. These are git-ignored, so a fresh worktree lacks them,
+# but the spec-driven workflow scripts and the local app config depend on them.
+#
+# Note: the project's own .claude/scripts/worktree/create-worktree.sh copies the
+# same files, so this file only matters if you use the native `claude --worktree` flag.
+.claude/config/github-project.env
+.claude/settings.local.json
+.env
+.env.local

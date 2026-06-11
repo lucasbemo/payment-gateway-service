@@ -130,4 +130,8 @@ Recommended next command:
 
 `/implement-feature specs/active/<folder-name>`
 
+Note: `/implement-feature` auto-creates an isolated git worktree for the feature
+(branch `feature/<n>-<slug>`, its own app port, shared infra) before writing code — you
+do not create the worktree here. This import step runs in the main checkout.
+
 Do not implement code.

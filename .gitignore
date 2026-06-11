@@ -76,3 +76,8 @@ coverage/
 
 # Generated temporary GitHub Project payloads
 .claude/tmp/
+
+# Git worktrees (spec-driven workflow) + their per-worktree local artifacts
+.worktrees/
+.env.worktree
+run-app.sh

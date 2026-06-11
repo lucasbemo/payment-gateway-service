@@ -30,6 +30,14 @@ Prepare a pull request for the current branch.
 
 User input: `$ARGUMENTS`
 
+## Worktree awareness
+
+Feature work happens in a per-feature worktree under `.worktrees/<n>-<slug>/` on branch
+`feature/<n>-<slug>`. If the current directory is under `.worktrees/`, run all git/build
+commands there and push that worktree's `feature/<n>-<slug>` branch. The spec folder is
+committed on the feature branch (so it travels with the PR); `specs/INDEX.md` is NOT
+edited on the feature branch (it is maintained only in the main checkout).
+
 ## Live repository context
 
 * Branch: !`git branch --show-current 2>/dev/null || true`
