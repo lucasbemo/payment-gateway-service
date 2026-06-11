@@ -58,10 +58,14 @@ target JDK.
   `/actuator/health` + `/actuator/prometheus` endpoints behave as before.
 
 ## Performance / Load (required)
-- Run a load profile (e.g. via the Postman/newman runner or a load tool) against the
-  JDK 26 build and compare latency/throughput/error-rate to a JDK 21 baseline.
-- Acceptance: no meaningful regression (define threshold with the owner, e.g. p95 within
-  ±10% of baseline).
+- Harness added under `load-test/` (see `load-test/README.md`):
+  - **k6** (`make load-test-k6`) — throughput/latency of the process→read-payment hot
+    path, with thresholds (p95 latency, <1% errors, >99% checks).
+  - **newman load loop** (`make load-test-newman`) — full Postman collection replayed
+    across concurrent workers, asserting every response (correctness under load).
+- Run against the JDK 26 build and compare latency/throughput/error-rate to a JDK 21
+  baseline. Acceptance: no meaningful regression (e.g. p95 within ±10% of baseline;
+  error rate <1%).
 
 ## Staging soak (required before "production ready")
 - Deploy the upgraded build to staging and let it run under representative traffic without

@@ -87,6 +87,12 @@ generate-openapi: ## Generate OpenAPI documentation
 coverage: ## Generate code coverage report
 	mvn clean test jacoco:report
 
+load-test-k6: ## Run the k6 throughput/latency load test (needs k6 + a running app)
+	k6 run load-test/k6/payment-load.js
+
+load-test-newman: ## Run the newman functional load loop (needs a running app)
+	load-test/newman/newman-load.sh
+
 format: ## Format code
 	mvn spotless:apply
 
