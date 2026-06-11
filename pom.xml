@@ -169,11 +169,17 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
-        <!-- Spring Boot 4 moved the tracing (Brave/Zipkin) auto-configuration out of
-             the actuator starter into this module; without it no spans are created -->
+        <!-- Spring Boot 4 split tracing auto-configuration out of the actuator starter:
+             micrometer-tracing wires the ObservationRegistry handler, and spring-boot-zipkin
+             provides the Brave tracer + Zipkin reporter auto-config. Without BOTH, no spans
+             are created (micrometer-tracing falls back to a Noop tracer). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-micrometer-tracing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-zipkin</artifactId>
         </dependency>
 
         <dependency>
