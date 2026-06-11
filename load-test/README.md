@@ -71,15 +71,19 @@ passes** (each a fresh `newman run`) and asserts every response — a functional
 that catches correctness regressions a throughput tool misses. Exits non-zero if any
 pass fails.
 
+```bash
+# parallel functional load (concurrency-safe):
+BASE_URL=http://localhost:8080 CONCURRENCY=8 PASSES=5 load-test/newman/newman-load.sh
+```
+
 **Tunables (env):** `BASE_URL`, `PASSES`, `CONCURRENCY`, `COLLECTION`, `ENVIRONMENT`.
 
-> ⚠️ **Keep `CONCURRENCY=1` (default).** This Postman collection is a *sequential*
-> end-to-end scenario and is **not concurrency-safe** — parallel passes generate
-> colliding test data (e.g. a merchant email), so all-but-one fail. That's a property
-> of the collection, not the app. For **concurrent** load use the k6 harness (it uses
-> unique idempotency keys against one pre-created merchant, so it scales cleanly).
-> Also note: the loop deliberately avoids newman's `-n` (which bleeds variables like
-> the idempotency payment id across iterations).
+> **Concurrency:** the collection generates **GUID-unique** test data per run
+> (merchant/customer email, external ids, idempotency keys), so passes are
+> independent and `CONCURRENCY>1` is safe — verified to **16/16 passes with 8
+> concurrent workers**. The loop deliberately avoids newman's `-n` (which would bleed
+> variables like the idempotency payment id across iterations); each pass is a fresh
+> `newman run`. For pure throughput/latency, prefer the k6 harness.
 
 ---
 

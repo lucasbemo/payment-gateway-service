@@ -9,17 +9,19 @@
 # newman's `-n`, because the collection is a stateful end-to-end flow and `-n` would
 # bleed variables (e.g. the idempotency payment id) across iterations.
 #
-# NOTE: this Postman collection is a *sequential* E2E scenario and is NOT
-# concurrency-safe (concurrent passes generate colliding test data, e.g. a merchant
-# email, so all-but-one fail). Keep CONCURRENCY=1 for a clean functional soak; use
-# the k6 harness for concurrent throughput/latency load.
+# The collection generates GUID-unique test data per run (merchant/customer email,
+# external ids, idempotency keys), so passes are independent and CONCURRENCY>1 is
+# safe — verified up to 8 concurrent workers. Default is sequential (a clean soak);
+# raise CONCURRENCY for parallel functional load, or use the k6 harness for pure
+# throughput/latency.
 #
 # Run:
 #   load-test/newman/newman-load.sh
 #   BASE_URL=http://localhost:8080 PASSES=50 load-test/newman/newman-load.sh
+#   CONCURRENCY=8 PASSES=5 load-test/newman/newman-load.sh   # parallel functional load
 #
-# Env: BASE_URL, PASSES (sequential collection runs), CONCURRENCY (parallel workers;
-#      keep 1 — see note above), COLLECTION, ENVIRONMENT.
+# Env: BASE_URL, PASSES (collection runs / worker), CONCURRENCY (parallel workers),
+#      COLLECTION, ENVIRONMENT.
 set -uo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
