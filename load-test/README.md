@@ -63,15 +63,23 @@ custom trend isolating the payment POST.
 ```bash
 make load-test-newman
 # or:
-BASE_URL=http://localhost:8080 CONCURRENCY=8 ITERATIONS=25 \
-  load-test/newman/newman-load.sh
+BASE_URL=http://localhost:8080 PASSES=50 load-test/newman/newman-load.sh
 ```
 
-**What it does:** launches `CONCURRENCY` parallel workers, each running the full
-Postman collection `ITERATIONS` times (= `CONCURRENCY × ITERATIONS` total runs),
-then aggregates assertion totals. Exits non-zero if any worker or assertion fails.
+**What it does:** replays the full Postman collection `PASSES` times as **independent
+passes** (each a fresh `newman run`) and asserts every response — a functional soak
+that catches correctness regressions a throughput tool misses. Exits non-zero if any
+pass fails.
 
-**Tunables (env):** `BASE_URL`, `CONCURRENCY`, `ITERATIONS`, `COLLECTION`, `ENVIRONMENT`.
+**Tunables (env):** `BASE_URL`, `PASSES`, `CONCURRENCY`, `COLLECTION`, `ENVIRONMENT`.
+
+> ⚠️ **Keep `CONCURRENCY=1` (default).** This Postman collection is a *sequential*
+> end-to-end scenario and is **not concurrency-safe** — parallel passes generate
+> colliding test data (e.g. a merchant email), so all-but-one fail. That's a property
+> of the collection, not the app. For **concurrent** load use the k6 harness (it uses
+> unique idempotency keys against one pre-created merchant, so it scales cleanly).
+> Also note: the loop deliberately avoids newman's `-n` (which bleeds variables like
+> the idempotency payment id across iterations).
 
 ---
 
