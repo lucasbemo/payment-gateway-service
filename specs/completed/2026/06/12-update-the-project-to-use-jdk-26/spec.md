@@ -1,7 +1,8 @@
 # Feature Spec: Update the project to JDK 26
 
-Status: draft
+Status: completed (merged 2026-06-12)
 Source: https://github.com/lucasbemo/payment-gateway-service/issues/12
+Merged PR: https://github.com/lucasbemo/payment-gateway-service/pull/13 (squash 99e5b97)
 
 ## Problem
 
