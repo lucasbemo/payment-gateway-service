@@ -178,10 +178,25 @@ Full documentation lives in [`docs/`](docs/README.md). Start here:
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the
-branching model, Conventional Commits, and the spec-driven workflow
-([GUIDE_WORKFLOW.md](GUIDE_WORKFLOW.md)). Run `make format` (Spotless) before
-committing — CI fails on `spotless:check`.
+Contributions are welcome. This project is built with a **spec-driven,
+human-in-the-loop AI workflow** ([Claude Code](https://claude.com/claude-code)):
+every non-trivial change flows from a backlog item to an approved spec to an
+implementation, with explicit human approval gates at each step — so the intent
+is reviewed *before* any code is written.
+
+```
+GitHub Project item → /import-github-project-item <n>   (scaffold + enrich a spec)
+                    → human review & approval           (answer blocking questions)
+                    → /implement-feature <spec>          (plan → APPROVE → code in a worktree)
+                    → /spring-boot-review → /create-pr   (review → draft PR)
+                    → merge → /finish-feature <n>-<slug> (archive spec, clean up)
+```
+
+See **[GUIDE_WORKFLOW.md](GUIDE_WORKFLOW.md)** for the full walkthrough and
+[CONTRIBUTING.md](CONTRIBUTING.md) for the branching model and Conventional
+Commits. Run `make format` (Spotless) before committing — CI fails on
+`spotless:check`. The workflow is optional for one-off fixes, but it's how the
+backlog is delivered.
 
 ## License
 
