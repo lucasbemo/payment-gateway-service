@@ -373,7 +373,7 @@
       "type": "stat",
       "targets": [
         {
-          "expr": "rate(payment_gateway_payments_amount_cents_sum[5m]) / rate(payment_gateway_payments_amount_cents_count[5m])",
+          "expr": "sum(payment_gateway_payments_amount_cents_sum) / clamp_min(sum(payment_gateway_payments_amount_cents_count), 1)",
           "legendFormat": "Avg Amount (cents)"
         }
       ],
