@@ -46,7 +46,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -98,7 +100,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -150,7 +154,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -202,7 +208,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["mean"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -212,7 +220,7 @@
       "type": "stat",
       "targets": [
         {
-          "expr": "rate(payment_gateway_payments_processing_duration_seconds_sum[5m]) / rate(payment_gateway_payments_processing_duration_seconds_count[5m]) * 1000",
+          "expr": "sum(payment_gateway_payments_processing_duration_seconds_sum) / clamp_min(sum(payment_gateway_payments_processing_duration_seconds_count), 1) * 1000",
           "legendFormat": "Avg Time"
         }
       ]
@@ -262,7 +270,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -348,7 +358,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "none"
         },
         "overrides": []
       },
@@ -366,7 +376,14 @@
           "expr": "rate(payment_gateway_payments_amount_cents_sum[5m]) / rate(payment_gateway_payments_amount_cents_count[5m])",
           "legendFormat": "Avg Amount (cents)"
         }
-      ]
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
     },
     {
       "datasource": {
@@ -416,7 +433,9 @@
   "refresh": "5s",
   "schemaVersion": 38,
   "style": "dark",
-  "tags": ["payment-gateway"],
+  "tags": [
+    "payment-gateway"
+  ],
   "templating": {
     "list": []
   },
