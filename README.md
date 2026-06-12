@@ -1,6 +1,6 @@
 # Payment Gateway Service
 
-> **Production-Ready Payment Gateway** built with Java 21 + Spring Boot 3, following DDD Modular Hexagonal Architecture with Kafka event-driven messaging, PostgreSQL persistence, and Redis-based idempotency handling.
+> **Production-Ready Payment Gateway** built with Java 26 + Spring Boot 4, following DDD Modular Hexagonal Architecture with Kafka event-driven messaging, PostgreSQL persistence, and Redis-based idempotency handling.
 
 ---
 
@@ -21,7 +21,7 @@
 
 ### Prerequisites
 
-- Java 21+
+- Java 26+
 - Maven 3.8+
 - Docker & Docker Compose
 
@@ -96,7 +96,7 @@ java -jar target/payment-gateway-0.0.1-SNAPSHOT.jar
 
 | Category | Technology |
 |----------|------------|
-| **Language** | Java 21 |
+| **Language** | Java 26 |
 | **Framework** | Spring Boot 3.2 |
 | **Database** | PostgreSQL 16 |
 | **Messaging** | Apache Kafka |
@@ -334,4 +334,4 @@ For questions or issues:
 
 ---
 
-*Built with ❤️ using Java 21 + Spring Boot 3 + DDD + Hexagonal Architecture*
+*Built with ❤️ using Java 26 + Spring Boot 4 + DDD + Hexagonal Architecture*

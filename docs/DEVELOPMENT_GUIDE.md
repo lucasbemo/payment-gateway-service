@@ -26,7 +26,7 @@ This guide provides detailed instructions for developing and contributing to the
 
 | Software | Version | Purpose |
 |----------|---------|---------|
-| Java | 21+ | Runtime |
+| Java | 26+ | Runtime |
 | Maven | 3.8+ | Build tool |
 | Docker | Latest | Containerization |
 | Docker Compose | Latest | Multi-container setup |

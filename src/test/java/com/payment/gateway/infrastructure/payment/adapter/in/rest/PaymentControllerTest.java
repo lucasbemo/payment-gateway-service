@@ -12,21 +12,22 @@ import com.payment.gateway.application.payment.port.in.CancelPaymentUseCase;
 import com.payment.gateway.application.payment.port.in.CapturePaymentUseCase;
 import com.payment.gateway.application.payment.port.in.GetPaymentUseCase;
 import com.payment.gateway.application.payment.port.in.ProcessPaymentUseCase;
+import com.payment.gateway.infrastructure.config.JacksonConfig;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @DisplayName("PaymentController Tests")
 @WebMvcTest(PaymentController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JacksonConfig.class})
 class PaymentControllerTest {
 
     @Autowired
@@ -35,19 +36,19 @@ class PaymentControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private ProcessPaymentUseCase processPaymentUseCase;
 
-    @MockBean
+    @MockitoBean
     private CapturePaymentUseCase capturePaymentUseCase;
 
-    @MockBean
+    @MockitoBean
     private CancelPaymentUseCase cancelPaymentUseCase;
 
-    @MockBean
+    @MockitoBean
     private GetPaymentUseCase getPaymentUseCase;
 
-    @MockBean
+    @MockitoBean
     private PaymentRestMapper paymentRestMapper;
 
     @Test

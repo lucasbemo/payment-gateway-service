@@ -12,21 +12,22 @@ import com.payment.gateway.application.merchant.port.in.GetMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.RegisterMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.SuspendMerchantUseCase;
 import com.payment.gateway.application.merchant.port.in.UpdateMerchantUseCase;
+import com.payment.gateway.infrastructure.config.JacksonConfig;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @DisplayName("MerchantController Tests")
 @WebMvcTest(MerchantController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JacksonConfig.class})
 class MerchantControllerTest {
 
     @Autowired
@@ -35,19 +36,19 @@ class MerchantControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private RegisterMerchantUseCase registerMerchantUseCase;
 
-    @MockBean
+    @MockitoBean
     private GetMerchantUseCase getMerchantUseCase;
 
-    @MockBean
+    @MockitoBean
     private UpdateMerchantUseCase updateMerchantUseCase;
 
-    @MockBean
+    @MockitoBean
     private SuspendMerchantUseCase suspendMerchantUseCase;
 
-    @MockBean
+    @MockitoBean
     private ActivateMerchantUseCase activateMerchantUseCase;
 
     @Test

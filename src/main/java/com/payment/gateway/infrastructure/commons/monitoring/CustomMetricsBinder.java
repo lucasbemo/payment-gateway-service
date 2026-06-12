@@ -156,6 +156,10 @@ public class CustomMetricsBinder implements MeterBinder {
         return paymentProcessingTimer;
     }
 
+    public void recordPaymentProcessingDuration(java.time.Duration duration) {
+        if (paymentProcessingTimer != null) paymentProcessingTimer.record(duration);
+    }
+
     // Refund recording methods
     public void recordRefundProcessed() {
         if (refundsProcessed != null) refundsProcessed.increment();

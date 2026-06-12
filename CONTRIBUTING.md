@@ -45,7 +45,7 @@ We are committed to providing a welcoming and inspiring community for all.
 
 ### Prerequisites
 
-- Java 21+
+- Java 26+
 - Maven 3.8+
 - Docker & Docker Compose
 - Git

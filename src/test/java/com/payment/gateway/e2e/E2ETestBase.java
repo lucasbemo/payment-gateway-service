@@ -5,8 +5,9 @@ import com.payment.gateway.test.ContainerConfig;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -43,6 +44,7 @@ import org.springframework.test.context.transaction.TestTransaction;
             "payment.gateway.idempotency.enabled=true"
         })
 @ActiveProfiles("e2e")
+@AutoConfigureTestRestTemplate
 public abstract class E2ETestBase extends ContainerConfig {
 
     @Autowired

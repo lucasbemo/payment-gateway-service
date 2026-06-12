@@ -145,6 +145,8 @@ class ProcessPaymentServiceTest {
             then(paymentQueryPort).should(times(2)).savePayment(any(Payment.class));
             then(externalPaymentProviderPort).should().authorize(any());
             then(transactionCommandPort).should().createTransaction(any());
+            then(metricsPort).should().recordPaymentApproved();
+            then(metricsPort).should().recordPaymentProcessingDuration(any(java.time.Duration.class));
         }
 
         @Test

@@ -11,21 +11,22 @@ import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.in.CancelRefundUseCase;
 import com.payment.gateway.application.refund.port.in.GetRefundUseCase;
 import com.payment.gateway.application.refund.port.in.ProcessRefundUseCase;
+import com.payment.gateway.infrastructure.config.JacksonConfig;
 import com.payment.gateway.infrastructure.config.SecurityConfig;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @DisplayName("RefundController Tests")
 @WebMvcTest(RefundController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JacksonConfig.class})
 class RefundControllerTest {
 
     @Autowired
@@ -34,13 +35,13 @@ class RefundControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private ProcessRefundUseCase processRefundUseCase;
 
-    @MockBean
+    @MockitoBean
     private GetRefundUseCase getRefundUseCase;
 
-    @MockBean
+    @MockitoBean
     private CancelRefundUseCase cancelRefundUseCase;
 
     @Test

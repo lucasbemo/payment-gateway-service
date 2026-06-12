@@ -81,3 +81,6 @@ coverage/
 .worktrees/
 .env.worktree
 run-app.sh
+
+# Soak run outputs (metrics CSV / reports / k6 logs)
+load-test/soak/out/

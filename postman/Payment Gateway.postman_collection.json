@@ -119,7 +119,7 @@
 							"script": {
 								"exec": [
 									"// Generate unique merchant email for each run",
-									"const timestamp = Date.now();",
+									"const timestamp = Date.now() + '-' + pm.variables.replaceIn('{{$guid}}');",
 									"pm.variables.set('merchantEmail', `merchant${timestamp}@test.com`);",
 									""
 								],
@@ -341,7 +341,7 @@
 							"script": {
 								"exec": [
 									"// Generate unique customer email for each run",
-									"const timestamp = Date.now();",
+									"const timestamp = Date.now() + '-' + pm.variables.replaceIn('{{$guid}}');",
 									"pm.variables.set('customerEmail', `customer${timestamp}@test.com`);",
 									"pm.variables.set('customerExternalId', `EXT-${timestamp}`);",
 									""
@@ -1356,7 +1356,7 @@
 							"script": {
 								"exec": [
 									"// Generate all unique identifiers for the flow",
-									"const timestamp = Date.now();",
+									"const timestamp = Date.now() + '-' + pm.variables.replaceIn('{{$guid}}');",
 									"",
 									"pm.variables.set('flowMerchantEmail', `merchant-${timestamp}@test.com`);",
 									"pm.variables.set('flowCustomerEmail', `customer-${timestamp}@test.com`);",
@@ -1415,7 +1415,7 @@
 							"script": {
 								"exec": [
 									"// Generate a fixed idempotency key for testing",
-									"const testKey = 'idempotency-test-' + Date.now();",
+									"const testKey = 'idempotency-test-' + Date.now() + '-' + pm.variables.replaceIn('{{$guid}}');",
 									"pm.environment.set('idempotencyTestKey', testKey);",
 									"console.log('Idempotency test key:', testKey);",
 									""
