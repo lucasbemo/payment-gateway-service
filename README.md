@@ -58,15 +58,15 @@ The service follows **DDD + Hexagonal (Ports & Adapters)** with a strict
 dependency direction `infrastructure → application → domain`:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  DOMAIN — pure business core (rich entities, domain services)│
-│  payment · refund · transaction · merchant · customer ·      │
-│  reconciliation · outbox · idempotency                       │
-├─────────────────────────────────────────────────────────────┤
-│  APPLICATION — use cases, commands/responses, ports          │
-├─────────────────────────────────────────────────────────────┤
-│  INFRASTRUCTURE — REST/Kafka adapters, persistence, Stripe   │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│ DOMAIN — business core: rich entities & domain services          │
+│ payment · refund · transaction · merchant · customer ·           │
+│ reconciliation · outbox · idempotency                            │
+├──────────────────────────────────────────────────────────────────┤
+│ APPLICATION — use cases, commands / responses, ports             │
+├──────────────────────────────────────────────────────────────────┤
+│ INFRASTRUCTURE — REST & Kafka adapters, JPA, Stripe              │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 The boundaries are enforced by an ArchUnit test (`HexagonalArchitectureTest`):
