@@ -1,5 +1,17 @@
 # Decisions: Update the project to JDK 26
 
+## Outcome (2026-06-12)
+
+**Completed and merged** via PR #13 (squash `99e5b97`). It was a genuine Spring Boot
+3.2 → 4.1 / Framework 6 → 7 major migration (Jackson 2→3 bridge, Boot 4 package/starter
+relocations, ~12 dependency bumps, test-API migration, Dockerfile + CI + docs). Verified:
+1081 unit + 128 e2e green, CI green, Postman 81/81 (concurrency-safe), Docker image,
+real-request validation, observability (metrics→Prometheus→Grafana, traces→Zipkin), and a
+local ~1h staging soak PASS. Four pre-existing observability bugs were surfaced and fixed
+(Zipkin endpoint key, dead processing-duration timer, Grafana datasource uid, avg-panel
+NaN). **Remaining:** a production-sized staging soak (`DURATION=8h make soak`) on real
+staging infra — harness committed; not doable locally.
+
 ## Decision Log
 
 | Date | Decision | Reason | Alternatives |
