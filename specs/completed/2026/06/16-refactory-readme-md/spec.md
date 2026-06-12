@@ -1,6 +1,7 @@
 # Feature Spec: Refactor README.md
 
-Status: draft
+Status: completed
+Merged PR: [#17](https://github.com/lucasbemo/payment-gateway-service/pull/17) (merged 2026-06-12)
 Source: https://github.com/lucasbemo/payment-gateway-service/issues/16
 Type: Documentation (no production code changes)
 
