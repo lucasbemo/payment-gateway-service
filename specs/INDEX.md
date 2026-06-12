@@ -21,6 +21,7 @@ This folder contains implementation-ready specs derived from GitHub Project back
 | Issue | Title | Merged PR | Date | Spec Path | Summary |
 |---|---|---|---|---|---|
 | #12 | Update the project to JDK 26 | [#13](https://github.com/lucasbemo/payment-gateway-service/pull/13) | 2026-06-12 | `specs/completed/2026/06/12-update-the-project-to-use-jdk-26/` | Spring Boot 3.2→4.1 / Framework 6→7 major migration for JDK 26; all tests/CI/Postman green, observability restored, local soak PASS. |
+| #16 | Refactor README.md | [#17](https://github.com/lucasbemo/payment-gateway-service/pull/17) | 2026-06-12 | `specs/completed/2026/06/16-refactory-readme-md/` | Docs-only: feature-oriented README (Overview → Features → Architecture → Quick Start w/ config → Documentation), added MIT LICENSE + badges, moved GUIDE_WORKFLOW/PROMPTS into `docs/`, fixed Spring Boot 3.2→4.1, Kafka 9093→19092, and dead links. |
 
 ## Archived
 
