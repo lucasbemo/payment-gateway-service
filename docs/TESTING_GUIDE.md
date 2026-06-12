@@ -1,15 +1,64 @@
 # Payment Gateway Testing Guide
 
-Comprehensive guide for testing the Payment Gateway API using Postman.
+Comprehensive guide for testing the Payment Gateway. Covers the automated
+**Java test suite (JUnit + Maven)** and the **Postman/Newman** API collection.
 
 ## Table of Contents
 
+- [Java Test Suite (JUnit + Maven)](#java-test-suite-junit--maven)
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Test Scenarios](#test-scenarios)
 - [Test Data](#test-data)
 - [Automated Testing](#automated-testing)
 - [CI/CD Integration](#cicd-integration)
+
+---
+
+## Java Test Suite (JUnit + Maven)
+
+Tests live under a single source root (`src/test/java`), all named `*Test.java`.
+Category is determined by **package + suffix**, not tags or Failsafe:
+
+| Category | Location | Style |
+|----------|----------|-------|
+| Unit | `domain/**`, `application/**`, `commons/**` | Mockito, no Spring |
+| Slice | `infrastructure/**/adapter/in/rest/*ControllerTest` | `@WebMvcTest` |
+| E2E | `com.payment.gateway.e2e.*E2ETest` | `@SpringBootTest` + Testcontainers |
+
+### Running tests
+
+```bash
+# Unit + slice tests (fast — recommended during development).
+# Use single quotes so the shell does not expand '!'.
+./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+
+# E2E tests only (Testcontainers spins up Postgres, Kafka, Redis — needs Docker)
+./mvnw test -Dtest='com.payment.gateway.e2e.**'
+
+# Everything
+./mvnw test
+
+# Code coverage (JaCoCo) → target/site/jacoco/index.html
+./mvnw test jacoco:report      # or: make coverage
+```
+
+> **E2E locally:** the full e2e suite runs in a single JVM. If you hit
+> "ApplicationContext failure threshold exceeded" while the local docker-compose
+> stack is also running, run e2e classes one per JVM with `-DreuseForks=false`.
+
+### CI split
+
+CI runs the same two-stage filter — fast unit/slice tests first, then e2e in a
+separate job with Docker and a longer timeout:
+
+```yaml
+# Stage 1: fast unit + slice tests
+- run: ./mvnw test -Dtest='!com.payment.gateway.e2e.**'
+
+# Stage 2: e2e tests (separate job, more resources)
+- run: ./mvnw test -Dtest='com.payment.gateway.e2e.**'
+```
 
 ---
 

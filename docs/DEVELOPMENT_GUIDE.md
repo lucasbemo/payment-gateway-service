@@ -35,7 +35,7 @@ This guide provides detailed instructions for developing and contributing to the
 | `jq` | Latest | AI spec-driven workflow only |
 
 > `gh` and `jq` are required only for the AI-assisted spec-driven workflow — see
-> [`GUIDE_WORKFLOW.md`](../GUIDE_WORKFLOW.md). They are not needed to build or run the app.
+> [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md). They are not needed to build or run the app.
 
 ### Recommended IDE
 

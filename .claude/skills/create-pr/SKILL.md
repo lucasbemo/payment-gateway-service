@@ -135,7 +135,7 @@ Use this structure:
 ## GitHub CLI workflow
 
 `gh` (authenticated GitHub CLI) is a **required** tool for this workflow — see the
-prerequisites in [`GUIDE_WORKFLOW.md`](../../../GUIDE_WORKFLOW.md). Verify it before
+prerequisites in [`GUIDE_WORKFLOW.md`](../../../docs/GUIDE_WORKFLOW.md). Verify it before
 creating the PR:
 
 - Run `gh auth status`. If `gh` is missing or not authenticated, **STOP** and tell the

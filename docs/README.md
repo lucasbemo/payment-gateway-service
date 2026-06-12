@@ -39,6 +39,13 @@ Welcome to the Payment Gateway Service documentation.
 | [Implementation Checkpoint](./IMPLEMENTATION_CHECKPOINT.md) | Implementation progress tracker |
 | [ADR Decisions](./decisions/) | Architecture Decision Records |
 
+### Project & Workflow
+
+| Document | Description |
+|----------|-------------|
+| [Workflow Guide](./GUIDE_WORKFLOW.md) | Spec-driven, AI-assisted development workflow |
+| [Prompts](./PROMPTS.md) | Reusable prompts used with the workflow |
+
 ### Archive
 
 | Document | Description |
@@ -74,6 +81,8 @@ docs/
 ├── STRIPE_INTEGRATION_ARCHITECTURE.md  # Stripe integration
 ├── OBSERVABILITY_TEST_REPORT.md        # Observability report
 ├── IMPLEMENTATION_CHECKPOINT.md        # Implementation tracker
+├── GUIDE_WORKFLOW.md                   # Spec-driven AI workflow
+├── PROMPTS.md                          # Reusable workflow prompts
 ├── archive/                            # Archived documents
 │   ├── PROJECT_PLAN.md                 # Original project plan
 │   ├── PHASE_10_API_DOCUMENTATION_PLAN.md
