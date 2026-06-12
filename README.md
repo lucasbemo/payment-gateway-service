@@ -142,8 +142,8 @@ and their local docker-compose defaults:
 ```bash
 # Database (host port 5433)
 DATASOURCE_URL=jdbc:postgresql://localhost:5433/payment_gateway
-DATASOURCE_USERNAME=postgres
-DATASOURCE_PASSWORD=your_secure_password_here
+DATASOURCE_USERNAME=admin
+DATASOURCE_PASSWORD=admin
 
 # Kafka (host port 19092)
 KAFKA_BOOTSTRAP_SERVERS=localhost:19092
