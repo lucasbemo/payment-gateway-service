@@ -65,6 +65,8 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
                 command.getAmount(),
                 command.getCurrency());
 
+        final long startNanos = System.nanoTime();
+
         // Validate merchant
         Merchant merchant = validateMerchant(command.getMerchantId());
 
@@ -111,6 +113,7 @@ public class ProcessPaymentService implements ProcessPaymentUseCase {
         log.info("Payment processed successfully: {}", savedPayment.getId());
         metricsPort.recordPaymentApproved();
         metricsPort.recordPaymentAmount(savedPayment.getAmount().getAmountInCents());
+        metricsPort.recordPaymentProcessingDuration(java.time.Duration.ofNanos(System.nanoTime() - startNanos));
         auditPort.logPaymentOperation(
                 savedPayment.getId(),
                 savedPayment.getMerchantId(),

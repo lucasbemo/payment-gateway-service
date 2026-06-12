@@ -1,5 +1,7 @@
 package com.payment.gateway.application.commons.port.out;
 
+import java.time.Duration;
+
 public interface MetricsPort {
 
     void recordPaymentApproved();
@@ -7,6 +9,8 @@ public interface MetricsPort {
     void recordPaymentFailed();
 
     void recordPaymentAmount(long amountCents);
+
+    void recordPaymentProcessingDuration(Duration duration);
 
     void recordRefundApproved();
 

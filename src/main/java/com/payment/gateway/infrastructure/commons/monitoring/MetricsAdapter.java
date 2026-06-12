@@ -26,6 +26,11 @@ public class MetricsAdapter implements MetricsPort {
     }
 
     @Override
+    public void recordPaymentProcessingDuration(java.time.Duration duration) {
+        customMetricsBinder.recordPaymentProcessingDuration(duration);
+    }
+
+    @Override
     public void recordRefundApproved() {
         customMetricsBinder.recordRefundApproved();
     }
