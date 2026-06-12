@@ -96,9 +96,12 @@ management:
         - spanId
         - parentId
         - sampled
-  zipkin:
-    tracing:
-      endpoint: ${ZIPKIN_BASE_URL:http://localhost:9411}/api/v2/spans
+    # Spring Boot 4 deprecated `management.zipkin.tracing.endpoint`; the canonical key
+    # is `management.tracing.export.zipkin.endpoint`. Using the old key silently fell back
+    # to the localhost:9411 default, so spans never reached Zipkin in-container.
+    export:
+      zipkin:
+        endpoint: ${ZIPKIN_BASE_URL:http://localhost:9411}/api/v2/spans
 
 logging:
   level:
