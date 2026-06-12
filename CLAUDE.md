@@ -101,7 +101,7 @@ Implementation runs in an **auto-created git worktree per feature** (default): b
 `feature/<n>-<slug>`, its own app `SERVER_PORT`, sharing one local infra stack. The spec
 folder travels on the feature branch; `specs/INDEX.md` is edited **only in the main
 checkout** (never on feature branches). After merge, `/finish-feature <n>-<slug>`
-archives the spec and removes the worktree. See [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md).
+archives the spec and removes the worktree. See [`GUIDE_WORKFLOW.md`](docs/GUIDE_WORKFLOW.md).
 
 ### Spec Context Policy
 

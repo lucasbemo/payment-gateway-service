@@ -192,7 +192,7 @@ GitHub Project item → /import-github-project-item <n>   (scaffold + enrich a s
                     → merge → /finish-feature <n>-<slug> (archive spec, clean up)
 ```
 
-See **[GUIDE_WORKFLOW.md](GUIDE_WORKFLOW.md)** for the full walkthrough and
+See **[GUIDE_WORKFLOW.md](docs/GUIDE_WORKFLOW.md)** for the full walkthrough and
 [CONTRIBUTING.md](CONTRIBUTING.md) for the branching model, Conventional Commits,
 and code style. The workflow is optional for one-off fixes, but it's how the
 backlog is delivered.

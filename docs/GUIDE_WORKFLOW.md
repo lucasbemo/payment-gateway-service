@@ -8,7 +8,7 @@ PR, with explicit human approval gates along the way.
 > **Source-of-truth rule:** GitHub Project is the product backlog source of truth.
 > Once imported and approved, `specs/active/<feature>/` becomes the engineering
 > contract for implementation. **Current source code and tests always override
-> older specs.** (See also the policy sections in [`CLAUDE.md`](CLAUDE.md).)
+> older specs.** (See also the policy sections in [`CLAUDE.md`](../CLAUDE.md).)
 
 ---
 
@@ -68,7 +68,7 @@ any code (or create the worktree) until you reply `APPROVE` to its Phase 1 plan.
 | **`jq`** | Latest | Parses GitHub issue JSON into specs | Workflow |
 
 > ⚠️ **The JDK must be 21 — not newer.** The host's default JDK (e.g. Temurin 25/26)
-> breaks Lombok/Mockito. See the *Gotchas* in [`CLAUDE.md`](CLAUDE.md) for the exact
+> breaks Lombok/Mockito. See the *Gotchas* in [`CLAUDE.md`](../CLAUDE.md) for the exact
 > JDK 26 toolchain (`sdk use java 26.0.1-tem`). The old JDK-21 pin and Testcontainers
 > `-Dapi.version=1.44` workaround are obsolete after the Spring Boot 4 / JDK 26 upgrade.
 
@@ -166,7 +166,7 @@ PRAISE) and a verdict (READY / NEEDS CHANGES / BLOCKED). Address blockers.
 ```
 Creates a focused draft PR with a Conventional-Commits title and a body covering
 summary, tests run, risk, and rollback. Follows the repo's
-[`CONTRIBUTING.md`](CONTRIBUTING.md) and CLAUDE.md Git rules (never on `main`,
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) and CLAUDE.md Git rules (never on `main`,
 draft PRs, no auto-merge).
 
 **7. After merge — clean up** (from the main checkout)

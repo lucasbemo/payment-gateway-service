@@ -57,7 +57,7 @@ need (not required for plain manual contribution):
 - **GitHub CLI (`gh`)**, authenticated with the `project` scope (`gh auth refresh -s project`)
 - **`jq`** (`brew install jq`)
 
-See [`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md) for the full workflow prerequisites.
+See [`GUIDE_WORKFLOW.md`](docs/GUIDE_WORKFLOW.md) for the full workflow prerequisites.
 
 ### Fork and Clone
 
@@ -150,7 +150,7 @@ workflow** powered by Claude Code skills. The idea is simple: a backlog item bec
 approved spec, the spec drives the implementation, and you stay in control at every gate.
 
 > 💡 **Optional.** The standard manual flow in the rest of this guide works exactly the
-> same. Full reference: **[`GUIDE_WORKFLOW.md`](GUIDE_WORKFLOW.md)**.
+> same. Full reference: **[`GUIDE_WORKFLOW.md`](docs/GUIDE_WORKFLOW.md)**.
 
 ### How it flows
 
@@ -449,7 +449,7 @@ void processPayment_withInvalidAmount_throwsException() { }
 | File | Purpose |
 |------|---------|
 | `README.md` | Project overview |
-| `GUIDE_WORKFLOW.md` | Spec-driven (AI-assisted) development workflow |
+| `docs/GUIDE_WORKFLOW.md` | Spec-driven (AI-assisted) development workflow |
 | `CHANGELOG.md` | Version history |
 | `docs/API_DOCUMENTATION.md` | API reference |
 | `docs/GETTING_STARTED.md` | Quick start |
