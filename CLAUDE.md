@@ -7,7 +7,7 @@ live in the lower half; the working-style rules at the top are mandatory.
 
 ## Working Style (mandatory)
 
-### 1. Plan Node Default
+### 1. Plan Mode Default
 
 * Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
 * If something goes sideways, STOP and re-plan immediately – don't keep pushing
@@ -102,6 +102,9 @@ Implementation runs in an **auto-created git worktree per feature** (default): b
 folder travels on the feature branch; `specs/INDEX.md` is edited **only in the main
 checkout** (never on feature branches). After merge, `/finish-feature <n>-<slug>`
 archives the spec and removes the worktree. See [`GUIDE_WORKFLOW.md`](docs/GUIDE_WORKFLOW.md).
+
+Other available commands (in `.claude/skills/`): `/implement-feature`,
+`/list-github-project-items`, `/spring-boot-review`, `/create-pr`.
 
 ### Spec Context Policy
 
@@ -288,5 +291,5 @@ kafka-ui 8082, pgadmin 8083, Prometheus 9090, Grafana 3000, Zipkin 9411, MinIO
 ## CI (`.github/workflows/ci.yml`)
 
 Jobs: build → (unit test | e2e test | OWASP dependency-check | spotless gate) →
-docker-build (main only) + AI review (PRs). Java 21 / Temurin. Mirror the unit
+docker-build (main only) + AI review (PRs). Java 26 / Temurin. Mirror the unit
 and e2e `-Dtest=` filters above when reproducing CI locally.
