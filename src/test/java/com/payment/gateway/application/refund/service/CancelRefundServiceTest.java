@@ -1,8 +1,12 @@
 package com.payment.gateway.application.refund.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
+import com.payment.gateway.application.refund.dto.RefundResponse;
 import com.payment.gateway.application.refund.port.out.RefundQueryPort;
 import com.payment.gateway.commons.exception.BusinessException;
 import com.payment.gateway.commons.model.Money;
@@ -67,6 +71,53 @@ class CancelRefundServiceTest {
             assertThatThrownBy(() -> cancelRefundService.cancelRefund(refundId, requestMerchantId, "Test reason"))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Refund does not belong to merchant");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when refund is in a terminal state")
+        void shouldThrowExceptionWhenRefundIsTerminal() {
+            // Given
+            String refundId = "refund_terminal";
+            String merchantId = "merchant-123";
+            Refund refund = createRefund(refundId, merchantId);
+            setStatus(refund, RefundStatus.COMPLETED); // terminal
+
+            given(refundQueryPort.findById(refundId)).willReturn(Optional.of(refund));
+
+            // When & Then
+            assertThatThrownBy(() -> cancelRefundService.cancelRefund(refundId, merchantId, "Too late"))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Cannot cancel refund in terminal state");
+        }
+    }
+
+    @Nested
+    @DisplayName("Successful Cancellation")
+    class SuccessfulCancellationTests {
+
+        @Test
+        @DisplayName("Should cancel a pending refund and return the mapped response")
+        void shouldCancelPendingRefundSuccessfully() {
+            // Given
+            String refundId = "refund_abc123";
+            String merchantId = "merchant-123";
+            String reason = "Customer changed their mind";
+            Refund refund = createRefund(refundId, merchantId);
+
+            given(refundQueryPort.findById(refundId)).willReturn(Optional.of(refund));
+            given(refundQueryPort.saveRefund(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+            // When
+            RefundResponse response = cancelRefundService.cancelRefund(refundId, merchantId, reason);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getId()).isEqualTo(refundId);
+            assertThat(response.getMerchantId()).isEqualTo(merchantId);
+            assertThat(response.getStatus()).isEqualTo(RefundStatus.CANCELLED.name());
+            assertThat(response.getReason()).isEqualTo(reason);
+            assertThat(refund.getStatus()).isEqualTo(RefundStatus.CANCELLED);
+            then(refundQueryPort).should().saveRefund(refund);
         }
     }
 

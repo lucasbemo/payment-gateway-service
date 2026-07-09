@@ -361,6 +361,49 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <!--
+                      Advisory coverage gate (issue #21): warns when the business
+                      layer (domain + application) drops below 70% LINE coverage,
+                      measured as an aggregate bundle. haltOnFailure=false keeps it
+                      informational only - it never breaks the build. To turn it
+                      into a hard gate later, flip haltOnFailure to true.
+                    -->
+                    <execution>
+                        <id>check-business-coverage</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <haltOnFailure>false</haltOnFailure>
+                            <includes>
+                                <include>com/payment/gateway/domain/**</include>
+                                <include>com/payment/gateway/application/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/payment/gateway/**/dto/**</exclude>
+                                <exclude>com/payment/gateway/**/port/**</exclude>
+                                <exclude>com/payment/gateway/**/event/**</exclude>
+                                <exclude>com/payment/gateway/**/*Exception.*</exclude>
+                                <exclude>com/payment/gateway/**/*Command.*</exclude>
+                                <exclude>com/payment/gateway/**/*Response.*</exclude>
+                                <exclude>com/payment/gateway/**/*Config.*</exclude>
+                                <exclude>com/payment/gateway/PaymentGatewayApplication.*</exclude>
+                            </excludes>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.70</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

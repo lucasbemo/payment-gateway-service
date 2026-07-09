@@ -257,6 +257,14 @@ Architecture is enforced by `architecture/HexagonalArchitectureTest.java`
   Kafka 7.5.0, Redis 7; wired via `@DynamicPropertySource`.
 * **Prod-profile smoke:** `ProdProfileAuthSmokeE2ETest` runs the real prod
   `SecurityFilterChain` (API-key + JWT) — keep it green when touching security.
+* **Coverage gate (advisory):** JaCoCo `check` (`check-business-coverage`
+  execution in `pom.xml`, bound to the `test` phase) enforces **70% LINE**
+  coverage as an aggregate BUNDLE over `domain.**` + `application.**` (DTOs,
+  ports, events, exceptions, config excluded). It is **advisory** —
+  `haltOnFailure=false`, so a below-70% run logs a `[WARNING] Rule violated ...`
+  but never fails the build/CI. Current business-layer line coverage is ~88%
+  (~93% excluding boilerplate). To make it a hard gate, flip `haltOnFailure` to
+  `true`.
 
 ## Local Environment
 
