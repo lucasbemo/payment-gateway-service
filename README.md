@@ -117,8 +117,10 @@ docker-compose up -d        # or: make docker-up
 
 ```bash
 ./mvnw spring-boot:run                 # or: make run  (profile: local)
-# or build a jar and run it
-./mvnw clean package && java -jar target/*.jar
+# or build a jar and run it (skip tests: `package` otherwise runs the
+# Testcontainers e2e suite, which needs the infra stack from step 2 and
+# can't share one JVM with the full test run — see `make build`)
+./mvnw clean package -DskipTests && java -jar target/*.jar
 ```
 
 ### 4. Access
