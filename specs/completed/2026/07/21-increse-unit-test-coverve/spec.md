@@ -1,6 +1,7 @@
 # Feature Spec: Increase unit test coverage + enforce a domain coverage threshold
 
-Status: draft
+Status: completed
+Merged PR: https://github.com/lucasbemo/payment-gateway-service/pull/23
 Source: https://github.com/lucasbemo/payment-gateway-service/issues/21
 
 ## Problem
