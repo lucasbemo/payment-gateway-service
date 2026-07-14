@@ -80,6 +80,49 @@ class UpdateMerchantServiceTest {
             assertThat(response.getId()).isEqualTo(merchantId);
             then(merchantCommandPort).should().saveMerchant(any());
         }
+
+        @Test
+        @DisplayName("Should update email successfully when it is valid and not taken")
+        void shouldUpdateEmailSuccessfully() {
+            // Given
+            String merchantId = "merchant-123";
+            Merchant merchant = createMerchant(merchantId);
+            String newEmail = "new@merchant.com";
+
+            given(merchantCommandPort.findById(merchantId)).willReturn(Optional.of(merchant));
+            given(merchantCommandPort.findByEmail(newEmail)).willReturn(Optional.empty());
+            given(merchantCommandPort.saveMerchant(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+            // When
+            MerchantResponse response = updateMerchantService.updateMerchant(merchantId, null, newEmail, null);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getEmail()).isEqualTo(newEmail);
+            then(merchantCommandPort).should().saveMerchant(any());
+        }
+
+        @Test
+        @DisplayName("Should allow updating to the same email already owned by the merchant")
+        void shouldAllowSameEmailForSameMerchant() {
+            // Given
+            String merchantId = "merchant-123";
+            Merchant merchant = createMerchant(merchantId);
+            String sameEmail = "same@merchant.com";
+
+            given(merchantCommandPort.findById(merchantId)).willReturn(Optional.of(merchant));
+            // The email resolves to the SAME merchant, so it must not be treated as a duplicate.
+            given(merchantCommandPort.findByEmail(sameEmail)).willReturn(Optional.of(merchant));
+            given(merchantCommandPort.saveMerchant(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+            // When
+            MerchantResponse response = updateMerchantService.updateMerchant(merchantId, null, sameEmail, null);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getEmail()).isEqualTo(sameEmail);
+            then(merchantCommandPort).should().saveMerchant(any());
+        }
     }
 
     @Nested
@@ -113,6 +156,24 @@ class UpdateMerchantServiceTest {
             assertThatThrownBy(() -> updateMerchantService.updateMerchant(merchantId, null, invalidEmail, null))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Invalid email address");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when email already belongs to another merchant")
+        void shouldThrowExceptionWhenEmailBelongsToAnotherMerchant() {
+            // Given
+            String merchantId = "merchant-123";
+            Merchant merchant = createMerchant(merchantId);
+            Merchant otherMerchant = createMerchant("merchant-999");
+            String takenEmail = "taken@merchant.com";
+
+            given(merchantCommandPort.findById(merchantId)).willReturn(Optional.of(merchant));
+            given(merchantCommandPort.findByEmail(takenEmail)).willReturn(Optional.of(otherMerchant));
+
+            // When & Then
+            assertThatThrownBy(() -> updateMerchantService.updateMerchant(merchantId, null, takenEmail, null))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Merchant with this email already exists");
         }
     }
 
