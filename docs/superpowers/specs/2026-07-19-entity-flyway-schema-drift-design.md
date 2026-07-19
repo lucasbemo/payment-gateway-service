@@ -50,9 +50,10 @@ New Testcontainers-backed test in `com.payment.gateway.architecture` (beside
 
 **Mechanics**
 
-- Uses the shared static Postgres from `test/ContainerConfig`; runs `Flyway.migrate()`
-  programmatically (idempotent — safe if migrations were already applied by another
-  class in the same JVM).
+- Starts its own pristine `postgres:15-alpine` container and runs `Flyway.migrate()`
+  programmatically (deliberately NOT the shared `test/ContainerConfig` Postgres: that class
+  force-starts Kafka+Redis and keeps its container package-private; a dedicated container
+  also guarantees a schema built by migrations alone).
 - **Schema side:** JDBC `DatabaseMetaData` per table — column inventory, varchar length,
   nullability, numeric precision/scale, unique indexes.
 - **Entity side:** Hibernate mapping model built via `MetadataSources` registering the 13
@@ -74,7 +75,7 @@ New Testcontainers-backed test in `com.payment.gateway.architecture` (beside
 **Allowlist = debt register:** `src/test/resources/known-schema-drift.txt`, one line per
 known mismatch: `table.column | kind | note`. The test fails on (a) any drift NOT in the
 file and (b) any **stale** entry whose drift no longer exists. The register can only
-shrink truthfully. PR A ships green with ~30 entries; PR C ends with the file empty (file
+shrink truthfully. PR A ships green with 38 entries (the guard found 2 real drifts the manual audit in §6 missed: `merchants.<uk:api_key_hash>` and `payment_items.payment_id | LENGTH`); PR C ends with the file empty (file
 retained so emptiness is enforced).
 
 ## 4. Stage 2 (PR B) — adopt auditing; Stage 3 (PR C) — align annotations

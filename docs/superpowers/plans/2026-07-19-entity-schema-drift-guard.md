@@ -350,7 +350,7 @@ EOF
 
 - [ ] **Step 1: Populate the allowlist from the Task 1 failure output**
 
-Copy every reported drift line into `known-schema-drift.txt` (keep the header comment). Use the `table.column | KIND` part verbatim; put the reported detail as the note. **The test output is ground truth** — the audit predicts these entries (expect ≈36; audit §6 tallies may be off by a couple), but the file must match the output exactly, no more, no less:
+Copy every reported drift line into `known-schema-drift.txt` (keep the header comment). Use the `table.column | KIND` part verbatim; put the reported detail as the note. **The test output is ground truth** — the audit predicts these entries (expect ≈36; audit §6 tallies may be off by a couple), but the file must match the output exactly, no more, no less: (Outcome note, post-execution: actual ground truth was 38 lines — the harness found `merchants.<uk:api_key_hash>` and `payment_items.payment_id | LENGTH`, which the manual audit missed.)
 
 ```text
 # Known entity<->schema drift register. Format: table.column | KIND | note
