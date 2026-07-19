@@ -2,12 +2,16 @@ package com.payment.gateway.infrastructure.payment.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.payment.gateway.infrastructure.merchant.adapter.out.persistence.MerchantJpaEntity;
+import com.payment.gateway.infrastructure.merchant.adapter.out.persistence.MerchantJpaRepository;
+import com.payment.gateway.infrastructure.merchant.adapter.out.persistence.MerchantStatus;
 import com.payment.gateway.test.TestAwsConfig;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
         properties = {
             "spring.main.allow-bean-definition-override=true",
             "spring.main.web-application-type=none",
-            "spring.main.lazy-initialization=true"
+            "spring.main.lazy-initialization=true",
+            // Share the container's schema with the Flyway-managed e2e contexts:
+            // use migrations + validate instead of create-drop, so this context
+            // never leaves a non-empty schema without a flyway_schema_history table.
+            "spring.flyway.enabled=true",
+            "spring.jpa.hibernate.ddl-auto=validate"
         })
 @Import({TestAwsConfig.class, com.payment.gateway.test.MockPortsConfig.class})
 @Transactional
@@ -32,6 +41,31 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
 
     @Autowired
     private PaymentJpaRepository paymentJpaRepository;
+
+    @Autowired
+    private MerchantJpaRepository merchantJpaRepository;
+
+    // The Flyway schema enforces fk_payments_merchant, so every merchant_id
+    // used by a payment fixture must exist in the merchants table. Inserts
+    // roll back with the test transaction.
+    @BeforeEach
+    void createDefaultMerchant() {
+        createMerchant("merchant-123");
+    }
+
+    private void createMerchant(String merchantId) {
+        merchantJpaRepository.save(MerchantJpaEntity.builder()
+                .id(merchantId)
+                .name("Test Merchant " + merchantId)
+                .email(merchantId + "@test.example")
+                .apiKey("key-" + merchantId)
+                .apiKeyHash("key-hash-" + merchantId)
+                .apiSecretHash("secret-hash-" + merchantId)
+                .status(MerchantStatus.ACTIVE)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build());
+    }
 
     @Nested
     @DisplayName("Save Payment Tests")
@@ -88,7 +122,8 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         @Test
         @DisplayName("Should find payments by merchant ID")
         void shouldFindPaymentsByMerchantId() {
-            String uniqueMerchantId = "merchant-test-" + UUID.randomUUID();
+            String uniqueMerchantId = "merchant-test-" + shortUuid();
+            createMerchant(uniqueMerchantId);
             PaymentJpaEntity payment1 = paymentJpaRepository.save(
                     createPaymentEntityForMerchant(uniqueMerchantId, "idem-key-1-" + UUID.randomUUID()));
             PaymentJpaEntity payment2 = paymentJpaRepository.save(
@@ -120,6 +155,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                     .idempotencyKey(saved.getIdempotencyKey())
                     .description(saved.getDescription())
                     .createdAt(saved.getCreatedAt())
+                    .updatedAt(Instant.now())
                     .build();
 
             paymentJpaRepository.save(updated);
@@ -143,6 +179,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                     .description(saved.getDescription())
                     .gatewayTransactionId("gateway-txn-xyz")
                     .createdAt(saved.getCreatedAt())
+                    .updatedAt(Instant.now())
                     .build();
 
             paymentJpaRepository.save(updated);
@@ -184,7 +221,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         @Test
         @DisplayName("Should save payment with items")
         void shouldSavePaymentWithItems() {
-            String paymentId = "pay-with-items-" + UUID.randomUUID();
+            String paymentId = "pay-with-items-" + shortUuid();
             PaymentJpaEntity paymentEntity = PaymentJpaEntity.builder()
                     .id(paymentId)
                     .merchantId("merchant-123")
@@ -194,6 +231,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                     .status(PaymentStatus.PENDING)
                     .description("Payment with items")
                     .createdAt(Instant.now())
+                    .updatedAt(Instant.now())
                     .build();
 
             PaymentJpaEntity saved = paymentJpaRepository.save(paymentEntity);
@@ -246,7 +284,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         void shouldSavePaymentWithLifecycleTimestamps() {
             Instant now = Instant.now();
             PaymentJpaEntity paymentEntity = PaymentJpaEntity.builder()
-                    .id("pay-timestamp-" + UUID.randomUUID())
+                    .id("pay-timestamp-" + shortUuid())
                     .merchantId("merchant-123")
                     .amount(new BigDecimal("100.00"))
                     .currency("USD")
@@ -254,6 +292,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                     .status(PaymentStatus.AUTHORIZED)
                     .description("Payment with timestamps")
                     .createdAt(now)
+                    .updatedAt(now)
                     .authorizedAt(now.plusSeconds(1))
                     .capturedAt(now.plusSeconds(2))
                     .build();
@@ -278,6 +317,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                     .idempotencyKey(saved.getIdempotencyKey())
                     .description(saved.getDescription())
                     .createdAt(saved.getCreatedAt())
+                    .updatedAt(Instant.now())
                     .errorCode("PAYMENT_DECLINED")
                     .errorMessage("Insufficient funds")
                     .failedAt(Instant.now())
@@ -300,7 +340,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         @DisplayName("Should save payment with customer and payment method")
         void shouldSavePaymentWithCustomerAndPaymentMethod() {
             PaymentJpaEntity paymentEntity = PaymentJpaEntity.builder()
-                    .id("pay-customer-" + UUID.randomUUID())
+                    .id("pay-customer-" + shortUuid())
                     .merchantId("merchant-123")
                     .customerId("customer-456")
                     .paymentMethodId("pm-789")
@@ -310,6 +350,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                     .status(PaymentStatus.PENDING)
                     .description("Payment with customer")
                     .createdAt(Instant.now())
+                    .updatedAt(Instant.now())
                     .build();
 
             PaymentJpaEntity saved = paymentJpaRepository.save(paymentEntity);
@@ -323,7 +364,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         void shouldFindPaymentsByCustomer() {
             // Note: This test documents expected behavior
             // A query method findByCustomerId would need to be added to the repository
-            String customerId = "customer-test-" + UUID.randomUUID();
+            String customerId = "customer-test-" + shortUuid();
             PaymentJpaEntity payment1 =
                     paymentJpaRepository.save(createPaymentWithCustomer(customerId, "idem-1-" + UUID.randomUUID()));
             PaymentJpaEntity payment2 =
@@ -342,7 +383,8 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         @Test
         @DisplayName("Should find pending payments")
         void shouldFindPendingPayments() {
-            String merchantId = "merchant-pending-" + UUID.randomUUID();
+            String merchantId = "merchant-pending-" + shortUuid();
+            createMerchant(merchantId);
             paymentJpaRepository.save(createPaymentEntityForMerchant(merchantId, "idem-1-" + UUID.randomUUID()));
             paymentJpaRepository.save(createPaymentEntityForMerchant(merchantId, "idem-2-" + UUID.randomUUID()));
 
@@ -352,9 +394,15 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
         }
     }
 
+    // ID columns (id, merchant_id, customer_id) are VARCHAR(36) in the Flyway
+    // schema; a prefixed full UUID overflows them, so use an 8-char suffix.
+    private static String shortUuid() {
+        return UUID.randomUUID().toString().substring(0, 8);
+    }
+
     private PaymentJpaEntity createPaymentWithCustomer(String customerId, String idempotencyKey) {
         return PaymentJpaEntity.builder()
-                .id("pay-cust-" + UUID.randomUUID())
+                .id("pay-cust-" + shortUuid())
                 .merchantId("merchant-123")
                 .customerId(customerId)
                 .amount(new BigDecimal("100.00"))
@@ -363,6 +411,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                 .status(PaymentStatus.PENDING)
                 .description("Test payment with customer")
                 .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -372,7 +421,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
 
     private PaymentJpaEntity createPaymentEntityForMerchant(String merchantId, String idempotencyKey) {
         return PaymentJpaEntity.builder()
-                .id("pay-" + UUID.randomUUID())
+                .id("pay-" + shortUuid())
                 .merchantId(merchantId)
                 .amount(new BigDecimal("100.00"))
                 .currency("USD")
@@ -380,6 +429,7 @@ class PaymentJpaRepositoryIntegrationTest extends com.payment.gateway.test.Conta
                 .status(PaymentStatus.PENDING)
                 .description("Test payment")
                 .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 }
