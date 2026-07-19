@@ -1,3 +1,43 @@
 # Known entity<->schema drift register. Format: table.column | KIND | note
 # The EntitySchemaDriftTest fails on drift missing from this file AND on
 # stale entries whose drift no longer exists. This file may only shrink.
+# Stage B (auditing adoption) removes the *_at NULLABLE entries.
+# Stage C (annotation alignment) removes everything else.
+customers.<uk:merchant_id+token> | UNIQUE_MISSING | schema unique constraint not declared on entity
+customers.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+discrepancies.created_at | NULLABLE | entity=nullable schema=NOT NULL
+discrepancies.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+idempotency_keys.<uk:key_hash> | UNIQUE_MISSING | schema unique constraint not declared on entity
+idempotency_keys.created_at | NULLABLE | entity=nullable schema=NOT NULL
+idempotency_keys.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+merchants.<uk:api_key_hash> | UNIQUE_MISSING | schema unique constraint not declared on entity
+merchants.api_key | NULLABLE | entity=nullable schema=NOT NULL
+merchants.api_key_hash | LENGTH | entity=255 schema=512
+merchants.api_key_hash | NULLABLE | entity=nullable schema=NOT NULL
+merchants.api_secret_hash | LENGTH | entity=255 schema=512
+merchants.api_secret_hash | NULLABLE | entity=nullable schema=NOT NULL
+merchants.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+merchants.webhook_secret | LENGTH | entity=255 schema=512
+outbox_events.error_message | TYPE | schema=text entity=varchar(255)
+outbox_events.retry_count | NULLABLE | entity=nullable schema=NOT NULL
+payment_items.payment_id | LENGTH | entity=64 schema=36
+payments.amount | SCALE | entity=(19,2) schema=(19,4)
+payments.customer_id | LENGTH | entity=64 schema=36
+payments.id | LENGTH | entity=64 schema=36
+payments.idempotency_key | LENGTH | entity=128 schema=255
+payments.merchant_id | LENGTH | entity=64 schema=36
+payments.payment_method_id | LENGTH | entity=64 schema=36
+payments.status | LENGTH | entity=32 schema=50
+payments.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+reconciliation_batches.<uk:batch_date+merchant_id> | UNIQUE_MISSING | schema unique constraint not declared on entity
+reconciliation_batches.discrepancy_count | NULLABLE | entity=nullable schema=NOT NULL
+reconciliation_batches.matched_transactions | NULLABLE | entity=nullable schema=NOT NULL
+reconciliation_batches.mismatched_transactions | NULLABLE | entity=nullable schema=NOT NULL
+reconciliation_batches.total_transactions | NULLABLE | entity=nullable schema=NOT NULL
+reconciliation_batches.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+refunds.error_message | TYPE | schema=text entity=varchar(255)
+refunds.retry_count | NULLABLE | entity=nullable schema=NOT NULL
+refunds.updated_at | NULLABLE | entity=nullable schema=NOT NULL
+transactions.error_message | TYPE | schema=text entity=varchar(255)
+transactions.retry_count | NULLABLE | entity=nullable schema=NOT NULL
+transactions.updated_at | NULLABLE | entity=nullable schema=NOT NULL
