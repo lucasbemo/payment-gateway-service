@@ -1,0 +1,3 @@
+# Known entity<->schema drift register. Format: table.column | KIND | note
+# The EntitySchemaDriftTest fails on drift missing from this file AND on
+# stale entries whose drift no longer exists. This file may only shrink.
