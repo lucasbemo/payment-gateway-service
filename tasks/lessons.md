@@ -1,5 +1,18 @@
 # Lessons
 
+## 2026-07-18 — "Done" includes booting the real app, and skips must be explained
+- Correction: after a test-only fix I reported completion off the test suite alone; user
+  asked (a) why 18 tests were skipped and (b) why I never ran the application.
+- Rule: after any implementation task, boot the actual app against the local stack and
+  drive at least health + one endpoint touching the changed area before claiming done.
+  Tests (even 1209 green) are not a substitute for a running process.
+- Rule: never report a test summary containing skips without listing why each class skips
+  (here: 18 pre-existing fully-qualified `@org.junit.jupiter.api.Disabled` — note a bare
+  `@Disabled` grep misses the fully-qualified form; grep for `api.Disabled`).
+- Runtime finding from this boot: `application.yml` defaults `REDIS_PORT:6379` but
+  docker-compose maps Redis to 6380 (`REDIS_PORT=6380 make run` works); and NotFound
+  currently maps to HTTP 400, not 404 as documented.
+
 ## 2026-06-09 — Fix findings, don't just report them
 - Correction: user asked "why did you not fix the kafka issue?" after I reported the
   unwired event publishing as an open finding needing a decision.
