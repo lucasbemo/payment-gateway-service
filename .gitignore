@@ -84,3 +84,5 @@ run-app.sh
 
 # Soak run outputs (metrics CSV / reports / k6 logs)
 load-test/soak/out/
+# Superpowers workflow scratch (SDD ledgers, task briefs, review diffs)
+.superpowers/
